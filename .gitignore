@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+.git
+.pyc
+__pycache__/
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir
+db_config.py
+celerybeat.pid
