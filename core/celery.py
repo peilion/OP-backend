@@ -1,8 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 from celery import Celery
 from sqlalchemy import text
-from db_config import session_make
-from db.conn import meta_engine, station_engines
+from db.db_config import session_make
+from db.conn_engine import meta_engine, station_engines
 import numpy as np
 from db_model.meta_models import MeasurePoint
 from db_model.sharding_models import ElecFeature, ElecData, VibFeature, VibData
