@@ -16,7 +16,7 @@ async def read_assets(
         limit: int = None,
 ):
     """
-    Get Assets.
+    Get Asset List.
     """
     conn = Database(META_URL)
     items = await get_multi(conn=conn, skip=skip, limit=limit)
