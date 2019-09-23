@@ -16,20 +16,19 @@ userMap = {
 }
 
 
-@router.post('/login/', tags=["login"], response_model=Token)
+@router.post('/login', response_model=Token)
 def login():
     return userMap['admin']
 
 
-@router.get('/login/', tags=["login"], response_model=Token)
-def login():
+@router.get('/login', response_model=Token)
+def get_login():
     return userMap['admin']
 
-@router.get('/info/', tags=["login"], response_model=Token)
-def login():
+@router.get('/info',  response_model=Token)
+def read_user_info():
     return userMap['admin']
 
-
-@router.post('/logout/', tags=["login"], response_model=Msg)
-def login():
+@router.post('/logout',  response_model=Msg)
+def logout():
     return {"msg": "Logout Success"}

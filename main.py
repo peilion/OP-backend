@@ -1,10 +1,10 @@
+import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-import uvicorn
-from core import config
-from api.api_v1.api import api_router
 
+from api.api_v1.api import api_router
+from core import config
+from dependencies import get_mp_mapper
 app = FastAPI(title=config.PROJECT_NAME, openapi_url="/api/v1/openapi.json")
 
 # CORS
@@ -24,8 +24,12 @@ if config.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
+@app.on_event("startup")
+async def startup_event():
+    get_mp_mapper()
+
 
 app.include_router(api_router, prefix=config.API_V1_STR)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info", reload=True, debug=True)
+    uvicorn.run('main:app', host="0.0.0.0", port=8000, log_level="info", reload=True, debug=True)

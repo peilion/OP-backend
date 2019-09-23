@@ -14,8 +14,6 @@ class Station(Base):
     location = Column(String(32), nullable=True)
     memo = Column(Text, nullable=True)
     telephone = Column(String(30), nullable=True)
-    cr_time = Column(DateTime, nullable=True, default=func.now())
-    md_time = Column(DateTime, nullable=True, default=func.now(), onupdate=func.now())
 
     sharding_db_id = Column(Integer, nullable=False)  # 指向该站数据库id
 

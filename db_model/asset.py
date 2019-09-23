@@ -27,7 +27,7 @@ class Asset(Base):
     station_id = Column(Integer, ForeignKey('station.id'))
     admin_id = Column(Integer, ForeignKey('user.id'), nullable=True)
 
-    children = relationship("Asset")
+    children = relationship("Asset",join_depth=2)
     manufacturer = relationship("Manufacturer", back_populates="assets")
     station = relationship('Station', back_populates='assets')
     admin = relationship('User', back_populates='assets')

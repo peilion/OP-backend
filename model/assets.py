@@ -1,30 +1,9 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
-from enum import IntEnum
 
 
-class LevelEnum(IntEnum):
-    unit = 0
-    equip = 1
-    component = 2
-
-
-class StatuEnum(IntEnum):
-    excellent = 0
-    good = 1
-    moderate = 2
-    poor = 3
-    offline = 4
-
-
-class StationEnum(IntEnum):
-    hhht = 0
-    etkq = 1
-    bt = 2
-
-
-class Asset(BaseModel):
+class FlattenAssetSchema(BaseModel):
     id: int
     name: str
     sn: str
@@ -35,11 +14,48 @@ class Asset(BaseModel):
     memo: Optional[str] = None
     health_indicator: float
     statu: int
-    parent_id: Optional[int] = None
-    manufacturer_id: Optional[int] = None
-    station_id: int
-    admin_id: int
     station_name: Optional[str] = None
+    parent_id: Optional[int] = None
 
     # class Config:
     #     orm_mode = True
+
+class FlattenAssetListSchema(BaseModel):
+    asset: Optional[List[Optional['FlattenAssetSchema']]]
+
+
+class NestAssetSchema(BaseModel):
+    id: int
+    name: str
+    sn: str
+    lr_time: Optional[datetime] = None
+    cr_time: Optional[datetime] = None
+    md_time: Optional[datetime] = None
+    asset_level: int
+    memo: Optional[str] = None
+    health_indicator: float
+    statu: int
+
+    children: Optional[List[Optional['NestAssetSchema']]]
+    station_id: int
+
+    class Config:
+        orm_mode = True
+
+class NestAssetListSchema(BaseModel):
+    asset: Optional[List[Optional['NestAssetSchema']]]
+
+
+NestAssetSchema.update_forward_refs()  # for self referencing orm model
+
+class StatuStatisticSchema(BaseModel):
+    class item(BaseModel):
+        statu: Optional[int]
+        cnt: Optional[int]
+    res: Optional[List[Optional['item']]]
+
+class StationStatisticSchema(BaseModel):
+    class item(BaseModel):
+        station: Optional[int]
+        cnt: Optional[int]
+    res: Optional[List[Optional['item']]]

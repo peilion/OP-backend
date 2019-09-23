@@ -9,6 +9,7 @@ Making sure that the init_db method has been called before app run.
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
 
 table_args = {
     'mysql_engine': 'InnoDB',
@@ -17,10 +18,10 @@ table_args = {
 
 Base = declarative_base()
 
-def session_make(engine):
+def session_make(engine) -> Session :
     # assert engine in [station_engines, meta_engine]
-    Session = sessionmaker(autocommit=False,
+    session = sessionmaker(autocommit=False,
                            autoflush=True,
                            bind=engine)
 
-    return Session()
+    return session()
