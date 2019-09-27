@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from model.msg import Msg
+from model.base import Msg
 from model.token import Token
 
 router = APIRouter()
@@ -16,19 +16,19 @@ userMap = {
 }
 
 
-@router.post('/login', response_model=Token)
+@router.post('/login/', response_model=Token)
 def login():
     return userMap['admin']
 
 
-@router.get('/login', response_model=Token)
+@router.get('/login/', response_model=Token)
 def get_login():
     return userMap['admin']
 
-@router.get('/info',  response_model=Token)
+@router.get('/info/',  response_model=Token)
 def read_user_info():
     return userMap['admin']
 
-@router.post('/logout',  response_model=Msg)
+@router.post('/logout/',  response_model=Msg)
 def logout():
     return {"msg": "Logout Success"}

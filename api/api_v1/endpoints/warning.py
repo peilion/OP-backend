@@ -1,13 +1,14 @@
+from enum import Enum
 from typing import List
+from typing import Optional
 
 from databases import Database
 from fastapi import APIRouter, HTTPException
 from starlette.responses import UJSONResponse
-from crud.warning import get_multi, get, get_warning_calendar, get_warning_stat_by_station,get_warning_stat_by_asset
-from db.conn_engine import  META_URL
+
+from crud.warning import get_multi, get, get_warning_calendar, get_warning_stat_by_station, get_warning_stat_by_asset
+from db.conn_engine import META_URL
 from model.warning import WarningLogSchema
-from typing import Optional
-from enum import Enum
 
 router = APIRouter()
 
@@ -32,7 +33,7 @@ async def read_warning_logs(
     return items
 
 
-@router.get("/stat", response_class=UJSONResponse)
+@router.get("/stat/", response_class=UJSONResponse)
 async def read_warning_logs_statistic(
         group_by: GroupRule,
 ):
@@ -59,7 +60,7 @@ async def read_warning_logs_statistic(
     else:
         raise HTTPException(status_code=400, detail="Bad query parameters")
 
-@router.get("/{id}", response_class=UJSONResponse, response_model=WarningLogSchema)
+@router.get("/{id}/", response_class=UJSONResponse, response_model=WarningLogSchema)
 async def read_warning_logs_by_id(
         id: int,
 ):

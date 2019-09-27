@@ -5,6 +5,7 @@ from crud.decorator import con_warpper, query2sql
 from db.db_config import session_make
 from db_model import Asset, Station, Bearing, PumpUnit, Motor, Pump, Stator, Rotor
 
+
 info_model_mapper = {
     'Bearing': Bearing, 'PumpUnit': PumpUnit, 'Motor': Motor, 'Pump': Pump, 'Stator': Stator, 'Rotor': Rotor
 }
@@ -17,7 +18,7 @@ async def get_multi(conn: Database, skip: int, limit: int, session: Session = se
               Asset.memo, Asset.health_indicator, Asset.statu, Asset.parent_id, Asset.station_id,
               Station.name.label('station_name')). \
         join(Station, Station.id == Asset.station_id). \
-        order_by(Asset.asset_level.desc()). \
+        order_by(Asset.id). \
         offset(skip). \
         limit(limit)
     return await conn.fetch_all(query2sql(query))
@@ -66,7 +67,11 @@ def get_tree(session: Session, id: int):
 @con_warpper
 async def get_count_by_statu(conn: Database):
     query = 'SELECT statu, COUNT(*) as cnt FROM `asset` GROUP BY statu'
-    return await conn.fetch_all(query)
+    res = await conn.fetch_all(query)
+    dic = {}
+    for row in res:
+        dic[Asset.STATUS[row.statu]] = row.cnt
+    return dic
 
 
 @con_warpper
@@ -81,9 +86,11 @@ async def get_count_by_both(conn: Database):
     res = await conn.fetch_all(query)
     res_dict = {}
     for item in res:
-        if res_dict.get(item[0]) is None:
-            res_dict.setdefault(item[0], [])
-            res_dict[item[0]].append({item[1]: item[2]})
+        station_name = Station.STATIONS[item[0]]
+        statu_name = Asset.STATUS[item[1]]
+        if res_dict.get(station_name) is None:
+            res_dict.setdefault(station_name, {})
+            res_dict[station_name][statu_name] = item[2]
         else:
-            res_dict[item[0]].append({item[1]: item[2]})
+            res_dict[station_name][statu_name] = item[2]
     return res_dict

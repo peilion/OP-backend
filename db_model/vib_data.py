@@ -1,7 +1,7 @@
 from sqlalchemy import Column, BigInteger, DateTime, LargeBinary
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
-from db import table_args,Base
+from db import table_args, Base
 
 
 class VibData(object):

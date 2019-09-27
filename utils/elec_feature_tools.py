@@ -1,5 +1,5 @@
 import numpy as np
-from scipy import signal, fftpack, optimize
+from scipy import signal, optimize
 
 
 def cal_samples(phaseAOmega, phaseBOmega, phaseCOmega, end_time):

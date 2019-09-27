@@ -7,11 +7,12 @@ from starlette.responses import UJSONResponse
 from treelib import Tree
 
 from crud.assets import get_multi, get, get_tree, get_count_by_statu, get_count_by_station, \
-    get_count_by_both,get_info
+    get_count_by_both, get_info
 from db import session_make
 from db.conn_engine import meta_engine, META_URL
 from model.assets import FlattenAssetSchema, FlattenAssetListSchema, NestAssetSchema, StatuStatisticSchema, \
     StationStatisticSchema
+
 router = APIRouter()
 
 
@@ -48,7 +49,7 @@ async def read_assets(
     # return NestAssetListSchema(asset=res)
 
 
-@router.get("/stat", response_class=UJSONResponse)
+@router.get("/stat/", response_class=UJSONResponse)
 async def read_assets_statistic(
         group_by: List[GroupRule] = Query(None),
 ):
@@ -57,7 +58,7 @@ async def read_assets_statistic(
             if group_by[0] == GroupRule.statu:
                 conn = Database(META_URL)
                 res = await get_count_by_statu(conn=conn)
-                return StatuStatisticSchema(res=res)
+                return StatuStatisticSchema.parse_obj(res)
             elif group_by[0] == GroupRule.station:
                 conn = Database(META_URL)
                 res = await get_count_by_station(conn=conn)
@@ -70,7 +71,7 @@ async def read_assets_statistic(
         raise HTTPException(status_code=400, detail="Bad query parameter")
 
 
-@router.get("/{id}", response_class=UJSONResponse)
+@router.get("/{id}/", response_class=UJSONResponse)
 async def read_by_id(
         id: int,
         iftree: bool = False
@@ -90,7 +91,7 @@ async def read_by_id(
         return NestAssetSchema.from_orm(item)
 
 
-@router.get("/{id}/info", response_class=UJSONResponse)
+@router.get("/{id}/info/", response_class=UJSONResponse)
 async def read_asset_info(
         id: int,
 ):

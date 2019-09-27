@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 
 from db import Base, table_args
 
+
 class Manufacturer(Base):
     __tablename__ = 'manufacturer'
     __table_args__ = table_args

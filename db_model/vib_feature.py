@@ -1,7 +1,7 @@
-from sqlalchemy import Column, BigInteger, ForeignKey, Float, DateTime
+from sqlalchemy import Column, BigInteger, ForeignKey, Float, DateTime, Binary,VARBINARY
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
-from db import table_args,Base
+from db import table_args, Base
 
 
 class VibFeature(object):
@@ -25,7 +25,14 @@ class VibFeature(object):
                 avg=Column(Float, default=0),
                 var=Column(Float, default=0),
                 kurtosis=Column(Float, default=0),
-
+                fr=Column(Float, default=0),
+                fr_amp=Column(VARBINARY),
+                thd = Column(Float, default=0),
+                bpfi=Column(Float, default=0),
+                bpfo=Column(Float, default=0),
+                bsf=Column(Float, default=0),
+                ftf=Column(Float, default=0),
+                sideband=Column(Float, default=0),
                 data_id=Column(BigInteger, ForeignKey('vib_data_{0}.id'.format(point_id)), unique=True),
 
                 __table_args__=table_args

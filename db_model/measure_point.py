@@ -25,6 +25,7 @@ class MeasurePoint(Base):
 
     sample_interval = Column(Integer)  # 单位为 s
     sample_freq = Column(Integer)  # 单位为 Hz
+    statu = Column(SmallInteger, default=4)  # 值含义见 STATUS
 
     asset_id = Column(Integer, ForeignKey('asset.id'))
 

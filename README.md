@@ -1,8 +1,8 @@
 ## Start
 
-```bash
-# Start flask app
-flask run
+```shell script
+# Start app
+python main.py
 
 # Create periodic tasks sender
 celery -A core beat --loglevel=info

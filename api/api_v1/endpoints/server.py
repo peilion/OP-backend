@@ -1,10 +1,12 @@
-from fastapi import APIRouter
-from starlette.responses import UJSONResponse
-from sqlalchemy import text
-from databases import Database
-from db.conn_engine import INFO_URL
 import psutil
+from databases import Database
+from fastapi import APIRouter
+from sqlalchemy import text
+from starlette.responses import UJSONResponse
+
+from db.conn_engine import INFO_URL
 from model.server import ServerInfoSchema
+
 router = APIRouter()
 
 

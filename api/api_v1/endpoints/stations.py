@@ -5,11 +5,11 @@ from fastapi import APIRouter, HTTPException
 
 from crud.stations import get_multi, get
 from db.conn_engine import META_URL
-from model.stations import Station
+from model.stations import StationSchema
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Optional[Station]])
+@router.get("/", response_model=List[Optional[StationSchema]])
 async def read_stations(
         skip: int = 0,
         limit: int = None,
@@ -22,7 +22,7 @@ async def read_stations(
     return items
 
 
-@router.get("/{id}", response_model=Optional[Station])
+@router.get("/{id}/", response_model=Optional[StationSchema])
 async def read_station_by_id(
         id: int,
 ):

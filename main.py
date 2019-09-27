@@ -4,7 +4,8 @@ from starlette.middleware.cors import CORSMiddleware
 
 from api.api_v1.api import api_router
 from core import config
-from dependencies import get_mp_mapper
+from core.dependencies import get_mp_mapper
+
 app = FastAPI(title=config.PROJECT_NAME, openapi_url="/api/v1/openapi.json")
 
 # CORS

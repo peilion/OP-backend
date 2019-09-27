@@ -1,6 +1,8 @@
-from models.meta_models import meta_engine, User, Manufacturer, Station, Asset, MeasurePoint
-from db.db_config import session_make
 import random
+
+from models.meta_models import meta_engine, User, Manufacturer, Station, Asset, MeasurePoint
+
+from db.db_config import session_make
 
 session = session_make(meta_engine)
 

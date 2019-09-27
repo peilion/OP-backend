@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, func
+from sqlalchemy import Column, Integer
 from sqlalchemy import String, Text
 from sqlalchemy.orm import relationship
 
@@ -8,6 +8,8 @@ from db import Base, table_args
 class Station(Base):
     __tablename__ = 'station'
     __table_args__ = table_args
+
+    STATIONS =  {1: 'HuHeHaoTe', 2: 'ErTuoKeQi', 3: 'BaoTou'}
 
     id = Column(Integer, primary_key=True)
     name = Column(String(32), unique=True)

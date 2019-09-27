@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
 
-class Station(BaseModel):
+
+class StationSchema(BaseModel):
     id: int
     name: str
     location: str

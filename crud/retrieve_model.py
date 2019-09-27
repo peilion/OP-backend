@@ -1,6 +1,7 @@
 from sqlalchemy import MetaData
-from db.db_config import engine, SHARDING_NUMBER
 from sqlalchemy import text
+
+from db.db_config import engine, SHARDING_NUMBER
 
 metadata = MetaData()
 
