@@ -8,7 +8,7 @@ from .motor import Motor
 from .pump import Pump
 from .pump_unit import PumpUnit
 from .rotor import Rotor
-from .station import Station
+from .organization import Station
 from .stator import Stator
 from .user import User
 from .vib_data import VibData

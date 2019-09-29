@@ -9,6 +9,7 @@ from db import Base, table_args
 class Asset(Base):
     LEVELS = {0: 'Unit', 1: 'Equip', 2: 'Component'}
     STATUS = {0: 'Excellent', 1: 'Good', 2: 'Moderate', 3: 'Poor', 4: 'Offline'}
+    TYPES = {0: 'PumpUnit', 1: 'Pump', 2: 'Motor', 3: 'Rotor', 4: 'Stator',5:'Bearing'}
 
     id = Column(Integer, primary_key=True)
     name = Column(String(64), unique=True)
@@ -16,9 +17,11 @@ class Asset(Base):
     lr_time = Column(DateTime, nullable=True)
     cr_time = Column(DateTime, nullable=True, default=func.now())
     md_time = Column(DateTime, nullable=True, default=func.now(), onupdate=func.now())
+    st_time = Column(DateTime, nullable=False)
+    asset_type = Column(SmallInteger, nullable=False)  # 值含义见 TYPES
     asset_level = Column(SmallInteger, nullable=False)  # 值含义见 LEVELS
+    repairs = Column(SmallInteger, nullable=False)
     memo = Column(Text, nullable=True)
-
     health_indicator = Column(Float, default=85, nullable=True)
     statu = Column(SmallInteger, default=4)  # 值含义见 STATUS
 

@@ -33,6 +33,8 @@ class VibFeature(object):
                 bsf=Column(Float, default=0),
                 ftf=Column(Float, default=0),
                 sideband=Column(Float, default=0),
+                health_indicator=Column(Float, default=85),
+
                 data_id=Column(BigInteger, ForeignKey('vib_data_{0}.id'.format(point_id)), unique=True),
 
                 __table_args__=table_args
