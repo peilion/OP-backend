@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer,ForeignKey
+from sqlalchemy import Column, Integer,ForeignKey,Float
 from sqlalchemy import String, Text
 from sqlalchemy.orm import relationship
 
@@ -9,8 +9,6 @@ class Station(Base):
     __tablename__ = 'station'
     __table_args__ = table_args
 
-    STATIONS =  {1: 'HuHeHaoTe', 2: 'ErTuoKeQi', 3: 'BaoTou'}
-
     id = Column(Integer, primary_key=True)
     name = Column(String(32), unique=True)
     location = Column(String(32), nullable=True)
@@ -20,7 +18,8 @@ class Station(Base):
     bc_id = Column(Integer, ForeignKey('branch_company.id'))
     rc_id = Column(Integer, ForeignKey('region_company.id'))
     sharding_db_id = Column(Integer, nullable=False)  # 指向该站数据库id
-
+    latitude = Column(Float)
+    longitude = Column(Float)
     assets = relationship('Asset', back_populates='station')
     measure_points = relationship('MeasurePoint', back_populates="station")
 

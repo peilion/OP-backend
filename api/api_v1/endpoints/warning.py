@@ -6,7 +6,7 @@ from databases import Database
 from fastapi import APIRouter, HTTPException
 from starlette.responses import UJSONResponse
 
-from crud.warning import get_multi, get, get_warning_calendar, get_warning_stat_by_station, get_warning_stat_by_asset
+from crud.warning import *
 from db.conn_engine import META_URL
 from model.warning import WarningLogSchema
 
@@ -17,6 +17,9 @@ class GroupRule(str, Enum):
     date = "date"
     station = "station"
     asset = "asset"
+    isread = "isread"
+    branch = "branch"
+    region = "region"
 
 
 @router.get("/", response_class=UJSONResponse, response_model=List[Optional[WarningLogSchema]])
@@ -41,22 +44,31 @@ async def read_warning_logs_statistic(
     Response Schema:
 
     - if **group_by = date**: [[date,warning number in this date],...]
-    - if **group_by = station**: [[station_id,warning number in this station],...]
+    - if **group_by = station/region/company**: return two fields 'labels' and 'series' for pie chart drawing.
     - if **group_by = asset**: [[asset_id,warning number of this asset],...]
+    - if **group_by = isread**: [[ 0,unread warninglog],[1,read warninglog]]
+
     """
     conn = Database(META_URL)
 
     if group_by == GroupRule.date:
-        item = await get_warning_calendar(conn=conn)
-        return item
-
+        res = await get_warning_calendar(conn=conn)
+        return res
     if group_by == GroupRule.station:
-        item = await get_warning_stat_by_station(conn=conn)
-        return item
-
+        res = await get_warning_stat_by_station(conn=conn)
+        return res
     if group_by == GroupRule.asset:
-        item = await get_warning_stat_by_asset(conn=conn)
-        return item
+        res = await get_warning_stat_by_asset(conn=conn)
+        return res
+    if group_by == GroupRule.isread:
+        res = await get_warning_stat_by_isreadable(conn=conn)
+        return res
+    if group_by == GroupRule.branch:
+        res = await get_warning_stat_by_branch_company(conn=conn)
+        return res
+    if group_by == GroupRule.region:
+        res = await get_warning_stat_by_region_company(conn=conn)
+        return res
     else:
         raise HTTPException(status_code=400, detail="Bad query parameters")
 

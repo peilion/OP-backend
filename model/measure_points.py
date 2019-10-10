@@ -9,8 +9,8 @@ class MeasurePointSchema(BaseModel):
     name: str
     type: int
     md_time: Optional[datetime] = None
-    staion_id: int
-    station_name: str
-    asset_id: int
-    asset_name: str
-    statu: int
+    staion_id: Optional[int]
+    station_name: Optional[str]
+    asset_id: Optional[int]
+    asset_name: Optional[str]
+    statu: Optional[int]

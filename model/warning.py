@@ -9,4 +9,5 @@ class WarningLogSchema(BaseModel):
     description : str
     severity : int
     asset_name :str
+    is_read : bool
 

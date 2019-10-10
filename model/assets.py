@@ -11,13 +11,14 @@ class FlattenAssetSchema(BaseModel):
     lr_time: Optional[datetime] = None
     cr_time: Optional[datetime] = None
     md_time: Optional[datetime] = None
+    st_time: Optional[datetime] = None
     asset_level: int
     memo: Optional[str] = None
     health_indicator: float
     statu: int
     station_name: Optional[str] = None
     parent_id: Optional[int] = None
-
+    repairs: Optional[int]
     # class Config:
     #     orm_mode = True
 
@@ -37,6 +38,7 @@ class NestAssetSchema(BaseModel):
     memo: Optional[str] = None
     health_indicator: float
     statu: int
+    repairs: Optional[int]
 
     children: Optional[List[Optional['NestAssetSchema']]]
     station_id: int
@@ -66,3 +68,25 @@ class StationStatisticSchema(BaseModel):
         cnt: Optional[int]
 
     res: Optional[List[Optional['item']]]
+
+
+class TypeStatisticSchema(BaseModel):
+    class item(BaseModel):
+        asset_type: Optional[int]
+        cnt: Optional[int]
+
+    res: Optional[List[Optional['item']]]
+
+
+class TypeStationSchema(BaseModel):
+    class item(BaseModel):
+        name : str
+        PumpUnit:  Optional[int] = 0
+        Pump:  Optional[int] = 0
+        Motor:  Optional[int] = 0
+        Rotor:  Optional[int] = 0
+        Stator:  Optional[int] = 0
+        Bearing:  Optional[int] = 0
+
+    res : Optional[List[Optional['item']]]
+    update_time: Optional[datetime] = None

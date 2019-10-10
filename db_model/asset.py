@@ -36,6 +36,7 @@ class Asset(Base):
     admin = relationship('User', back_populates='assets')
     warninglogs = relationship('WarningLog', back_populates='asset')
     measure_points = relationship('MeasurePoint', back_populates='asset')
+    maintlogs = relationship('MaintenanceRecord', back_populates='asset')
 
     __tablename__ = 'asset'
     __table_args__ = table_args
