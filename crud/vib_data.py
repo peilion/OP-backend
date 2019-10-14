@@ -24,11 +24,12 @@ async def get_by_id(conn: Database, shard_id: int, data_id: int, session: Sessio
         filter(model.id == data_id)
     return await conn.fetch_one(query2sql(query))
 
+
 @con_warpper
-async def get_multi(conn:Database,shard_id:int,time_before:datetime,time_after:datetime,session : Session = session_make(engine=None)):
+async def get_multi(conn: Database, shard_id: int, time_before: datetime, time_after: datetime, session: Session = session_make(engine=None)):
     model = VibData.model(point_id=shard_id)
     query = session. \
-        query(model.id,model.time). \
-        filter(model.time.between(str(time_before),str(time_after))). \
+        query(model.id, model.time). \
+        filter(model.time.between(str(time_before), str(time_after))). \
         order_by(model.id)
     return await conn.fetch_all(query2sql(query))

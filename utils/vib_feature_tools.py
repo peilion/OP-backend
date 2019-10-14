@@ -4,7 +4,9 @@
 
 import numpy as np
 import scipy.stats as sts
+from numpy import ndarray
 
+import numba
 
 def rms_fea(a):
     return np.sqrt(np.mean(np.square(a)))
@@ -49,3 +51,15 @@ def spectral_pow(a):
     mag = np.abs(np.fft.fft(a))
     mag = mag[1:N / 2] * 2.00 / N
     return np.mean(np.power(mag, 3))
+
+
+def fftransform(Signal: str):
+    # fft_size = int(Signal.shape[0])
+    Signal = np.fromstring(Signal, dtype=np.float32)
+
+    N = Signal.shape[0]
+    spec = np.fft.fft(Signal)[0:int(N / 2)] / N  # FFT function from numpy
+    spec[1:] = 2 * spec[1:]  # need to take the single-sided spectrum only
+    spec = np.abs(spec)
+
+    return {'spec': spec, 'vib': Signal}

@@ -1,13 +1,14 @@
 from datetime import datetime
 
 from pydantic import BaseModel
-from model.base import SubSampledBinaryArray
+from model.base import SubSampledBinaryArray,SubSampledArray,SignalArray
 
 
 class VibrationSignalSchema(BaseModel):
     id: int
     time: datetime
-    vib: SubSampledBinaryArray
+    vib: SubSampledArray
+    spec: SignalArray
 
 class VibrationSignalListSchema(BaseModel):
     id: int

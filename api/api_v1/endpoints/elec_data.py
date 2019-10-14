@@ -20,7 +20,7 @@ async def read_the_latest_electric_signal(
         raise HTTPException(status_code=400,
                             detail="The given measure point collect vibration data, try to use the approaprite endpoint.")
 
-    conn = Database(STATION_URLS[mp_shard_info['station_id']])
+    conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
     res = await get_latest(conn=conn, shard_id=mp_shard_info['inner_id'])
     return dict(res)
 
@@ -40,7 +40,7 @@ async def read_all_electric_signal_info(
         raise HTTPException(status_code=400,
                             detail="The given measure point collect vibration data, try to use the approaprite endpoint.")
 
-    conn = Database(STATION_URLS[mp_shard_info['station_id']])
+    conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
     res = await get_multi(conn=conn, shard_id=mp_shard_info['inner_id'], time_before=time_before, time_after=time_after)
     if not res:
         raise HTTPException(status_code=400,
@@ -59,6 +59,6 @@ async def read_electric_signal_by_id(
         raise HTTPException(status_code=400,
                             detail="The given measure point collect vibration data, try to use the approaprite endpoint.")
 
-    conn = Database(STATION_URLS[mp_shard_info['station_id']])
+    conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
     res = await get_by_id(conn=conn, shard_id=mp_shard_info['inner_id'], data_id=data_id)
     return dict(res)

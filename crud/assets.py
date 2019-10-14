@@ -49,6 +49,7 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
         Asset.lr_time,
         Asset.cr_time,
         Asset.md_time,
+        Asset.st_time,
         Asset.asset_level,
         Asset.memo,
         Asset.health_indicator,

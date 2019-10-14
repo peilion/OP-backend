@@ -29,7 +29,7 @@ async def read_the_latest_vibration_feature(
         raise HTTPException(status_code=400,
                             detail="The given measure point collect vibration data, try to use the approaprite endpoint.")
 
-    conn = Database(STATION_URLS[mp_shard_info['station_id']])
+    conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
 
     res = await get_latest(conn=conn, shard_id=mp_shard_info['inner_id'], fileds=features)
     return dict(res)
@@ -56,7 +56,7 @@ async def read_vibration_features(
         raise HTTPException(status_code=400,
                             detail="The given measure point collect vibration data, try to use the approaprite endpoint.")
 
-    conn = Database(STATION_URLS[mp_shard_info['station_id']])
+    conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
     res = await get_multi(conn=conn, shard_id=mp_shard_info['inner_id'], fileds=features, time_before=str(time_before),
                           time_after=str(time_after))
     if not res:
@@ -82,6 +82,6 @@ async def read_vibration_feature_by_id(
         raise HTTPException(status_code=400,
                             detail="The given measure point collect vibration data, try to use the approaprite endpoint.")
 
-    conn = Database(STATION_URLS[mp_shard_info['station_id']])
+    conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
     res = await get(conn=conn, shard_id=mp_shard_info['inner_id'], data_id=data_id, fileds=features)
     return dict(res)

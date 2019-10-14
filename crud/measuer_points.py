@@ -11,12 +11,12 @@ from db_model import MeasurePoint, Station, Asset
 async def get_multi(conn: Database, skip: int, limit: int, brief: bool,
                     session: Session = session_make(engine=None), **kwargs):
     if brief:
-        query = session. query(
+        query = session.query(
             MeasurePoint.id,
             MeasurePoint.name,
             MeasurePoint.type)
     else:
-        query = session. query(
+        query = session.query(
             MeasurePoint.id,
             MeasurePoint.name,
             MeasurePoint.type,
@@ -41,23 +41,16 @@ async def get_multi(conn: Database, skip: int, limit: int, brief: bool,
 
 @con_warpper
 async def get(conn: Database, id: int, session: Session = session_make(engine=None)):
-    query = session. query(
+    query = session.query(
         MeasurePoint.id,
         MeasurePoint.name,
         MeasurePoint.type,
         MeasurePoint.md_time,
-        MeasurePoint.cr_time,
         MeasurePoint.statu,
-        Station.id.label('staion_id'),
-        Station.name.label('station_name'),
-        Asset.id.label('asset_id'),
-        Asset.name.label('asset_name')). order_by(
-        MeasurePoint.id). join(
-            Station,
-            MeasurePoint.station_id == Station.id). join(
-                Asset,
-                MeasurePoint.asset_id == Asset.id). filter(
-                    MeasurePoint.asset_id == id)
+        MeasurePoint.sample_freq,
+        MeasurePoint.sample_interval).order_by(
+        MeasurePoint.id).filter(
+            MeasurePoint.id == id)
     return await conn.fetch_one(query2sql(query))
 
 
@@ -66,13 +59,13 @@ async def get_stat(conn: Database, rule: str, session: Session = session_make(en
     query = None
     if rule == 'station':
         query = session.query(MeasurePoint.station_id, func.count(
-            '*').label('cnt')). group_by(MeasurePoint.station_id)
+            '*').label('cnt')).group_by(MeasurePoint.station_id)
     elif rule == 'asset':
         query = session.query(MeasurePoint.asset_id, func.count(
-            '*').label('cnt')). group_by(MeasurePoint.asset_id)
+            '*').label('cnt')).group_by(MeasurePoint.asset_id)
     elif rule == 'statu':
         query = session.query(MeasurePoint.statu, func.count(
-            '*').label('cnt')). group_by(MeasurePoint.statu)
+            '*').label('cnt')).group_by(MeasurePoint.statu)
     else:
         return None
 

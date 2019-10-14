@@ -22,7 +22,8 @@ class GroupRule(str, Enum):
     region = "region"
 
 
-@router.get("/", response_class=UJSONResponse, response_model=List[Optional[WarningLogSchema]])
+@router.get("/", response_class=UJSONResponse,
+            response_model=List[Optional[WarningLogSchema]])
 async def read_warning_logs(
         skip: int = None,
         limit: int = None,
@@ -72,7 +73,11 @@ async def read_warning_logs_statistic(
     else:
         raise HTTPException(status_code=400, detail="Bad query parameters")
 
-@router.get("/{id}/", response_class=UJSONResponse, response_model=WarningLogSchema)
+
+@router.get(
+    "/{id}/",
+    response_class=UJSONResponse,
+    response_model=WarningLogSchema)
 async def read_warning_logs_by_id(
         id: int,
 ):
