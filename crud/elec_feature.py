@@ -38,22 +38,25 @@ async def get_latest(conn: Database, shard_id: int, fileds: List[str], session: 
 
 
 @con_warpper
-async def get_multi(conn: Database, shard_id: int, fileds: List[str], time_before: str, time_after: str,
+async def get_multi(conn: Database, shard_id: int, fileds: List[str], time_before: str, time_after: str, limit: 50,
                     session: Session = session_make(engine=None)):
     model = ElecFeature.model(point_id=shard_id)
 
     query = session.query(model)
     for filed in fileds + ['id', 'time']:
         query = query.options(load_only(filed))
-    query = query. \
-        order_by(model.id). \
-        filter(model.time.between(str(time_after), str(time_before)))
-
+    if limit is None:
+        query = query. \
+            order_by(model.id). \
+            filter(model.time.between(str(time_after), str(time_before)))
+    if limit:
+        query = query.order_by(model.id.desc()).limit(limit)
     res = await conn.fetch_all(query2sql(query))
+
 
     dic = {}
     keys = res[0].keys()
-    for row in res:
+    for row in reversed(res): # Ordered results are required in Chartist.js.
         for key in keys:
             if key == 'time':
                 dic.setdefault(key, []).append(str(row[key]))

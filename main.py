@@ -9,7 +9,7 @@ from core.dependencies import get_mp_mapper
 app = FastAPI(title=config.PROJECT_NAME, openapi_url="/api/v1/openapi.json")
 
 # CORS
-origins = []
+origins = ["*"]
 
 # Set all CORS enabled origins
 if config.BACKEND_CORS_ORIGINS:

@@ -3,7 +3,7 @@ from typing import List
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Query
 from starlette.responses import UJSONResponse
-from treelib import Tree
+from custom_lib.treelib import Tree
 
 from crud.assets import get_multi, get, get_tree, get_info
 from crud.assets_stat import *
@@ -47,13 +47,14 @@ async def read_assets(
         skip: int = None,
         limit: int = None,
         iftree: bool = False,
-        type: int = None
+        type: int = None,
+        station_name: str = None
 ):
     """
     Get Asset List.
     """
     conn = Database(META_URL)
-    items = await get_multi(conn=conn, skip=skip, limit=limit, type=type)
+    items = await get_multi(conn=conn, skip=skip, limit=limit, type=type,station_name=station_name)
     if not iftree:
         return FlattenAssetListSchema(asset=items)
     elif iftree:
@@ -61,13 +62,14 @@ async def read_assets(
         tree.create_node(tag='root', identifier='root')
         items = [dict(row) for row in items]
         for item in items:
+            item = {**item,'originalSTtime':item['st_time'],'edit':False} # For tree table editable fields
             tree.create_node(data=item, identifier=item['id'], parent='root')
 
         for node in tree.expand_tree(mode=Tree.WIDTH):
             if node != 'root':
                 if tree[node].data['parent_id']:
                     tree.move_node(node, tree[node].data['parent_id'])
-        return tree.to_dict(with_data=True)['root']['children']
+        return tree.to_dict(with_data=True)['children']
     # return NestAssetListSchema(asset=res)
 
 

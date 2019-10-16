@@ -21,7 +21,7 @@ async def read_equip_level_mapper(
     res = await conn.fetch_one(s)
     await conn.disconnect()
 
-    return {'table_volume': str(res.volume) + 'GB',
+    return {'table_volume': str(res.volume) + ' Bytes',
             'disk_usage': round(res.volume / 1024 / 1024 / 1024 / 3072 * 100, 2),
             'cpu_statu': psutil.cpu_percent(None),
             'memory_statu': psutil.virtual_memory().percent}

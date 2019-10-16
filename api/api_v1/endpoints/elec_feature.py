@@ -49,6 +49,7 @@ async def read_vibration_features(
              'winitial_phase',
              'n_rms', 'p_rms', 'z_rms', 'imbalance', 'health_indicator'],
             description='Only these fileds can be returned now.'),
+        limit: int = None,
         mp_mapper: dict = Depends(get_mp_mapper)
 ):
     mp_shard_info = mp_mapper[mp_id]
@@ -58,7 +59,7 @@ async def read_vibration_features(
 
     conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
     res = await get_multi(conn=conn, shard_id=mp_shard_info['inner_id'], fileds=features, time_before=str(time_before),
-                          time_after=str(time_after))
+                          time_after=str(time_after),limit=limit)
     if not res:
         raise HTTPException(status_code=400,
                             detail="No signal collected between the time range")

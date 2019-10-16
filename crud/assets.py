@@ -15,8 +15,9 @@ info_model_mapper = {
 
 
 @con_warpper
-async def get_multi(conn: Database, skip: int, limit: int, type: int, session: Session = session_make(engine=None)):
-    query = session. query(
+async def get_multi(conn: Database, skip: int, limit: int, type: int, station_name: str,
+                    session: Session = session_make(engine=None)):
+    query = session.query(
         Asset.id,
         Asset.name,
         Asset.sn,
@@ -31,18 +32,20 @@ async def get_multi(conn: Database, skip: int, limit: int, type: int, session: S
         Asset.parent_id,
         Asset.station_id,
         Asset.repairs,
-        Station.name.label('station_name')). join(
+        Station.name.label('station_name')).join(
         Station,
-        Station.id == Asset.station_id). order_by(
-            Asset.id). offset(skip). limit(limit)
+        Station.id == Asset.station_id).order_by(
+        Asset.id).offset(skip).limit(limit)
     if type is not None:
         query = query.filter(Asset.asset_type == type)
+    if station_name is not None:
+        query = query.filter(Station.name == station_name)
     return await conn.fetch_all(query2sql(query))
 
 
 @con_warpper
 async def get(conn: Database, id: int, session: Session = session_make(engine=None)):
-    query = session. query(
+    query = session.query(
         Asset.id,
         Asset.name,
         Asset.sn,
@@ -54,10 +57,10 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
         Asset.memo,
         Asset.health_indicator,
         Asset.statu,
-        Station.name.label('station_name')). join(
+        Station.name.label('station_name')).join(
         Station,
-        Station.id == Asset.station_id). filter(
-            Asset.id == id)
+        Station.id == Asset.station_id).filter(
+        Asset.id == id)
 
     return await conn.fetch_one(query2sql(query))
 
