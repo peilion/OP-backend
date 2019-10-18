@@ -1,21 +1,40 @@
 from datetime import datetime
 from typing import Optional, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel,validator
 
+class AssetPostSchema(BaseModel):
+    class asset(BaseModel):
+
+        @validator('st_time',pre=True)
+        def datetime_validate(cls, v):
+            return str(datetime.strptime(v, '%Y-%m-%dT%H:%M:%S.%fZ'))
+
+        name: str
+        sn: str
+        st_time: datetime
+        asset_level: int
+        asset_type: int
+        repairs: int
+        station_id: int
+        parent_id: Optional[int]
+        memo: Optional[str]
+
+    base: asset
+    info: dict
 
 class FlattenAssetSchema(BaseModel):
     id: int
     name: str
-    sn: str
+    sn: Optional[str]
     lr_time: Optional[datetime] = None
     cr_time: Optional[datetime] = None
     md_time: Optional[datetime] = None
     st_time: Optional[datetime] = None
-    asset_level: int
+    asset_level: Optional[int]
     memo: Optional[str] = None
-    health_indicator: float
-    statu: int
+    health_indicator: Optional[float]
+    statu: Optional[int]
     station_name: Optional[str] = None
     parent_id: Optional[int] = None
     repairs: Optional[int]

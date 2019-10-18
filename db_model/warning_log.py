@@ -18,6 +18,9 @@ class WarningLog(Base):
     severity = Column(SmallInteger, nullable=False)
     is_read = Column(Boolean, nullable=False, default=False)
     fp_hash = Column(String(21), nullable=False)  # generate by: hash(falut_pattern_array[set])
+
     asset_id = Column(Integer, ForeignKey('asset.id'))
+    mp_id = Column(Integer,ForeignKey('measure_point.id'))
+    data_id = Column(Integer)
 
     asset = relationship("Asset", back_populates="warninglogs")

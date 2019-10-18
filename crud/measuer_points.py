@@ -21,8 +21,10 @@ async def get_multi(conn: Database, skip: int, limit: int, brief: bool,
             MeasurePoint.name,
             MeasurePoint.type,
             MeasurePoint.md_time,
-            MeasurePoint.cr_time,
             MeasurePoint.statu,
+            MeasurePoint.health_indicator,
+            MeasurePoint.sample_freq,
+            MeasurePoint.sample_interval,
             Station.id.label('staion_id'),
             Station.name.label('station_name'),
             Asset.id.label('asset_id'),
@@ -36,6 +38,7 @@ async def get_multi(conn: Database, skip: int, limit: int, brief: bool,
         query = query.filter(MeasurePoint.station_id == kwargs['station_id'])
     if kwargs['asset_id']:
         query = query.filter(MeasurePoint.asset_id == kwargs['asset_id'])
+    query = query.order_by(MeasurePoint.id)
     return await conn.fetch_all(query2sql(query))
 
 
@@ -50,13 +53,12 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
         MeasurePoint.sample_freq,
         MeasurePoint.sample_interval).order_by(
         MeasurePoint.id).filter(
-            MeasurePoint.id == id)
+        MeasurePoint.id == id)
     return await conn.fetch_one(query2sql(query))
 
 
 @con_warpper
 async def get_stat(conn: Database, rule: str, session: Session = session_make(engine=None)):
-    query = None
     if rule == 'station':
         query = session.query(MeasurePoint.station_id, func.count(
             '*').label('cnt')).group_by(MeasurePoint.station_id)

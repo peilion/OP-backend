@@ -1,10 +1,12 @@
 from databases import Database
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.ext.declarative import declarative_base
 
 from crud.decorator import con_warpper, query2sql
+from db import meta_engine
 from db.db_config import session_make
-from db_model import Asset, Station, Bearing, PumpUnit, Motor, Pump, Stator, Rotor
-
+from db_model import Asset, Station, Bearing, PumpUnit, Motor, Pump, Stator, Rotor,AssetHI
+from fastapi.encoders import jsonable_encoder
 info_model_mapper = {
     0: PumpUnit,
     1: Pump,
@@ -15,7 +17,7 @@ info_model_mapper = {
 
 
 @con_warpper
-async def get_multi(conn: Database, skip: int, limit: int, type: int, station_name: str,
+async def get_multi(conn: Database, skip: int, limit: int, type: int, station_name: str, level: int, station_id: int,
                     session: Session = session_make(engine=None)):
     query = session.query(
         Asset.id,
@@ -40,6 +42,12 @@ async def get_multi(conn: Database, skip: int, limit: int, type: int, station_na
         query = query.filter(Asset.asset_type == type)
     if station_name is not None:
         query = query.filter(Station.name == station_name)
+    if level is not None:
+        query = session.query(
+            Asset.id, Asset.name).filter(
+            Asset.asset_level == level)
+    if station_id is not None:
+        query = query.filter(Asset.station_id == station_id)
     return await conn.fetch_all(query2sql(query))
 
 
@@ -96,3 +104,18 @@ def get_tree(session: Session, id: int):
         filter(Asset.id == id)
 
     return query.one()
+
+def create(session: Session,data):
+    data = jsonable_encoder(data)
+    asset = Asset(**data['base'])
+    session.add(asset)
+    session.commit()
+    session.refresh(asset)
+    if data['base']['asset_type'] == 0 :
+        add_asset_hi_table(asset.id)
+    session.close()
+
+def add_asset_hi_table(id):
+    base = declarative_base()
+    model = AssetHI.model(point_id=id, base=base)  # registe to metadata for all pump_unit
+    base.metadata.create_all(meta_engine)

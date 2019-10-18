@@ -1,16 +1,16 @@
 from enum import Enum
 from typing import List
-from datetime import datetime
+from sqlalchemy.exc import IntegrityError
 from fastapi import APIRouter, HTTPException, Query
 from starlette.responses import UJSONResponse
 from custom_lib.treelib import Tree
 
-from crud.assets import get_multi, get, get_tree, get_info
+from crud.assets import get_multi, get, get_tree, get_info,create
 from crud.assets_stat import *
 from crud.assets_hi import get_avg_hi_during_time, get_avg_hi_pre, get_avg_hi_before_limit
 from db import session_make
 from db.conn_engine import meta_engine, META_URL
-from model.assets import FlattenAssetSchema, FlattenAssetListSchema, NestAssetSchema, TypeStationSchema
+from model.assets import FlattenAssetSchema, FlattenAssetListSchema, NestAssetSchema, AssetPostSchema
 from databases import Database
 
 router = APIRouter()
@@ -48,13 +48,16 @@ async def read_assets(
         limit: int = None,
         iftree: bool = False,
         type: int = None,
-        station_name: str = None
+        level: int = None,
+        station_name: str = None,
+        station_id: int = None
 ):
     """
     Get Asset List.
     """
     conn = Database(META_URL)
-    items = await get_multi(conn=conn, skip=skip, limit=limit, type=type,station_name=station_name)
+    items = await get_multi(conn=conn, skip=skip, limit=limit, type=type, level=level, station_name=station_name,
+                            station_id=station_id)
     if not iftree:
         return FlattenAssetListSchema(asset=items)
     elif iftree:
@@ -62,7 +65,7 @@ async def read_assets(
         tree.create_node(tag='root', identifier='root')
         items = [dict(row) for row in items]
         for item in items:
-            item = {**item,'originalSTtime':item['st_time'],'edit':False} # For tree table editable fields
+            item = {**item, 'originalSTtime': item['st_time'], 'edit': False}  # For tree table editable fields
             tree.create_node(data=item, identifier=item['id'], parent='root')
 
         for node in tree.expand_tree(mode=Tree.WIDTH):
@@ -147,7 +150,7 @@ async def read_asset_info(
 
 
 @router.get("/{id}/avghi/", response_class=UJSONResponse)
-async def read_asset_info(
+async def read_asset_avghi(
         id: int,
         time_before: str = Query(default='2016-07-01 00:00:00'),
         time_after: str = Query(default='2016-01-10 00:00:00'),
@@ -175,3 +178,21 @@ async def read_asset_info(
                 status_code=400,
                 detail="No health indicator calculated in the time range")
         return res
+
+
+@router.post("/", response_class=UJSONResponse)
+async def create_asset(
+        asset: AssetPostSchema
+):
+    session = session_make(meta_engine)
+    try:
+        create(session,asset)
+        return {'msg': 'Asset successfully added.'}
+    except IntegrityError:
+        raise HTTPException(
+            status_code=409,
+            detail="Conflict asset already exsit in the database.")
+    # finally:
+    #     raise HTTPException(
+    #         status_code=400,
+    #         detail="Unexpected error.")

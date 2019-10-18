@@ -42,9 +42,9 @@ def format_map_grouped_result(res: list, fisrt_group_names: Optional[dict], seco
 def format_timediff_result(res: list, time_after: str, interval: int):
     time_list = []
     res_list = []
-    initial_time = datetime.datetime.strptime(time_after.split(' ')[0], "%Y-%m-%d")
+    initial_time = datetime.datetime.strptime(time_after, "%Y-%m-%d %H:%M:%S")
 
     for item in res:
-        time_list.append((initial_time + datetime.timedelta(days=interval * item['diff'])).strftime('%Y-%m-%d'))
+        time_list.append((initial_time + datetime.timedelta(days=interval * item['diff'])).strftime('%Y-%m-%d %H:%M:%S'))
         res_list.append(item['avg'])
     return {'time_list': time_list, 'res_list': res_list}

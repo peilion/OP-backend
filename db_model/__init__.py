@@ -15,7 +15,8 @@ from .vib_data import VibData
 from .vib_feature import VibFeature
 from .warning_log import WarningLog
 from .maintenance_record import MaintenanceRecord
+from .asset_hi import AssetHI
 
 __all__ = ['Asset', 'MeasurePoint', 'Bearing', 'Manufacturer', 'Motor', 'PumpUnit', 'Pump', 'Rotor', 'Stator',
            'Station', 'User', 'WarningLog', 'ElecFeature', 'ElecData', 'VibFeature', 'VibData', 'BranchCompany',
-           'RegionCompany','MaintenanceRecord']
+           'RegionCompany','MaintenanceRecord','AssetHI']

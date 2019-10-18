@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, SmallInteger, \
-    ForeignKey, DateTime, func
+    ForeignKey, DateTime, func,Float
 from sqlalchemy import String
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -20,15 +20,13 @@ class MeasurePoint(Base):
     name = Column(String(64))
     cr_time = Column(DateTime, nullable=True, default=func.now())
     md_time = Column(DateTime, nullable=True, default=func.now(), onupdate=func.now())
-
+    health_indicator = Column(Float, default=85, nullable=True)
     type = Column(SmallInteger, nullable=False)  # 键含义参照 TYPES
-
     sample_interval = Column(Integer)  # 单位为 s
     sample_freq = Column(Integer)  # 单位为 Hz
     statu = Column(SmallInteger, default=4)  # 值含义见 STATUS
 
     asset_id = Column(Integer, ForeignKey('asset.id'))
-
     station_id = Column(Integer, ForeignKey('station.id'))
     id_inner_station = Column(Integer)
 
