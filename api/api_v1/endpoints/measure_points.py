@@ -5,9 +5,11 @@ from databases import Database
 from fastapi import APIRouter, HTTPException, Query
 from starlette.responses import UJSONResponse
 
-from crud.measuer_points import get_multi, get, get_stat
-from db.conn_engine import META_URL
-from model.measure_points import MeasurePointSchema
+from crud.measuer_points import get_multi, get, get_stat,create
+from db import session_make
+from db.conn_engine import META_URL, meta_engine
+from model.measure_points import MeasurePointSchema, MeasurePointInputSchema
+from sqlalchemy.exc import IntegrityError
 
 router = APIRouter()
 
@@ -56,3 +58,17 @@ async def read_measure_point_by_id(
     if not item:
         raise HTTPException(status_code=400, detail="Measure point not found")
     return item
+
+
+@router.post("/", response_class=UJSONResponse)
+async def create_measure_point(
+        mp: MeasurePointInputSchema
+):
+    session = session_make(meta_engine)
+    try:
+        create(session,mp)
+        return {'msg': 'Measure Point successfully added.'}
+    except IntegrityError:
+        raise HTTPException(
+            status_code=409,
+            detail="Conflict measure point already exist in the database.")

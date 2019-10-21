@@ -42,17 +42,19 @@ async def get_multi(conn: Database, shard_id: int, fileds: List[str], time_befor
     query = session.query(model)
     for filed in fileds + ['id', 'time']:
         query = query.options(load_only(filed))
-    if limit is None:
+
+    if time_before != 'None':
         query = query. \
-            order_by(model.id). \
             filter(model.time.between(str(time_after), str(time_before)))
+    query = query.order_by(model.time)
+
     if limit:
-        query = query.order_by(model.id.desc()).limit(limit)
+        query = query.limit(limit)
     res = await conn.fetch_all(query2sql(query))
 
     dic = {}
     keys = res[0].keys()
-    for row in reversed(res):
+    for row in res:
         for key in keys:
             if key == 'time':
                 dic.setdefault(key, []).append(str(row[key]))

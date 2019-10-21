@@ -1,10 +1,14 @@
 from databases import Database
 from sqlalchemy import func
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
-
+from fastapi.encoders import jsonable_encoder
 from crud.decorator import con_warpper, query2sql
+from db import station_engines
 from db.db_config import session_make
-from db_model import MeasurePoint, Station, Asset
+from db_model import MeasurePoint, Station, Asset, VibFeature, VibData, ElecFeature, ElecData
+from model.measure_points import MeasurePointSchema, MeasurePointInputSchema
+from core.dependencies import mp_change_commit
 
 
 @con_warpper
@@ -14,7 +18,9 @@ async def get_multi(conn: Database, skip: int, limit: int, brief: bool,
         query = session.query(
             MeasurePoint.id,
             MeasurePoint.name,
-            MeasurePoint.type)
+            MeasurePoint.type,
+            MeasurePoint.health_indicator,
+        )
     else:
         query = session.query(
             MeasurePoint.id,
@@ -72,3 +78,30 @@ async def get_stat(conn: Database, rule: str, session: Session = session_make(en
         return None
 
     return await conn.fetch_all(query2sql(query))
+
+
+def create(session: Session, data: MeasurePointInputSchema):
+    data = jsonable_encoder(data)
+
+    latest_id = session.query(MeasurePoint.id_inner_station). \
+        filter(MeasurePoint.station_id == data['station_id']). \
+        order_by(MeasurePoint.id_inner_station.desc()). \
+        limit(1).one().id_inner_station
+
+    mp = MeasurePoint(id_inner_station=latest_id + 1, **data)
+    session.add(mp)
+    session.commit()
+    session.refresh(mp)
+    add_mp_data_and_feature_table(mp)
+    session.close()
+    mp_change_commit()
+
+
+def add_mp_data_and_feature_table(mp):
+    data_model = VibData if (mp.type == 0) else ElecData
+    feature_model = VibFeature if (mp.type == 0) else ElecFeature
+    base = declarative_base()
+    data_table = data_model.model(point_id=mp.id_inner_station, base=base)
+    feature_table = feature_model.model(
+        point_id=mp.id_inner_station, base=base)
+    base.metadata.create_all(station_engines[mp.station_id - 1])

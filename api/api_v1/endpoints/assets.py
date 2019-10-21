@@ -5,9 +5,9 @@ from fastapi import APIRouter, HTTPException, Query
 from starlette.responses import UJSONResponse
 from custom_lib.treelib import Tree
 
-from crud.assets import get_multi, get, get_tree, get_info,create
+from crud.assets import get_multi, get, get_tree, get_info, create
 from crud.assets_stat import *
-from crud.assets_hi import get_avg_hi_during_time, get_avg_hi_pre, get_avg_hi_before_limit
+from crud.assets_hi import get_avg_hi_during_time, get_avg_hi_pre, get_avg_hi_before_limit, get_avg_hi_multi
 from db import session_make
 from db.conn_engine import meta_engine, META_URL
 from model.assets import FlattenAssetSchema, FlattenAssetListSchema, NestAssetSchema, AssetPostSchema
@@ -65,7 +65,8 @@ async def read_assets(
         tree.create_node(tag='root', identifier='root')
         items = [dict(row) for row in items]
         for item in items:
-            item = {**item, 'originalSTtime': item['st_time'], 'edit': False}  # For tree table editable fields
+            # For tree table editable fields
+            item = {**item, 'originalSTtime': item['st_time'], 'edit': False}
             tree.create_node(data=item, identifier=item['id'], parent='root')
 
         for node in tree.expand_tree(mode=Tree.WIDTH):
@@ -152,9 +153,9 @@ async def read_asset_info(
 @router.get("/{id}/avghi/", response_class=UJSONResponse)
 async def read_asset_avghi(
         id: int,
-        time_before: str = Query(default='2016-07-01 00:00:00'),
-        time_after: str = Query(default='2016-01-10 00:00:00'),
-        interval: int = 1,
+        time_before: str = Query(None, description='e.x. 2016-07-01 00:00:00'),
+        time_after: str = Query(None, description='e.x. 2016-01-10 00:00:00'),
+        interval: int = None,
         limit: int = None,
         pre_query: bool = True
 ):
@@ -166,13 +167,17 @@ async def read_asset_avghi(
         res = await get_avg_hi_pre(conn=conn)
         return res
     if not pre_query:
-        if not limit:
+        if (limit is not None) & (interval is not None):
+            res = await get_avg_hi_before_limit(conn=conn, asset_id=id, time_before=time_before,
+                                                interval=interval, limit=limit)
+
+        elif (limit is None) & (interval is not None):
             res = await get_avg_hi_during_time(conn=conn, asset_id=id, time_before=time_before,
                                                time_after=time_after,
                                                interval=interval)
-        else:
-            res = await get_avg_hi_before_limit(conn=conn, asset_id=id, time_before=time_before,
-                                                interval=interval, limit=limit)
+        elif (limit is not None) & (interval is None):
+            res = await get_avg_hi_multi(conn=conn, asset_id=id, time_before=time_before, limit=limit)
+
         if not res['time_list']:
             raise HTTPException(
                 status_code=400,
@@ -186,7 +191,7 @@ async def create_asset(
 ):
     session = session_make(meta_engine)
     try:
-        create(session,asset)
+        create(session, asset)
         return {'msg': 'Asset successfully added.'}
     except IntegrityError:
         raise HTTPException(

@@ -37,3 +37,18 @@ async def get_avg_hi_before_limit(conn: Database, asset_id: int, time_before: st
 
     res = format_timediff_result(res, time_after=time_before, interval=interval)
     return res
+
+
+@con_warpper
+async def get_avg_hi_multi(conn: Database, asset_id: int, time_before: str, limit: int):
+    query = text('SELECT time, health_indicator FROM asset_hi_{0} ' \
+                 'WHERE time <= \'{1}\' '
+                 'order by time desc ' \
+                 'limit {2}'.format(asset_id, time_before, limit))
+    res = await conn.fetch_all(query)
+
+    dic = {'time_list': [], 'health_indicator': []}
+    for row in reversed(res):  # Ordered results are required in Chartist.js.
+        dic['time_list'].append(str(row['time']))
+        dic['health_indicator'].append(row['health_indicator'])
+    return dic

@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class MeasurePointSchema(BaseModel):
-    id: int
+    id: Optional[int]
     name: str
     type: int
     md_time: Optional[datetime] = None
@@ -13,7 +13,15 @@ class MeasurePointSchema(BaseModel):
     sample_interval: Optional[int]
     statu: Optional[int]
     health_indicator: Optional[int]
-    staion_id: Optional[int]
+    station_id: Optional[int]
     station_name: Optional[str]
     asset_id: Optional[int]
     asset_name: Optional[str]
+
+class MeasurePointInputSchema(BaseModel):
+    name: str
+    type: int
+    sample_freq: int
+    sample_interval: int
+    station_id: int
+    asset_id: int

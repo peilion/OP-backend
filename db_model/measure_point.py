@@ -28,7 +28,7 @@ class MeasurePoint(Base):
 
     asset_id = Column(Integer, ForeignKey('asset.id'))
     station_id = Column(Integer, ForeignKey('station.id'))
-    id_inner_station = Column(Integer)
+    id_inner_station = Column(Integer) # 这里的做法极度不安全，可以考虑用uuid4作为分表索引
 
     asset = relationship("Asset", back_populates="measure_points")
     station = relationship('Station', back_populates="measure_points")

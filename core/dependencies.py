@@ -11,3 +11,6 @@ def get_mp_mapper():
             measure_point_regsiter[row.id] = {'station_id': row.station_id, 'inner_id': row.id_inner_station,'type':row.type}
         session.close()
     return measure_point_regsiter
+
+def mp_change_commit():
+    measure_point_regsiter = {}
