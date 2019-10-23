@@ -168,7 +168,7 @@ async def read_asset_avghi(
         return res
     if not pre_query:
         if (limit is not None) & (interval is not None):
-            res = await get_avg_hi_before_limit(conn=conn, asset_id=id, time_before=time_before,
+            res = await get_avg_hi_before_limit(conn=conn, asset_id=id,
                                                 interval=interval, limit=limit)
 
         elif (limit is None) & (interval is not None):
@@ -183,21 +183,3 @@ async def read_asset_avghi(
                 status_code=400,
                 detail="No health indicator calculated in the time range")
         return res
-
-
-@router.post("/", response_class=UJSONResponse)
-async def create_asset(
-        asset: AssetPostSchema
-):
-    session = session_make(meta_engine)
-    try:
-        create(session, asset)
-        return {'msg': 'Asset successfully added.'}
-    except IntegrityError:
-        raise HTTPException(
-            status_code=409,
-            detail="Conflict asset already exsit in the database.")
-    # finally:
-    #     raise HTTPException(
-    #         status_code=400,
-    #         detail="Unexpected error.")

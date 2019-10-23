@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from api.api_v1.endpoints import users, assets, stations, constant, warning, server, vib_data, measure_points, \
-    elec_data, vib_feature, elec_feature, maintenance_record,pipeline
+    elec_data, vib_feature, elec_feature, maintenance_record,pipeline,union
 
 api_router = APIRouter()
 
@@ -13,6 +13,7 @@ api_router.include_router(stations.router, prefix='/stations', tags=["Stations"]
 api_router.include_router(pipeline.router, prefix='/pipelines', tags=["Pipelines"])
 
 api_router.include_router(warning.router, prefix='/warning', tags=["Warning"])
+api_router.include_router(union.router, prefix='/union', tags=["Union"])
 api_router.include_router(server.router, prefix='/server', tags=['Server'])
 api_router.include_router(vib_data.router, tags=['Vibration'])
 api_router.include_router(vib_feature.router, tags=['Vibration'])

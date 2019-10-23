@@ -67,7 +67,7 @@ async def read_all_electric_signal_info(
 
 
 @router.get(
-    "/mp/{mp_id}/elec/{data_id}/}",
+    "/mp/{mp_id}/elec/{data_id}/",
     response_class=UJSONResponse,
     response_model=ElecSignalSchema)
 async def read_electric_signal_by_id(
@@ -83,4 +83,11 @@ async def read_electric_signal_by_id(
 
     conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
     res = await get_by_id(conn=conn, shard_id=mp_shard_info['inner_id'], data_id=data_id)
-    return dict(res)
+
+    final = {}
+    for phase in ['u', 'v', 'w']:
+        processed_res = fftransform(res[phase + 'cur'])
+        final[phase + 'cur'] = processed_res['vib']
+        final[phase + 'fft'] = processed_res['spec'][:300]
+    return {**final, **{'id': res['id'],
+                        'time': res['time']}}

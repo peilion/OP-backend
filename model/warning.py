@@ -11,3 +11,9 @@ class WarningLogSchema(BaseModel):
     asset_name :str
     is_read : bool
 
+class WarningAndMainteSchema(BaseModel):
+    cr_time:datetime
+    description: str
+    t_name: str
+    class Config:
+        orm_mode = True

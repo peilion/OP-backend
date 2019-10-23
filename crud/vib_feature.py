@@ -1,9 +1,12 @@
+from typing import List
+
 from databases import Database
+from fastapi import HTTPException
 from sqlalchemy.orm import Session, load_only
+
 from crud.decorator import con_warpper, query2sql
 from db.db_config import session_make
 from db_model import VibFeature
-from typing import List
 
 
 @con_warpper
@@ -51,6 +54,10 @@ async def get_multi(conn: Database, shard_id: int, fileds: List[str], time_befor
     if limit:
         query = query.limit(limit)
     res = await conn.fetch_all(query2sql(query))
+
+    if len(res) == 0 :
+        raise HTTPException(status_code=400,
+                            detail="No signal collected between the time range")
 
     dic = {}
     keys = res[0].keys()

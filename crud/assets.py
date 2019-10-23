@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from crud.decorator import con_warpper, query2sql
 from db import meta_engine
 from db.db_config import session_make
-from db_model import Asset, Station, Bearing, PumpUnit, Motor, Pump, Stator, Rotor,AssetHI
+from db_model import Asset, Station, Bearing, PumpUnit, Motor, Pump, Stator, Rotor,AssetHI,MeasurePoint
 from fastapi.encoders import jsonable_encoder
 info_model_mapper = {
     0: PumpUnit,

@@ -52,7 +52,7 @@ async def read_vibration_features(
     return res
 
 
-@router.get("/mp/{mp_id}/vib_feature/{data_id}/}", response_class=UJSONResponse)
+@router.get("/mp/{mp_id}/vib_feature/{data_id}/", response_class=UJSONResponse)
 async def read_vibration_feature_by_id(
         mp_id: int,
         data_id: int,

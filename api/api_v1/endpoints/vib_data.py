@@ -5,7 +5,7 @@ from datetime import datetime
 from core.dependencies import get_mp_mapper
 from crud.vib_data import get_latest, get_by_id, get_multi
 from db.conn_engine import STATION_URLS
-from model.vib_data import VibrationSignalSchema, VibrationSignalListSchema
+from model.vib_data import VibrationSignalSchema, VibrationSignalListSchema, VibrationSignalSchemaByid
 from typing import List
 from utils.vib_feature_tools import fftransform
 router = APIRouter()
@@ -61,7 +61,7 @@ async def read_all_vibration_signal_info(
 
 
 @router.get(
-    "/mp/{mp_id}/vib_data/{data_id}/}",
+    "/mp/{mp_id}/vib_data/{data_id}/",
     response_class=UJSONResponse,
     response_model=VibrationSignalSchema)
 async def read_vibration_signal_by_id(
@@ -77,4 +77,6 @@ async def read_vibration_signal_by_id(
 
     conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
     res = await get_by_id(conn=conn, shard_id=mp_shard_info['inner_id'], data_id=data_id)
-    return dict(res)
+    processed_res = fftransform(res['vib'])
+    return {**processed_res, **{'id': res['id'],
+                                'time': res['time']}}

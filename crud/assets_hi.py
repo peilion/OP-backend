@@ -26,11 +26,13 @@ async def get_avg_hi_during_time(conn: Database, asset_id: int, time_before: str
 
 
 @con_warpper
-async def get_avg_hi_before_limit(conn: Database, asset_id: int, time_before: str, interval: int, limit: int):
+async def get_avg_hi_before_limit(conn: Database, asset_id: int, interval: int, limit: int):
+    import datetime
+    time_before = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     query = text('SELECT datediff( time, \'{0}\' ) DIV {2} AS diff, AVG( health_indicator ) as avg '
                  'FROM asset_hi_{1} ' \
                  'WHERE time <= \'{0}\' ' \
-                 'GROUP BY diff desc '
+                 'GROUP BY diff '
                  'limit {3}'.format(time_before, asset_id, interval, limit))
 
     res = await conn.fetch_all(query)

@@ -57,6 +57,7 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
         MeasurePoint.md_time,
         MeasurePoint.statu,
         MeasurePoint.sample_freq,
+        MeasurePoint.asset_id,
         MeasurePoint.sample_interval).order_by(
         MeasurePoint.id).filter(
         MeasurePoint.id == id)

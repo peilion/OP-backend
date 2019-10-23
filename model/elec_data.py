@@ -7,9 +7,9 @@ from model.base import SubSampledBinaryArray,SignalArray
 class ElecSignalSchema(BaseModel):
     id: int
     time: datetime
-    ucur: SignalArray
-    vcur: SignalArray
-    wcur: SignalArray
+    ucur: SubSampledBinaryArray
+    vcur: SubSampledBinaryArray
+    wcur: SubSampledBinaryArray
     ufft: SignalArray
     vfft: SignalArray
     wfft: SignalArray
