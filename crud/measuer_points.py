@@ -58,8 +58,12 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
         MeasurePoint.statu,
         MeasurePoint.sample_freq,
         MeasurePoint.asset_id,
-        MeasurePoint.sample_interval).order_by(
-        MeasurePoint.id).filter(
+        Station.id.label('staion_id'),
+        Station.name.label('station_name'),
+        MeasurePoint.sample_interval).join(
+        Station,
+        MeasurePoint.station_id == Station.id) .order_by(
+            MeasurePoint.id).filter(
         MeasurePoint.id == id)
     return await conn.fetch_one(query2sql(query))
 
