@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from databases import Database
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from crud.pipeline import get_multi
 from db.conn_engine import META_URL

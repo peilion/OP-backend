@@ -1,5 +1,5 @@
-from typing import Optional
 import datetime
+from typing import Optional
 
 
 def format_double_grouped_result(res: list, fisrt_group_names: Optional[dict], second_group_names: dict):

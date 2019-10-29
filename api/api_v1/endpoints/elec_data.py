@@ -1,15 +1,16 @@
+from datetime import datetime
+from typing import List
+
 from databases import Database
 from fastapi import APIRouter, Depends, HTTPException, Query
 from starlette.responses import UJSONResponse
-from datetime import datetime
+
 from core.dependencies import get_mp_mapper
-from crud.elec_data import get_latest, get_by_id, get_multi
+from crud.data import get_latest, get_by_id, get_multi
 from db.conn_engine import STATION_URLS
 from model.elec_data import ElecSignalListSchema, ElecSignalSchema
-from typing import List
-
 from utils.vib_feature_tools import fftransform
-
+from db_model import ElecData
 router = APIRouter()
 
 
@@ -28,7 +29,7 @@ async def read_the_latest_electric_signal(
             detail="The given measure point collect vibration data, try to use the approaprite endpoint.")
 
     conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
-    res = await get_latest(conn=conn, shard_id=mp_shard_info['inner_id'])
+    res = await get_latest(conn=conn, shard_id=mp_shard_info['inner_id'], orm_model=ElecData)
     final = {}
     for phase in ['u', 'v', 'w']:
         processed_res = fftransform(res[phase + 'cur'])
@@ -58,7 +59,7 @@ async def read_all_electric_signal_info(
             detail="The given measure point collect vibration data, try to use the approaprite endpoint.")
 
     conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
-    res = await get_multi(conn=conn, shard_id=mp_shard_info['inner_id'], time_before=time_before, time_after=time_after)
+    res = await get_multi(conn=conn, shard_id=mp_shard_info['inner_id'], time_before=time_before, time_after=time_after, orm_model=ElecData)
     if not res:
         raise HTTPException(
             status_code=400,
@@ -82,7 +83,7 @@ async def read_electric_signal_by_id(
             detail="The given measure point collect vibration data, try to use the approaprite endpoint.")
 
     conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
-    res = await get_by_id(conn=conn, shard_id=mp_shard_info['inner_id'], data_id=data_id)
+    res = await get_by_id(conn=conn, shard_id=mp_shard_info['inner_id'], data_id=data_id, orm_model=ElecData)
 
     final = {}
     for phase in ['u', 'v', 'w']:

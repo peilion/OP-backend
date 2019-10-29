@@ -1,11 +1,14 @@
+from datetime import datetime
+from typing import List
+
 from databases import Database
 from fastapi import APIRouter, Depends, HTTPException, Query
 from starlette.responses import UJSONResponse
-from datetime import datetime
+
 from core.dependencies import get_mp_mapper
-from crud.vib_feature import get_latest, get_multi, get
+from crud.feature import get_latest, get_multi, get
 from db.conn_engine import STATION_URLS
-from typing import List
+from db_model import VibFeature
 
 router = APIRouter()
 
@@ -19,12 +22,13 @@ async def read_the_latest_vibration_feature(
 ):
     mp_shard_info = mp_mapper[mp_id]
     if mp_shard_info['type'] == 1:
-        raise HTTPException(status_code=400,
-                            detail="The given measure point collect elecdata, try to use the approaprite endpoint.")
+        raise HTTPException(
+            status_code=400,
+            detail="The given measure point collect elecdata, try to use the approaprite endpoint.")
 
     conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
 
-    res = await get_latest(conn=conn, shard_id=mp_shard_info['inner_id'], fileds=features)
+    res = await get_latest(conn=conn, shard_id=mp_shard_info['inner_id'], fileds=features, orm_model=VibFeature)
     return dict(res)
 
 
@@ -40,15 +44,17 @@ async def read_vibration_features(
 ):
     mp_shard_info = mp_mapper[mp_id]
     if mp_shard_info['type'] == 1:
-        raise HTTPException(status_code=400,
-                            detail="The given measure point collect elecdata, try to use the approaprite endpoint.")
+        raise HTTPException(
+            status_code=400,
+            detail="The given measure point collect elecdata, try to use the approaprite endpoint.")
 
     conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
     res = await get_multi(conn=conn, shard_id=mp_shard_info['inner_id'], fileds=features, time_before=str(time_before),
-                          time_after=str(time_after), limit=limit)
+                          time_after=str(time_after), limit=limit, orm_model=VibFeature)
     if not res:
-        raise HTTPException(status_code=400,
-                            detail="No signal collected between the time range")
+        raise HTTPException(
+            status_code=400,
+            detail="No signal collected between the time range")
     return res
 
 
@@ -62,9 +68,10 @@ async def read_vibration_feature_by_id(
 ):
     mp_shard_info = mp_mapper[mp_id]
     if mp_shard_info['type'] == 1:
-        raise HTTPException(status_code=400,
-                            detail="The given measure point collect elecdata, try to use the approaprite endpoint.")
+        raise HTTPException(
+            status_code=400,
+            detail="The given measure point collect elecdata, try to use the approaprite endpoint.")
 
     conn = Database(STATION_URLS[mp_shard_info['station_id'] - 1])
-    res = await get(conn=conn, shard_id=mp_shard_info['inner_id'], data_id=data_id, fileds=features)
+    res = await get(conn=conn, shard_id=mp_shard_info['inner_id'], data_id=data_id, fileds=features, orm_model=VibFeature)
     return dict(res)

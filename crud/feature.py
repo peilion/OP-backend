@@ -6,13 +6,16 @@ from sqlalchemy.orm import Session, load_only
 
 from crud.decorator import con_warpper, query2sql
 from db.db_config import session_make
-from db_model import VibFeature
 
 
 @con_warpper
-async def get(conn: Database, shard_id: int, fileds: List[str], data_id: int,
+async def get(conn: Database,
+              shard_id: int,
+              orm_model,
+              fileds: List[str],
+              data_id: int,
               session: Session = session_make(engine=None)):
-    model = VibFeature.model(point_id=shard_id)
+    model = orm_model.model(point_id=shard_id)
 
     query = session.query(model)
     for filed in fileds + ['id', 'time']:
@@ -24,11 +27,15 @@ async def get(conn: Database, shard_id: int, fileds: List[str], data_id: int,
 
 
 @con_warpper
-async def get_latest(conn: Database, shard_id: int, fileds: List[str], session: Session = session_make(engine=None)):
-    model = VibFeature.model(point_id=shard_id)
+async def get_latest(
+        conn: Database,
+        shard_id: int,
+        orm_model,
+        fileds: List[str],
+        session: Session = session_make(engine=None)):
+    model = orm_model.model(point_id=shard_id)
 
     query = session.query(model)
-    # for filed in fileds + ['id', 'time']:
     for filed in fileds:
         query = query.options(load_only(filed))
     query = query.order_by(model.id.desc()).limit(1)
@@ -38,9 +45,15 @@ async def get_latest(conn: Database, shard_id: int, fileds: List[str], session: 
 
 
 @con_warpper
-async def get_multi(conn: Database, shard_id: int, fileds: List[str], time_before: str, time_after: str, limit: int,
+async def get_multi(conn: Database,
+                    shard_id: int,
+                    orm_model,
+                    fileds: List[str],
+                    time_before: str,
+                    time_after: str,
+                    limit: int,
                     session: Session = session_make(engine=None)):
-    model = VibFeature.model(point_id=shard_id)
+    model = orm_model.model(point_id=shard_id)
 
     query = session.query(model)
     for filed in fileds + ['id', 'time']:

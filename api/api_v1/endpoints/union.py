@@ -1,7 +1,9 @@
+from typing import List, Optional
+
 from databases import Database
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from starlette.responses import UJSONResponse
-from typing import List,Optional
+
 from crud.union import get_warning_and_maintenace
 from db.conn_engine import META_URL
 from model.warning import WarningAndMainteSchema

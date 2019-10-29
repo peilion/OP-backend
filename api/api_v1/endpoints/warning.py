@@ -2,7 +2,6 @@ from enum import Enum
 from typing import List
 from typing import Optional
 
-from databases import Database
 from fastapi import APIRouter, HTTPException
 from starlette.responses import UJSONResponse
 

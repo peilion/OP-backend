@@ -1,8 +1,8 @@
 import random
 
-from db_model import User, Manufacturer, Station, Asset, MeasurePoint
 from db import meta_engine
 from db.db_config import session_make
+from db_model import User, Manufacturer, Station, Asset, MeasurePoint
 
 session = session_make(meta_engine)
 

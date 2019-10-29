@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from pydantic import BaseModel
-from model.base import SubSampledBinaryArray,SignalArray
+
+from model.base import SubSampledBinaryArray, SignalArray
 
 
 class ElecSignalSchema(BaseModel):

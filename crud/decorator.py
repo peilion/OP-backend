@@ -13,4 +13,8 @@ def con_warpper(func):
 
 
 def query2sql(query: Query):
-    return str(query.statement.compile(dialect=mysql.dialect(), compile_kwargs={'literal_binds': True}))
+    return str(
+        query.statement.compile(
+            dialect=mysql.dialect(),
+            compile_kwargs={
+                'literal_binds': True}))

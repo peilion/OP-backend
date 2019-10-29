@@ -3,13 +3,13 @@ from typing import List, Optional
 
 from databases import Database
 from fastapi import APIRouter, HTTPException, Query
+from sqlalchemy.exc import IntegrityError
 from starlette.responses import UJSONResponse
 
-from crud.measuer_points import get_multi, get, get_stat,create
+from crud.measuer_points import get_multi, get, get_stat, create
 from db import session_make
 from db.conn_engine import META_URL, meta_engine
 from model.measure_points import MeasurePointSchema, MeasurePointInputSchema
-from sqlalchemy.exc import IntegrityError
 
 router = APIRouter()
 

@@ -1,8 +1,10 @@
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel
-from model.base import SubSampledBinaryArray,SubSampledArray,SignalArray
-from typing import List
+
+from model.base import SubSampledBinaryArray, SubSampledArray, SignalArray
+
 
 class VibrationSignalSchema(BaseModel):
     id: int
@@ -34,9 +36,16 @@ class VibrationSTFTSchema(BaseModel):
     stft: List
     max:float
 
-class VibrationMUSENSSchema(BaseModel):
+class VibrationWelchSchema(BaseModel):
     id: int
     time: datetime
-    scale: List
+    spec: SignalArray
     freq: SignalArray
-    value: List
+
+class VibrationCumtrapzSchema(BaseModel):
+    id: int
+    time: datetime
+    vel: SubSampledArray
+    acc: SubSampledArray
+    vel_spec: SignalArray
+    acc_spec: SignalArray

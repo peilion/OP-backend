@@ -25,6 +25,7 @@ if config.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
+
 @app.on_event("startup")
 async def startup_event():
     get_mp_mapper()
@@ -33,4 +34,10 @@ async def startup_event():
 app.include_router(api_router, prefix=config.API_V1_STR)
 
 if __name__ == "__main__":
-    uvicorn.run('main:app', host="0.0.0.0", port=8000, log_level="info", reload=True, debug=True)
+    uvicorn.run(
+        'main:app',
+        host="0.0.0.0",
+        port=8000,
+        log_level="info",
+        reload=True,
+        debug=True)

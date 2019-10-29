@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, SmallInteger, \
-    ForeignKey, DateTime, func,Float
+    ForeignKey, DateTime, func, Float
 from sqlalchemy import String
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import relationship

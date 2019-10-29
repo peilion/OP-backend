@@ -1,6 +1,7 @@
 import numpy as np
-from pydantic import BaseModel
 from numpy import ndarray
+from pydantic import BaseModel
+
 from core.config import TIME_DOMAIN_SUB_SAMPLED_RATIO, TIME_DOMAIN_DECIMAL
 
 

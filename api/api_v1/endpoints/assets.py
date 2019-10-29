@@ -1,17 +1,17 @@
 from enum import Enum
 from typing import List
-from sqlalchemy.exc import IntegrityError
+
+from databases import Database
 from fastapi import APIRouter, HTTPException, Query
 from starlette.responses import UJSONResponse
-from custom_lib.treelib import Tree
 
-from crud.assets import get_multi, get, get_tree, get_info, create
-from crud.assets_stat import *
+from crud.assets import get_multi, get, get_tree, get_info
 from crud.assets_hi import get_avg_hi_during_time, get_avg_hi_pre, get_avg_hi_before_limit, get_avg_hi_multi
+from crud.assets_stat import *
+from custom_lib.treelib import Tree
 from db import session_make
 from db.conn_engine import meta_engine, META_URL
-from model.assets import FlattenAssetSchema, FlattenAssetListSchema, NestAssetSchema, AssetPostSchema
-from databases import Database
+from model.assets import FlattenAssetSchema, FlattenAssetListSchema, NestAssetSchema
 
 router = APIRouter()
 

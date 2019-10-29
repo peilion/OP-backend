@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, ForeignKey, Float, DateTime, Binary,VARBINARY
+from sqlalchemy import Column, BigInteger, ForeignKey, Float, DateTime, VARBINARY
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
 from db import table_args, Base

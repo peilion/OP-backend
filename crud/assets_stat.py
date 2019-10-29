@@ -3,7 +3,8 @@ from databases import Database
 from crud.decorator import con_warpper
 from db_model import Asset, Station, PumpUnit
 from model.assets import TypeStationSchema
-from utils.query_result_reformat import format_double_grouped_result, format_single_grouped_result, format_map_grouped_result
+from utils.query_result_reformat import format_double_grouped_result, format_single_grouped_result, \
+    format_map_grouped_result
 
 
 @con_warpper

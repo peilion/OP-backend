@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, SmallInteger, \
-    ForeignKey, DateTime, func, Boolean, String
+    ForeignKey, DateTime, func
 from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 
