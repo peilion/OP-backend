@@ -9,16 +9,18 @@ from db.db_config import session_make
 
 
 @con_warpper
-async def get(conn: Database,
-              shard_id: int,
-              orm_model,
-              fileds: List[str],
-              data_id: int,
-              session: Session = session_make(engine=None)):
+async def get(
+    conn: Database,
+    shard_id: int,
+    orm_model,
+    fileds: List[str],
+    data_id: int,
+    session: Session = session_make(engine=None),
+):
     model = orm_model.model(point_id=shard_id)
 
     query = session.query(model)
-    for filed in fileds + ['id', 'time']:
+    for filed in fileds + ["id", "time"]:
         query = query.options(load_only(filed))
     query = query.filter(model.id == data_id)
 
@@ -28,11 +30,12 @@ async def get(conn: Database,
 
 @con_warpper
 async def get_latest(
-        conn: Database,
-        shard_id: int,
-        orm_model,
-        fileds: List[str],
-        session: Session = session_make(engine=None)):
+    conn: Database,
+    shard_id: int,
+    orm_model,
+    fileds: List[str],
+    session: Session = session_make(engine=None),
+):
     model = orm_model.model(point_id=shard_id)
 
     query = session.query(model)
@@ -45,38 +48,40 @@ async def get_latest(
 
 
 @con_warpper
-async def get_multi(conn: Database,
-                    shard_id: int,
-                    orm_model,
-                    fileds: List[str],
-                    time_before: str,
-                    time_after: str,
-                    limit: int,
-                    session: Session = session_make(engine=None)):
+async def get_multi(
+    conn: Database,
+    shard_id: int,
+    orm_model,
+    fileds: List[str],
+    time_before: str,
+    time_after: str,
+    limit: int,
+    session: Session = session_make(engine=None),
+):
     model = orm_model.model(point_id=shard_id)
 
     query = session.query(model)
-    for filed in fileds + ['id', 'time']:
+    for filed in fileds + ["id", "time"]:
         query = query.options(load_only(filed))
 
-    if time_before != 'None':
-        query = query. \
-            filter(model.time.between(str(time_after), str(time_before)))
+    if time_before != "None":
+        query = query.filter(model.time.between(str(time_after), str(time_before)))
     query = query.order_by(model.time)
 
     if limit:
         query = query.limit(limit)
     res = await conn.fetch_all(query2sql(query))
 
-    if len(res) == 0 :
-        raise HTTPException(status_code=400,
-                            detail="No signal collected between the time range")
+    if len(res) == 0:
+        raise HTTPException(
+            status_code=400, detail="No signal collected between the time range"
+        )
 
     dic = {}
     keys = res[0].keys()
     for row in res:
         for key in keys:
-            if key == 'time':
+            if key == "time":
                 dic.setdefault(key, []).append(str(row[key]))
             else:
                 dic.setdefault(key, []).append(row[key])

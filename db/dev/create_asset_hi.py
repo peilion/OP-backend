@@ -12,13 +12,14 @@ x = session.query(Asset.id).filter(Asset.asset_type == 0).all()
 
 base = declarative_base()
 for row in x:
-    model = AssetHI.model(point_id=row.id, base=base)  # registe to metadata for all pump_unit
+    model = AssetHI.model(
+        point_id=row.id, base=base
+    )  # registe to metadata for all pump_unit
 
 from sqlalchemy import create_engine
 
-META_URL = 'mysql://git:Fpl8315814.@123.56.7.137/op_meta?charset=utf8'
-engine = create_engine(META_URL, encoding='utf-8',
-                       pool_pre_ping=True)
+META_URL = "mysql://git:Fpl8315814.@123.56.7.137/op_meta?charset=utf8"
+engine = create_engine(META_URL, encoding="utf-8", pool_pre_ping=True)
 base.metadata.create_all(engine)
 
 for row in x:
@@ -26,7 +27,9 @@ for row in x:
     tmp = []
     model = AssetHI.model(point_id=row.id)  # registe to metadata for all pump_unit
     for i in range(1, 900):
-        r = model(id=i, time=str(initial_datetime), health_indicator=80 + random.random() * 10)
+        r = model(
+            id=i, time=str(initial_datetime), health_indicator=80 + random.random() * 10
+        )
         initial_datetime += datetime.timedelta(days=1)
         tmp.append(r)
     session.add_all(tmp)

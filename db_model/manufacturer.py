@@ -8,7 +8,7 @@ from db import Base, table_args
 
 
 class Manufacturer(Base):
-    __tablename__ = 'manufacturer'
+    __tablename__ = "manufacturer"
     __table_args__ = table_args
 
     id = Column(Integer, primary_key=True)
@@ -17,4 +17,4 @@ class Manufacturer(Base):
     cr_time = Column(DateTime, nullable=True, default=func.now())
     md_time = Column(DateTime, nullable=True, default=func.now(), onupdate=func.now())
 
-    assets = relationship('Asset', back_populates='manufacturer')
+    assets = relationship("Asset", back_populates="manufacturer")

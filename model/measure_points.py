@@ -18,6 +18,7 @@ class MeasurePointSchema(BaseModel):
     asset_id: Optional[int]
     asset_name: Optional[str]
 
+
 class MeasurePointInputSchema(BaseModel):
     name: str
     type: int

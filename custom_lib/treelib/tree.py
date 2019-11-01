@@ -42,7 +42,7 @@ except ImportError:
 from .exceptions import *
 from .node import Node
 
-__author__ = 'chenxm'
+__author__ = "chenxm"
 
 
 def python_2_unicode_compatible(klass):
@@ -56,12 +56,13 @@ def python_2_unicode_compatible(klass):
     returning text and apply this decorator to the class.
     """
     if sys.version_info[0] == 2:
-        if '__str__' not in klass.__dict__:
-            raise ValueError("@python_2_unicode_compatible cannot be applied "
-                             "to %s because it doesn't define __str__()." %
-                             klass.__name__)
+        if "__str__" not in klass.__dict__:
+            raise ValueError(
+                "@python_2_unicode_compatible cannot be applied "
+                "to %s because it doesn't define __str__()." % klass.__name__
+            )
         klass.__unicode__ = klass.__str__
-        klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
+        klass.__str__ = lambda self: self.__unicode__().encode("utf-8")
     return klass
 
 
@@ -77,8 +78,7 @@ class Tree(object):
         """Return a list of the nodes'identifiers matching the
         identifier argument.
         """
-        return [node for node in self._nodes
-                if node == identifier]
+        return [node for node in self._nodes if node == identifier]
 
     def __init__(self, tree=None, deep=False, node_class=None):
         """Initiate a new tree or copy another tree with a shallow or
@@ -124,14 +124,23 @@ class Tree(object):
         self._reader = ""
 
         def write(line):
-            self._reader += line.decode('utf-8') + "\n"
+            self._reader += line.decode("utf-8") + "\n"
 
         self.__print_backend(func=write)
         return self._reader
 
-    def __print_backend(self, nid=None, level=ROOT, idhidden=True, filter=None,
-                        key=None, reverse=False, line_type='ascii-ex',
-                        data_property=None, func=print):
+    def __print_backend(
+        self,
+        nid=None,
+        level=ROOT,
+        idhidden=True,
+        filter=None,
+        key=None,
+        reverse=False,
+        line_type="ascii-ex",
+        data_property=None,
+        func=print,
+    ):
         """
         Another implementation of printing tree using Stack
         Print tree structure in hierarchy style.
@@ -159,51 +168,62 @@ class Tree(object):
         # Factory for proper get_label() function
         if data_property:
             if idhidden:
+
                 def get_label(node):
                     return getattr(node.data, data_property)
+
             else:
+
                 def get_label(node):
-                    return "%s[%s]" % (getattr(node.data, data_property), node.identifier)
+                    return "%s[%s]" % (
+                        getattr(node.data, data_property),
+                        node.identifier,
+                    )
+
         else:
             if idhidden:
+
                 def get_label(node):
                     return node.tag
+
             else:
+
                 def get_label(node):
                     return "%s[%s]" % (node.tag, node.identifier)
 
         # legacy ordering
         if key is None:
+
             def key(node):
                 return node
 
         # iter with func
-        for pre, node in self.__get(nid, level, filter, key, reverse,
-                                    line_type):
+        for pre, node in self.__get(nid, level, filter, key, reverse, line_type):
             label = get_label(node)
-            func('{0}{1}'.format(pre, label).encode('utf-8'))
+            func("{0}{1}".format(pre, label).encode("utf-8"))
 
     def __get(self, nid, level, filter_, key, reverse, line_type):
         # default filter
         if filter_ is None:
+
             def filter_(node):
                 return True
 
         # render characters
         dt = {
-            'ascii': ('|', '|-- ', '+-- '),
-            'ascii-ex': ('\u2502', '\u251c\u2500\u2500 ', '\u2514\u2500\u2500 '),
-            'ascii-exr': ('\u2502', '\u251c\u2500\u2500 ', '\u2570\u2500\u2500 '),
-            'ascii-em': ('\u2551', '\u2560\u2550\u2550 ', '\u255a\u2550\u2550 '),
-            'ascii-emv': ('\u2551', '\u255f\u2500\u2500 ', '\u2559\u2500\u2500 '),
-            'ascii-emh': ('\u2502', '\u255e\u2550\u2550 ', '\u2558\u2550\u2550 '),
+            "ascii": ("|", "|-- ", "+-- "),
+            "ascii-ex": ("\u2502", "\u251c\u2500\u2500 ", "\u2514\u2500\u2500 "),
+            "ascii-exr": ("\u2502", "\u251c\u2500\u2500 ", "\u2570\u2500\u2500 "),
+            "ascii-em": ("\u2551", "\u2560\u2550\u2550 ", "\u255a\u2550\u2550 "),
+            "ascii-emv": ("\u2551", "\u255f\u2500\u2500 ", "\u2559\u2500\u2500 "),
+            "ascii-emh": ("\u2502", "\u255e\u2550\u2550 ", "\u2558\u2550\u2550 "),
         }[line_type]
 
         return self.__get_iter(nid, level, filter_, key, reverse, dt, [])
 
     def __get_iter(self, nid, level, filter_, key, reverse, dt, is_last):
         dt_vline, dt_line_box, dt_line_cor = dt
-        leading = ''
+        leading = ""
         lasting = dt_line_box
 
         nid = self.root if (nid is None) else nid
@@ -215,8 +235,9 @@ class Tree(object):
         if level == self.ROOT:
             yield "", node
         else:
-            leading = ''.join(map(lambda x: dt_vline + ' ' * 3
-                                  if not x else ' ' * 4, is_last[0:-1]))
+            leading = "".join(
+                map(lambda x: dt_vline + " " * 3 if not x else " " * 4, is_last[0:-1])
+            )
             lasting = dt_line_cor if is_last[-1] else dt_line_box
             yield leading + lasting, node
 
@@ -230,8 +251,9 @@ class Tree(object):
             level += 1
             for idx, child in enumerate(children):
                 is_last.append(idx == idxlast)
-                for item in self.__get_iter(child.identifier, level, filter_,
-                                            key, reverse, dt, is_last):
+                for item in self.__get_iter(
+                    child.identifier, level, filter_, key, reverse, dt, is_last
+                ):
                     yield item
                 is_last.pop()
 
@@ -256,14 +278,15 @@ class Tree(object):
         """
         if not isinstance(node, self.node_class):
             raise OSError(
-                "First parameter must be object of {}".format(self.node_class))
+                "First parameter must be object of {}".format(self.node_class)
+            )
 
         if node.identifier in self._nodes:
-            raise DuplicatedNodeIdError("Can't create node "
-                                        "with ID '%s'" % node.identifier)
+            raise DuplicatedNodeIdError(
+                "Can't create node " "with ID '%s'" % node.identifier
+            )
 
-        pid = parent.identifier if isinstance(
-            parent, self.node_class) else parent
+        pid = parent.identifier if isinstance(parent, self.node_class) else parent
 
         if pid is None:
             if self.root is not None:
@@ -271,8 +294,7 @@ class Tree(object):
             else:
                 self.root = node.identifier
         elif not self.contains(pid):
-            raise NodeIDAbsentError("Parent node '%s' "
-                                    "is not in the tree" % pid)
+            raise NodeIDAbsentError("Parent node '%s' " "is not in the tree" % pid)
 
         self._nodes.update({node.identifier: node})
         self.__update_fpointer(pid, node.identifier, self.node_class.ADD)
@@ -335,8 +357,9 @@ class Tree(object):
             ret = self.level(nid)
         return ret
 
-    def expand_tree(self, nid=None, mode=DEPTH, filter=None, key=None,
-                    reverse=False, sorting=True):
+    def expand_tree(
+        self, nid=None, mode=DEPTH, filter=None, key=None, reverse=False, sorting=True
+    ):
         """
         Python generator to traverse the tree (or a subtree) with optional
         node filtering and sorting.
@@ -372,8 +395,7 @@ class Tree(object):
                     queue.sort(key=key, reverse=reverse)
                 while queue:
                     yield queue[0].identifier
-                    expansion = [self[i] for i in queue[0].fpointer
-                                 if filter(self[i])]
+                    expansion = [self[i] for i in queue[0].fpointer if filter(self[i])]
                     if sorting:
                         expansion.sort(key=key, reverse=reverse)
                     if mode is self.DEPTH:
@@ -388,8 +410,7 @@ class Tree(object):
                 stack = stack_bw = queue
                 direction = False
                 while stack:
-                    expansion = [self[i] for i in stack[0].fpointer
-                                 if filter(self[i])]
+                    expansion = [self[i] for i in stack[0].fpointer if filter(self[i])]
                     yield stack.pop(0).identifier
                     if direction:
                         expansion.reverse()
@@ -401,8 +422,7 @@ class Tree(object):
                         stack = stack_fw if direction else stack_bw
 
             else:
-                raise ValueError(
-                    "Traversal mode '{}' is not supported".format(mode))
+                raise ValueError("Traversal mode '{}' is not supported".format(mode))
 
     def filter_nodes(self, func):
         """
@@ -476,8 +496,9 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
         if self.root == nid:
-            raise LinkPastRootNodeError("Cannot link past the root node, "
-                                        "delete it with remove_node()")
+            raise LinkPastRootNodeError(
+                "Cannot link past the root node, " "delete it with remove_node()"
+            )
         # Get the parent of the node we are linking past
         parent = self[self[nid].bpointer]
         # Set the children of the node to the parent
@@ -554,7 +575,7 @@ class Tree(object):
         set_joint = set(new_tree._nodes) & set(self._nodes)  # joint keys
         if set_joint:
             # TODO: a deprecated routine is needed to avoid exception
-            raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
+            raise ValueError("Duplicated nodes %s exists." % list(set_joint))
 
         if deep:
             for node in new_tree._nodes:
@@ -613,8 +634,7 @@ class Tree(object):
             return 0
 
         if not self.contains(identifier):
-            raise NodeIDAbsentError("Node '%s' "
-                                    "is not in the tree" % identifier)
+            raise NodeIDAbsentError("Node '%s' " "is not in the tree" % identifier)
 
         parent = self[identifier].bpointer
         for id in self.expand_tree(identifier):
@@ -691,22 +711,50 @@ class Tree(object):
             # subtree() hasn't update the bpointer
             current = self[current].bpointer if self.root != current else None
 
-    def save2file(self, filename, nid=None, level=ROOT, idhidden=True,
-                  filter=None, key=None, reverse=False, line_type='ascii-ex', data_property=None):
+    def save2file(
+        self,
+        filename,
+        nid=None,
+        level=ROOT,
+        idhidden=True,
+        filter=None,
+        key=None,
+        reverse=False,
+        line_type="ascii-ex",
+        data_property=None,
+    ):
         """
         Save the tree into file for offline analysis.
         """
 
         def _write_line(line, f):
-            f.write(line + b'\n')
+            f.write(line + b"\n")
 
-        handler = lambda x: _write_line(x, open(filename, 'ab'))
+        handler = lambda x: _write_line(x, open(filename, "ab"))
 
-        self.__print_backend(nid, level, idhidden, filter,
-                             key, reverse, line_type, data_property, func=handler)
+        self.__print_backend(
+            nid,
+            level,
+            idhidden,
+            filter,
+            key,
+            reverse,
+            line_type,
+            data_property,
+            func=handler,
+        )
 
-    def show(self, nid=None, level=ROOT, idhidden=True, filter=None,
-             key=None, reverse=False, line_type='ascii-ex', data_property=None):
+    def show(
+        self,
+        nid=None,
+        level=ROOT,
+        idhidden=True,
+        filter=None,
+        key=None,
+        reverse=False,
+        line_type="ascii-ex",
+        data_property=None,
+    ):
         """
         Print the tree structure in hierarchy style.
 
@@ -732,13 +780,22 @@ class Tree(object):
         self._reader = ""
 
         def write(line):
-            self._reader += line.decode('utf-8') + "\n"
+            self._reader += line.decode("utf-8") + "\n"
 
         try:
-            self.__print_backend(nid, level, idhidden, filter,
-                                 key, reverse, line_type, data_property, func=write)
+            self.__print_backend(
+                nid,
+                level,
+                idhidden,
+                filter,
+                key,
+                reverse,
+                line_type,
+                data_property,
+                func=write,
+            )
         except NodeIDAbsentError:
-            print('Tree is empty')
+            print("Tree is empty")
 
         print(self._reader)
 
@@ -772,10 +829,17 @@ class Tree(object):
         else:
             try:
                 level = int(level)
-                return len([node for node in self.all_nodes_itr() if self.level(node.identifier) == level])
+                return len(
+                    [
+                        node
+                        for node in self.all_nodes_itr()
+                        if self.level(node.identifier) == level
+                    ]
+                )
             except:
                 raise TypeError(
-                    "level should be an integer instead of '%s'" % type(level))
+                    "level should be an integer instead of '%s'" % type(level)
+                )
 
     def subtree(self, nid):
         """
@@ -812,7 +876,7 @@ class Tree(object):
         """
         cn = self[nid]
         for attr, val in attrs.items():
-            if attr == 'identifier':
+            if attr == "identifier":
                 # Updating node id meets following contraints:
                 # * Update node identifier property
                 # * Update parent's followers
@@ -820,12 +884,13 @@ class Tree(object):
                 # * Update tree registration of var _nodes
                 # * Update tree root if necessary
                 cn = self._nodes.pop(nid)
-                setattr(cn, 'identifier', val)
+                setattr(cn, "identifier", val)
                 self._nodes[val] = cn
 
                 if cn.bpointer is not None:
                     self[cn.bpointer].update_fpointer(
-                        nid=nid, replace=val, mode=self.node_class.REPLACE)
+                        nid=nid, replace=val, mode=self.node_class.REPLACE
+                    )
 
                 for fp in cn.fpointer:
                     self[fp].update_bpointer(nid=val)
@@ -846,7 +911,7 @@ class Tree(object):
             if not (self[ntag].data):
                 pass
             else:
-                tree_dict = { **tree_dict, **self[nid].data}
+                tree_dict = {**tree_dict, **self[nid].data}
             # tree_dict[ntag]["data"] = self[nid].data
 
         if self[nid].expanded:
@@ -857,7 +922,10 @@ class Tree(object):
 
             for elem in queue:
                 tree_dict["children"].append(
-                    self.to_dict(elem.identifier, with_data=with_data, sort=sort, reverse=reverse))
+                    self.to_dict(
+                        elem.identifier, with_data=with_data, sort=sort, reverse=reverse
+                    )
+                )
             if len(tree_dict["children"]) == 0:
                 if not with_data:
                     tree_dict = self[nid].tag
@@ -896,15 +964,14 @@ class Tree(object):
         """To format the tree in JSON format."""
         return json.dumps(self.to_dict(with_data=with_data, sort=sort, reverse=reverse))
 
-    def to_graphviz(self, filename=None, shape='circle', graph='digraph'):
+    def to_graphviz(self, filename=None, shape="circle", graph="digraph"):
         """Exports the tree in the dot format of the graphviz software"""
         nodes, connections = [], []
         if self.nodes:
 
             for n in self.expand_tree(mode=self.WIDTH):
                 nid = self[n].identifier
-                state = '"{0}" [label="{1}", shape={2}]'.format(
-                    nid, self[n].tag, shape)
+                state = '"{0}" [label="{1}", shape={2}]'.format(nid, self[n].tag, shape)
                 nodes.append(state)
 
                 for c in self.children(nid):
@@ -914,21 +981,21 @@ class Tree(object):
         # write nodes and connections to dot format
         is_plain_file = filename is not None
         if is_plain_file:
-            f = codecs.open(filename, 'w', 'utf-8')
+            f = codecs.open(filename, "w", "utf-8")
         else:
             f = StringIO()
 
-        f.write(graph + ' tree {\n')
+        f.write(graph + " tree {\n")
         for n in nodes:
-            f.write('\t' + n + '\n')
+            f.write("\t" + n + "\n")
 
         if len(connections) > 0:
-            f.write('\n')
+            f.write("\n")
 
         for c in connections:
-            f.write('\t' + c + '\n')
+            f.write("\t" + c + "\n")
 
-        f.write('}')
+        f.write("}")
 
         if not is_plain_file:
             print(f.getvalue())

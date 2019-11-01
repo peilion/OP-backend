@@ -9,11 +9,9 @@ from model.pipeline import PipelineSchema
 
 router = APIRouter()
 
+
 @router.get("/", response_model=List[Optional[PipelineSchema]])
-async def read_pipelines(
-        skip: int = 0,
-        limit: int = None,
-):
+async def read_pipelines(skip: int = 0, limit: int = None):
     """
     Get Pipeline List.
     """

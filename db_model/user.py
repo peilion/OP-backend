@@ -8,7 +8,7 @@ from db import Base, table_args
 
 
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = "user"
     __table_args__ = table_args
 
     id = Column(Integer, primary_key=True)
@@ -16,4 +16,4 @@ class User(Base):
     cr_time = Column(DateTime, nullable=True, default=func.now())
     md_time = Column(DateTime, nullable=True, default=func.now(), onupdate=func.now())
 
-    assets = relationship('Asset', back_populates='admin')
+    assets = relationship("Asset", back_populates="admin")

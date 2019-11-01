@@ -12,11 +12,11 @@ from model.maintenace_record import MaintenanceRecord
 router = APIRouter()
 
 
-@router.get("/", response_class=UJSONResponse, response_model=List[Optional[MaintenanceRecord]])
+@router.get(
+    "/", response_class=UJSONResponse, response_model=List[Optional[MaintenanceRecord]]
+)
 async def read_maintenance_record(
-        skip: int = None,
-        limit: int = None,
-        asset_id: int = None
+    skip: int = None, limit: int = None, asset_id: int = None
 ):
     """
     Get Warning List.
@@ -27,9 +27,7 @@ async def read_maintenance_record(
 
 
 @router.get("/{id}/", response_class=UJSONResponse, response_model=MaintenanceRecord)
-async def read_maintenance_record_by_id(
-        id: int,
-):
+async def read_maintenance_record_by_id(id: int,):
     """
     Get warning log by ID.
     """

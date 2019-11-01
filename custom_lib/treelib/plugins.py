@@ -27,7 +27,7 @@ Deprecated! We prefer a unified processing of Tree object.
 from __future__ import unicode_literals
 
 
-def export_to_dot(tree, filename=None, shape='circle', graph='digraph'):
+def export_to_dot(tree, filename=None, shape="circle", graph="digraph"):
     """Exports the tree in the dot format of the graphviz software"""
-    print('Deprecated module. Use `tree.to_graphviz()` instead.')
+    print("Deprecated module. Use `tree.to_graphviz()` instead.")
     tree.to_graphviz(filename=filename, shape=shape, graph=graph)

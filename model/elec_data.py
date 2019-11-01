@@ -15,6 +15,7 @@ class ElecSignalSchema(BaseModel):
     vfft: SignalArray
     wfft: SignalArray
 
+
 class ElecSignalListSchema(BaseModel):
     id: int
     time: datetime

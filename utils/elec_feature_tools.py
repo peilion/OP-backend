@@ -3,21 +3,19 @@ from scipy import signal, optimize
 
 
 def cal_samples(phaseAOmega, phaseBOmega, phaseCOmega, end_time):
-    '''
+    """
     Calculate the number of samples needed.
-    '''
-    max_omega = max(abs(phaseAOmega),
-                    abs(phaseBOmega),
-                    abs(phaseCOmega))
+    """
+    max_omega = max(abs(phaseAOmega), abs(phaseBOmega), abs(phaseCOmega))
     max_freq = max_omega / (2 * np.pi)
     samples = (max_freq ** 2) * 6 * end_time
     return samples
 
 
 def make_phase(mag, omega, phi, samples, end_time):
-    '''
+    """
     Create the phase signal in complex form.
-    '''
+    """
 
     array_time = np.linspace(0, end_time, samples)
 
@@ -72,10 +70,15 @@ def to_complex(r, x, real_offset=0, imag_offset=0):
 
     imag = r * np.sin(x) + imag_offset
 
-    return (real + 1j * imag)
+    return real + 1j * imag
+
 
 def threephase_deserialize(u, v, w):
-    return np.fromstring(u, dtype=np.float32), np.fromstring(v, dtype=np.float32), np.fromstring(w, dtype=np.float32)
+    return (
+        np.fromstring(u, dtype=np.float32),
+        np.fromstring(v, dtype=np.float32),
+        np.fromstring(w, dtype=np.float32),
+    )
 
 
 def feature_calculator(u, v, w):
@@ -92,7 +95,7 @@ def feature_calculator(u, v, w):
     brb_list = []
     for phase in [u, v, w]:
         # FFt
-        phase = signal.detrend(phase, type='constant')
+        phase = signal.detrend(phase, type="constant")
         phase_fft = fftransform(phase)
         phase_fft_axis = np.linspace(0, RATE / 2, len(phase) / 2 + 1)
 
@@ -112,7 +115,7 @@ def feature_calculator(u, v, w):
         THD = np.sqrt(total)
         # Hilbert transform
         Shiftted = np.abs(signal.hilbert(phase))
-        phase_envelope = signal.detrend(Shiftted[1024:1024 + 4096])
+        phase_envelope = signal.detrend(Shiftted[1024 : 1024 + 4096])
         # Hilebert spectrum
         phase_envelope_fft = fftransform(phase_envelope)
         brb_list.append(phase_envelope_fft[:10])
@@ -133,30 +136,55 @@ def feature_calculator(u, v, w):
     p = []
     for phase in [u, v, w]:
         # Estimate parameters
-        p0 = [max_list[i], PSF_list[i], np.pi * PSF_list[i]]  # Initial guess for the parameters
+        p0 = [
+            max_list[i],
+            PSF_list[i],
+            np.pi * PSF_list[i],
+        ]  # Initial guess for the parameters
         p1 = parameter_estimation(phase, RATE, initailization=p0)
         p.append(p1)
         i = i + 1
         # Calculate complex data
 
-    samples = cal_samples(2 * np.pi * p[0][1], 2 * np.pi * p[1][1], 2 * np.pi * p[2][1], end_time=LENGTH / RATE)
+    samples = cal_samples(
+        2 * np.pi * p[0][1],
+        2 * np.pi * p[1][1],
+        2 * np.pi * p[2][1],
+        end_time=LENGTH / RATE,
+    )
 
     i = 0
     for phase in [u, v, w]:
-        complex_phase, _ = make_phase(p[i][0],
-                                      2 * np.pi * p[i][1],
-                                      p[i][2], samples=int(samples), end_time=LENGTH / RATE)
+        complex_phase, _ = make_phase(
+            p[i][0],
+            2 * np.pi * p[i][1],
+            p[i][2],
+            samples=int(samples),
+            end_time=LENGTH / RATE,
+        )
         # Append to the list
         complex_list.append(complex_phase)
         i = i + 1
 
-    (phaseA_pos, phaseB_pos, phaseC_pos,
-     phaseA_neg, phaseB_neg, phaseC_neg,
-     phaseZero) = cal_symm(complex_list[1],
-                           complex_list[0],
-                           complex_list[2])
+    (
+        phaseA_pos,
+        phaseB_pos,
+        phaseC_pos,
+        phaseA_neg,
+        phaseB_neg,
+        phaseC_neg,
+        phaseZero,
+    ) = cal_symm(complex_list[1], complex_list[0], complex_list[2])
 
-    return rms_list, THD_list, harmonics_list, max_list, min_list, brb_list, p, \
-           np.sqrt(np.dot(phaseA_neg.real, phaseA_neg.real) / phase.size), \
-           np.sqrt(np.dot(phaseA_pos.real, phaseA_pos.real) / phase.size), \
-           np.sqrt(np.dot(phaseZero.real, phaseZero.real) / phase.size)
+    return (
+        rms_list,
+        THD_list,
+        harmonics_list,
+        max_list,
+        min_list,
+        brb_list,
+        p,
+        np.sqrt(np.dot(phaseA_neg.real, phaseA_neg.real) / phase.size),
+        np.sqrt(np.dot(phaseA_pos.real, phaseA_pos.real) / phase.size),
+        np.sqrt(np.dot(phaseZero.real, phaseZero.real) / phase.size),
+    )

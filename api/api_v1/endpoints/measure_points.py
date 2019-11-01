@@ -20,39 +20,53 @@ class GroupRule(str, Enum):
     asset = "asset"
 
 
-@router.get("/", response_class=UJSONResponse,
-            response_model=List[Optional[MeasurePointSchema]])
+@router.get(
+    "/", response_class=UJSONResponse, response_model=List[Optional[MeasurePointSchema]]
+)
 async def read_measure_points(
-        skip: int = None,
-        limit: int = None,
-        brief: bool = False,
-        station_id: int = Query(default=None, description='Filtering measure points with station\'s id'),
-        asset_id: int = Query(default=None,
-                              description='Filtering measure points with asset\'s id , **only one of the two filtering conditions shuold be given**'),
+    skip: int = None,
+    limit: int = None,
+    brief: bool = False,
+    station_id: int = Query(
+        default=None, description="Filtering measure points with station's id"
+    ),
+    asset_id: int = Query(
+        default=None,
+        description="Filtering measure points with asset's id , **only one of the two filtering conditions shuold be given**",
+    ),
 ):
     if station_id and asset_id:
         raise HTTPException(
             status_code=400,
-            detail="Only one of station_id and asset_id should be given.")
+            detail="Only one of station_id and asset_id should be given.",
+        )
     conn = Database(META_URL)
-    item = await get_multi(conn=conn, skip=skip, limit=limit, brief=brief, station_id=station_id, asset_id=asset_id)
+    item = await get_multi(
+        conn=conn,
+        skip=skip,
+        limit=limit,
+        brief=brief,
+        station_id=station_id,
+        asset_id=asset_id,
+    )
     return item
 
 
 @router.get("/stat/", response_class=UJSONResponse)
 async def read_measure_point_statistic_report(
-        rule: GroupRule = Query(default=None, description='Rule to generate statistic report.')
+    rule: GroupRule = Query(
+        default=None, description="Rule to generate statistic report."
+    )
 ):
     conn = Database(META_URL)
     res = await get_stat(conn=conn, rule=rule.value)
     return [dict(row) for row in res]
 
 
-@router.get("/{id}/", response_class=UJSONResponse,
-            response_model=Optional[MeasurePointSchema])
-async def read_measure_point_by_id(
-        id: int
-):
+@router.get(
+    "/{id}/", response_class=UJSONResponse, response_model=Optional[MeasurePointSchema]
+)
+async def read_measure_point_by_id(id: int):
     conn = Database(META_URL)
     item = await get(conn=conn, id=id)
     if not item:
@@ -61,14 +75,13 @@ async def read_measure_point_by_id(
 
 
 @router.post("/", response_class=UJSONResponse)
-async def create_measure_point(
-        mp: MeasurePointInputSchema
-):
+async def create_measure_point(mp: MeasurePointInputSchema):
     session = session_make(meta_engine)
     try:
-        create(session,mp)
-        return {'msg': 'Measure Point successfully added.'}
+        create(session, mp)
+        return {"msg": "Measure Point successfully added."}
     except IntegrityError:
         raise HTTPException(
             status_code=409,
-            detail="Conflict measure point already exist in the database.")
+            detail="Conflict measure point already exist in the database.",
+        )

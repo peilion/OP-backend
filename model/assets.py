@@ -6,10 +6,9 @@ from pydantic import BaseModel, validator
 
 class AssetPostSchema(BaseModel):
     class asset(BaseModel):
-
-        @validator('st_time',pre=True)
+        @validator("st_time", pre=True)
         def datetime_validate(cls, v):
-            return str(datetime.strptime(v, '%Y-%m-%dT%H:%M:%S.%fZ'))
+            return str(datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%fZ"))
 
         name: str
         sn: str
@@ -23,6 +22,7 @@ class AssetPostSchema(BaseModel):
 
     base: asset
     info: dict
+
 
 class FlattenAssetSchema(BaseModel):
     id: int
@@ -44,7 +44,7 @@ class FlattenAssetSchema(BaseModel):
 
 
 class FlattenAssetListSchema(BaseModel):
-    asset: Optional[List[Optional['FlattenAssetSchema']]]
+    asset: Optional[List[Optional["FlattenAssetSchema"]]]
 
 
 class NestAssetSchema(BaseModel):
@@ -60,7 +60,7 @@ class NestAssetSchema(BaseModel):
     statu: int
     repairs: Optional[int]
 
-    children: Optional[List[Optional['NestAssetSchema']]]
+    children: Optional[List[Optional["NestAssetSchema"]]]
     station_id: int
 
     class Config:
@@ -68,7 +68,7 @@ class NestAssetSchema(BaseModel):
 
 
 class NestAssetListSchema(BaseModel):
-    asset: Optional[List[Optional['NestAssetSchema']]]
+    asset: Optional[List[Optional["NestAssetSchema"]]]
 
 
 NestAssetSchema.update_forward_refs()  # for self referencing orm model
@@ -87,7 +87,7 @@ class StationStatisticSchema(BaseModel):
         station: Optional[int]
         cnt: Optional[int]
 
-    res: Optional[List[Optional['item']]]
+    res: Optional[List[Optional["item"]]]
 
 
 class TypeStatisticSchema(BaseModel):
@@ -95,18 +95,18 @@ class TypeStatisticSchema(BaseModel):
         asset_type: Optional[int]
         cnt: Optional[int]
 
-    res: Optional[List[Optional['item']]]
+    res: Optional[List[Optional["item"]]]
 
 
 class TypeStationSchema(BaseModel):
     class item(BaseModel):
-        name : str
-        PumpUnit:  Optional[int] = 0
-        Pump:  Optional[int] = 0
-        Motor:  Optional[int] = 0
-        Rotor:  Optional[int] = 0
-        Stator:  Optional[int] = 0
-        Bearing:  Optional[int] = 0
+        name: str
+        PumpUnit: Optional[int] = 0
+        Pump: Optional[int] = 0
+        Motor: Optional[int] = 0
+        Rotor: Optional[int] = 0
+        Stator: Optional[int] = 0
+        Bearing: Optional[int] = 0
 
-    res : Optional[List[Optional['item']]]
+    res: Optional[List[Optional["item"]]]
     update_time: Optional[datetime] = None

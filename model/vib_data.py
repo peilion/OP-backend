@@ -12,14 +12,17 @@ class VibrationSignalSchema(BaseModel):
     vib: SubSampledArray
     spec: SignalArray
 
+
 class VibrationSignalSchemaByid(BaseModel):
     id: int
     time: datetime
     vib: SubSampledBinaryArray
 
+
 class VibrationSignalListSchema(BaseModel):
     id: int
     time: datetime
+
 
 class VibrationEnvelopeSchema(BaseModel):
     id: int
@@ -28,19 +31,22 @@ class VibrationEnvelopeSchema(BaseModel):
     env_vib: SubSampledArray
     env_fft: SignalArray
 
+
 class VibrationSTFTSchema(BaseModel):
     id: int
     time: datetime
     f: SignalArray
     t: SignalArray
     stft: List
-    max:float
+    max: float
+
 
 class VibrationWelchSchema(BaseModel):
     id: int
     time: datetime
     spec: SignalArray
     freq: SignalArray
+
 
 class VibrationCumtrapzSchema(BaseModel):
     id: int
