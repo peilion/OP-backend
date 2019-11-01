@@ -2,7 +2,7 @@ from databases import Database
 from sqlalchemy import text, func
 from sqlalchemy.orm import Session
 
-from crud.decorator import con_warpper, query2sql
+from crud.base import con_warpper, query2sql
 from db import meta_engine
 from db.db_config import session_make
 from db_model import WarningLog, Asset, Station

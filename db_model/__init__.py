@@ -1,41 +1,11 @@
 from .asset import Asset
-from .asset_hi import AssetHI
-from .bearing import Bearing
-from .elec_data import ElecData
-from .elec_feature import ElecFeature
-from .maintenance_record import MaintenanceRecord
-from .manufacturer import Manufacturer
+from db_model.asset import AssetHI
+from db_model.asset_info import Bearing, Motor, Pump, PumpUnit, Rotor, Stator
+from db_model.raw_data import ElecData, VibData
+from db_model.feature import ElecFeature, VibFeature
+from db_model.log import MaintenanceRecord, WarningLog
 from .measure_point import MeasurePoint
-from .motor import Motor
 from .organization import Station, BranchCompany, RegionCompany
-from .pump import Pump
-from .pump_unit import PumpUnit
-from .rotor import Rotor
-from .stator import Stator
-from .user import User
-from .vib_data import VibData
-from .vib_feature import VibFeature
-from .warning_log import WarningLog
+from db_model.others import User, Manufacturer
 
-__all__ = [
-    "Asset",
-    "MeasurePoint",
-    "Bearing",
-    "Manufacturer",
-    "Motor",
-    "PumpUnit",
-    "Pump",
-    "Rotor",
-    "Stator",
-    "Station",
-    "User",
-    "WarningLog",
-    "ElecFeature",
-    "ElecData",
-    "VibFeature",
-    "VibData",
-    "BranchCompany",
-    "RegionCompany",
-    "MaintenanceRecord",
-    "AssetHI",
-]
+__all__ = [s for s in dir() if not s.startswith('_')]

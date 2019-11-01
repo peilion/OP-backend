@@ -5,7 +5,7 @@ from fastapi import APIRouter
 
 from crud.pipeline import get_multi
 from db.conn_engine import META_URL
-from model.pipeline import PipelineSchema
+from model.organizations import PipelineSchema
 
 router = APIRouter()
 

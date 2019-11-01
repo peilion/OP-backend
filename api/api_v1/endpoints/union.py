@@ -6,7 +6,7 @@ from starlette.responses import UJSONResponse
 
 from crud.union import get_warning_and_maintenace
 from db.conn_engine import META_URL
-from model.warning import WarningAndMainteSchema
+from model.log import WarningAndMainteSchema
 
 router = APIRouter()
 

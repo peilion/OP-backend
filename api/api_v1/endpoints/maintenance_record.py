@@ -7,13 +7,13 @@ from starlette.responses import UJSONResponse
 
 from crud.maintenance_record import get_multi, get
 from db.conn_engine import META_URL
-from model.maintenace_record import MaintenanceRecord
+from model.log import MaintenanceRecordSchema
 
 router = APIRouter()
 
 
 @router.get(
-    "/", response_class=UJSONResponse, response_model=List[Optional[MaintenanceRecord]]
+    "/", response_class=UJSONResponse, response_model=List[Optional[MaintenanceRecordSchema]]
 )
 async def read_maintenance_record(
     skip: int = None, limit: int = None, asset_id: int = None
@@ -26,7 +26,7 @@ async def read_maintenance_record(
     return items
 
 
-@router.get("/{id}/", response_class=UJSONResponse, response_model=MaintenanceRecord)
+@router.get("/{id}/", response_class=UJSONResponse, response_model=MaintenanceRecordSchema)
 async def read_maintenance_record_by_id(id: int,):
     """
     Get warning log by ID.

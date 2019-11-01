@@ -5,7 +5,7 @@ from sqlalchemy import text
 from starlette.responses import UJSONResponse
 
 from db.conn_engine import INFO_URL
-from model.server import ServerInfoSchema
+from model.others import ServerInfoSchema
 
 router = APIRouter()
 

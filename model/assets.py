@@ -39,8 +39,6 @@ class FlattenAssetSchema(BaseModel):
     station_name: Optional[str] = None
     parent_id: Optional[int] = None
     repairs: Optional[int]
-    # class Config:
-    #     orm_mode = True
 
 
 class FlattenAssetListSchema(BaseModel):
@@ -67,11 +65,11 @@ class NestAssetSchema(BaseModel):
         orm_mode = True
 
 
+NestAssetSchema.update_forward_refs()  # for self referencing orm model
+
 class NestAssetListSchema(BaseModel):
     asset: Optional[List[Optional["NestAssetSchema"]]]
 
-
-NestAssetSchema.update_forward_refs()  # for self referencing orm model
 
 
 class StatuStatisticSchema(BaseModel):

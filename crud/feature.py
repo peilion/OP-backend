@@ -4,7 +4,7 @@ from databases import Database
 from fastapi import HTTPException
 from sqlalchemy.orm import Session, load_only
 
-from crud.decorator import con_warpper, query2sql
+from crud.base import con_warpper, query2sql
 from db.db_config import session_make
 
 

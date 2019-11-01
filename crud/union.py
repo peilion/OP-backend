@@ -1,6 +1,6 @@
 from databases import Database
 
-from crud.decorator import con_warpper
+from crud.base import con_warpper
 
 
 @con_warpper

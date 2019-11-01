@@ -13,7 +13,7 @@ class VibrationSignalSchema(BaseModel):
     spec: SignalArray
 
 
-class VibrationSignalSchemaByid(BaseModel):
+class VibrationSignalByidSchema(BaseModel):
     id: int
     time: datetime
     vib: SubSampledBinaryArray

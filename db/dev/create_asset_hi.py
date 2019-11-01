@@ -4,8 +4,7 @@ import random
 from sqlalchemy.ext.declarative import declarative_base
 
 from db import session_make, meta_engine
-from db_model import Asset
-from db_model.asset_hi import AssetHI
+from db_model import Asset, AssetHI
 
 session = session_make(meta_engine)
 x = session.query(Asset.id).filter(Asset.asset_type == 0).all()

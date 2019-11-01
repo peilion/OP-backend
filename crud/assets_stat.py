@@ -1,6 +1,6 @@
 from databases import Database
 
-from crud.decorator import con_warpper
+from crud.base import con_warpper
 from db_model import Asset, Station, PumpUnit
 from model.assets import TypeStationSchema
 from utils.query_result_reformat import (

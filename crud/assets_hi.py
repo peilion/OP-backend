@@ -2,7 +2,7 @@ from databases import Database
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from crud.decorator import con_warpper, query2sql
+from crud.base import con_warpper, query2sql
 from db import session_make
 from db_model import Asset
 from utils.query_result_reformat import format_timediff_result

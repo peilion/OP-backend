@@ -21,3 +21,8 @@ class RegionSchema(BaseModel):
     id: int
     name: str
     telephone: Optional[str]
+
+
+class PipelineSchema(BaseModel):
+    id: int
+    name: str

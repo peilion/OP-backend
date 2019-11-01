@@ -1,6 +1,5 @@
 import numpy as np
 from numpy import ndarray
-from pydantic import BaseModel
 
 from core.config import TIME_DOMAIN_SUB_SAMPLED_RATIO, TIME_DOMAIN_DECIMAL
 
@@ -48,5 +47,3 @@ class SignalArray(list):
         return [round(float(item), TIME_DOMAIN_DECIMAL) for item in v]
 
 
-class Msg(BaseModel):
-    msg: str

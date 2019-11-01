@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
 from core.dependencies import mp_change_commit
-from crud.decorator import con_warpper, query2sql
+from crud.base import con_warpper, query2sql
 from db import station_engines
 from db.db_config import session_make
 from db_model import (
