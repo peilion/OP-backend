@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, Float, SmallInteger, ForeignKey, Boolean
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm import relationship
 
 from db import Base, table_args
@@ -100,3 +101,7 @@ class Stator(Base):
 
     asset_id = Column(Integer, ForeignKey("asset.id"))
     asset = relationship("Asset", uselist=False)
+
+
+info_models_mapper = {key: value for key, value in locals().items() if
+                      (value.__class__ == DeclarativeMeta) & (key != 'Base')}

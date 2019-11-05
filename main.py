@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 
 from api.api_v1.api import api_router
 from core import config
@@ -24,6 +25,9 @@ if config.BACKEND_CORS_ORIGINS:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+app.add_middleware(GZipMiddleware,
+                   minimum_size=300000)  # gzip compression do not enhance the performance in local test environment
 
 
 @app.on_event("startup")

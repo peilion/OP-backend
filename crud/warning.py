@@ -132,8 +132,9 @@ async def get_warning_stat_by_region_company(
 async def get_warning_stat_by_asset(
     conn: Database, session: Session = session_make(engine=None)
 ):
-    query = session.query(WarningLog.asset_id, func.count("*").label("cnt")).group_by(
-        WarningLog.asset_id
+    query = (
+        session.query(WarningLog.asset_id, func.count("*").label("cnt"))
+        .group_by(WarningLog.asset_id)
     )
     res = await conn.fetch_all(query2sql(query))
     return [[row.asset_id, row.cnt] for row in res]
@@ -143,8 +144,9 @@ async def get_warning_stat_by_asset(
 async def get_warning_stat_by_isreadable(
     conn: Database, session: Session = session_make(engine=None)
 ):
-    query = session.query(WarningLog.is_read, func.count("*").label("cnt")).group_by(
-        WarningLog.is_read
+    query = (
+        session.query(WarningLog.is_read, func.count("*").label("cnt"))
+        .group_by(WarningLog.is_read)
     )
     res = await conn.fetch_all(query2sql(query))
     return [[row.is_read, row.cnt] for row in res]

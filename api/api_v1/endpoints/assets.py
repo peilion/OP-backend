@@ -107,15 +107,14 @@ async def read_assets_statistic(group_by: List[GroupRule] = Query(None),):
     - Filed **'statu' and** one of the other fileds
     - Filed **'type' and 'station'**
     """
+    conn = Database(META_URL)
 
     if len(group_by) == 1:
-        conn = Database(META_URL)
         crud_meth = crud_meth_mapper[group_by[0]][0]
         res = await crud_meth(conn=conn)
         return res
 
     elif len(group_by) == 2:
-        conn = Database(META_URL)
         if "statu" in group_by:
             group_by.pop(group_by.index("statu"))
             crud_meth = crud_meth_mapper[group_by[0]][1]
