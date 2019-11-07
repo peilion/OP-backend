@@ -116,7 +116,7 @@ def get_tree(session: Session, id: int):
     return query.one()
 
 @con_warpper
-async def create(session: Session, conn: Database, data):
+async def create(conn: Database, data):
     data = jsonable_encoder(data)
     query = Asset.__table__.insert()
 

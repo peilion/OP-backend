@@ -209,11 +209,9 @@ async def read_asset_avghi(
 
 @router.post("/", response_class=UJSONResponse)
 async def create_asset(asset: AssetPostSchema):
-    session = session_make(meta_engine)
     try:
         conn = Database(META_URL)
-
-        res = await create(session, conn=conn, data = asset)
+        res = await create(conn=conn, data = asset)
         if res == True:
             return {"msg": "Asset successfully added."}
         else:
