@@ -19,7 +19,7 @@ class AssetPostSchema(BaseModel):
         station_id: int
         parent_id: Optional[int]
         memo: Optional[str]
-
+        statu: int = 0
     base: asset
     info: dict
 

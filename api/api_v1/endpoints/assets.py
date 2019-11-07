@@ -58,13 +58,13 @@ class GroupRule(str, Enum):
 
 @router.get("/", response_class=UJSONResponse)
 async def read_assets(
-    skip: int = None,
-    limit: int = None,
-    iftree: bool = False,
-    type: int = None,
-    level: int = None,
-    station_name: str = None,
-    station_id: int = None,
+        skip: int = None,
+        limit: int = None,
+        iftree: bool = False,
+        type: int = None,
+        level: int = None,
+        station_name: str = None,
+        station_id: int = None,
 ):
     """
     Get Asset List.
@@ -99,7 +99,7 @@ async def read_assets(
 
 
 @router.get("/stat/", response_class=UJSONResponse)
-async def read_assets_statistic(group_by: List[GroupRule] = Query(None),):
+async def read_assets_statistic(group_by: List[GroupRule] = Query(None), ):
     """
     **Supported Query Mode** are listed follow, other query mode will be informed a 400 bad query parameter error.
 
@@ -149,7 +149,7 @@ async def read_by_id(id: int, iftree: bool = False):
 
 
 @router.get("/{id}/info/", response_class=UJSONResponse)
-async def read_asset_info(id: int,):
+async def read_asset_info(id: int, ):
     """
     Get Asset Info by ID.
     """
@@ -166,12 +166,12 @@ async def read_asset_info(id: int,):
 
 @router.get("/{id}/avghi/", response_class=UJSONResponse)
 async def read_asset_avghi(
-    id: int,
-    time_before: str = Query(None, description="e.x. 2016-07-01 00:00:00"),
-    time_after: str = Query(None, description="e.x. 2016-01-10 00:00:00"),
-    interval: int = None,
-    limit: int = None,
-    pre_query: bool = True,
+        id: int,
+        time_before: str = Query(None, description="e.x. 2016-07-01 00:00:00"),
+        time_after: str = Query(None, description="e.x. 2016-01-10 00:00:00"),
+        interval: int = None,
+        limit: int = None,
+        pre_query: bool = True,
 ):
     """
     Get avg Asset HI by time range and interval.
@@ -211,8 +211,15 @@ async def read_asset_avghi(
 async def create_asset(asset: AssetPostSchema):
     session = session_make(meta_engine)
     try:
-        create(session, asset)
-        return {"msg": "Asset successfully added."}
+        conn = Database(META_URL)
+
+        res = await create(session, conn=conn, data = asset)
+        if res == True:
+            return {"msg": "Asset successfully added."}
+        else:
+            raise HTTPException(
+                status_code=409, detail="Error happened when creating table."
+            )
     except IntegrityError:
         raise HTTPException(
             status_code=409, detail="Conflict asset already exsit in the database."

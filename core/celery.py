@@ -2,13 +2,13 @@ from __future__ import absolute_import, unicode_literals
 
 import numpy as np
 from celery import Celery
-from db_model.meta_models import MeasurePoint
-from db_model.sharding_models import ElecFeature, ElecData, VibFeature, VibData
 from sqlalchemy import text
 from sqlalchemy.ext.declarative import declarative_base
 
 from db.conn_engine import meta_engine, station_engines
 from db.db_config import session_make
+from db_model import ElecFeature, ElecData, VibFeature, VibData
+from db_model import MeasurePoint
 from utils import vib_feature_tools
 from utils.elec_feature_tools import threephase_deserialize, feature_calculator
 
@@ -58,7 +58,11 @@ def cal_elec_feature():
         for mp_id in mp_ids:
             engine = station_engines[station_id - 1]
             s = text(
-                "SELECT d.id,d.time as time, d.ucur as u , d.vcur as v,d.wcur as w from elec_data_{} as d LEFT JOIN elec_feature_{} as f on d.id = f.data_id where f.data_id is null limit 10;".format(
+                "SELECT d.id,d.time as time, d.ucur as u , d.vcur as v,d.wcur as w "
+                "FROM elec_data_{} as d "
+                "LEFT JOIN elec_feature_{} as f on d.id = f.data_id "
+                "WHERE f.data_id IS NULL "
+                "limit 10;".format(
                     mp_id, mp_id
                 )
             )

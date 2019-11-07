@@ -2,6 +2,7 @@ from databases import Database
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.schema import CreateTable
 
 from crud.base import con_warpper, query2sql
 from db import meta_engine
@@ -114,21 +115,42 @@ def get_tree(session: Session, id: int):
 
     return query.one()
 
-
-def create(session: Session, data):
+@con_warpper
+async def create(session: Session, conn: Database, data):
     data = jsonable_encoder(data)
-    asset = Asset(**data["base"])
-    session.add(asset)
-    session.commit()
-    session.refresh(asset)
-    if data["base"]["asset_type"] == 0:
-        add_asset_hi_table(asset.id)
-    session.close()
+    query = Asset.__table__.insert()
 
-
-def add_asset_hi_table(id):
-    base = declarative_base()
-    model = AssetHI.model(
-        point_id=id, base=base
-    )  # register to metadata for all pump_unit
-    base.metadata.create_all(meta_engine)
+    transaction = await conn.transaction()
+    try:
+        id = await conn.execute(query=query, values=data['base'])
+        model = AssetHI.model(point_id=id)  # register to metadata for all pump_unit
+        table_sql = CreateTable(model.__table__).compile(meta_engine)
+        if data["base"]["asset_type"] == 0:
+            await conn.execute(str(table_sql))
+    except Exception as e:
+        print(e)
+        await transaction.rollback()
+        return False
+    else:
+        await transaction.commit()
+        return True
+    # asset = Asset(**data["base"])
+    # session.add(asset)
+    # if data["base"]["asset_type"] == 0:
+    #     session.flush()
+    #     model = AssetHI.model(point_id=36)  # register to metadata for all pump_unit
+    #     table_sql = CreateTable(model.__table__).compile(meta_engine)
+    #     try:
+    #         session.execute(table_sql.statement)
+    #         session.commit()
+    #         session.close()
+    #         return True
+    #     except Exception as e:
+    #         session.delete(asset)
+    #         session.commit()
+    #         session.close()
+    #         return False
+    # else:
+    #     session.commit()
+    #     session.close()
+    #     return True

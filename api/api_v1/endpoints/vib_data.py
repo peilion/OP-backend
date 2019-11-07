@@ -19,12 +19,12 @@ from model.vib_data import (
     VibrationCumtrapzSchema,
 )
 from utils.vib_feature_tools import (
-    fftransform,
+    fast_fournier_transform,
     hilbert,
-    stft,
-    musens,
-    welch,
-    toVelocity,
+    short_time_fournier_transform,
+    multi_scale_envelope_spectrum,
+    welch_spectrum_estimation,
+    acceleration_to_velocity,
 )
 
 router = APIRouter()
@@ -49,7 +49,7 @@ async def read_the_latest_vibration_signal(
     res = await get_latest(
         conn=conn, shard_id=mp_shard_info["inner_id"], orm_model=VibData
     )
-    processed_res = fftransform(res["vib"])
+    processed_res = fast_fournier_transform(res["vib"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -111,7 +111,7 @@ async def read_vibration_signal_by_id(
         data_id=data_id,
         orm_model=VibData,
     )
-    processed_res = fftransform(res["vib"])
+    processed_res = fast_fournier_transform(res["vib"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -165,7 +165,7 @@ async def analyze_vibration_signal_with_stft(
         orm_model=VibData,
     )
 
-    processed_res = stft(res["vib"])
+    processed_res = short_time_fournier_transform(res["vib"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -194,7 +194,7 @@ async def analyze_vibration_signal_with_musens(
         orm_model=VibData,
     )
 
-    processed_res = musens(res["vib"], n_Fs=10000, n_Ssta=1.0, n_Send=8.0, n_Sint=0.2)
+    processed_res = multi_scale_envelope_spectrum(res["vib"], n_Fs=10000, n_Ssta=1.0, n_Send=8.0, n_Sint=0.2)
     x = json.dumps({**processed_res, **{"id": res["id"], "time": str(res["time"])}})
     # using json response directly to skip data validation, for extreme large
     # array.
@@ -224,7 +224,7 @@ async def analyze_vibration_signal_with_welch(
         orm_model=VibData,
     )
 
-    processed_res = welch(res["vib"])
+    processed_res = welch_spectrum_estimation(res["vib"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -251,5 +251,5 @@ async def analyze_vibration_signal_with_cumtrapz(
         orm_model=VibData,
     )
 
-    processed_res = toVelocity(res["vib"])
+    processed_res = acceleration_to_velocity(res["vib"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}

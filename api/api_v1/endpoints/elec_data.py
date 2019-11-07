@@ -10,7 +10,7 @@ from crud.data import get_latest, get_by_id, get_multi
 from db.conn_engine import STATION_URLS
 from db_model import ElecData
 from model.elec_data import ElecSignalListSchema, ElecSignalSchema
-from utils.vib_feature_tools import fftransform
+from utils.vib_feature_tools import fast_fournier_transform
 
 router = APIRouter()
 
@@ -36,7 +36,7 @@ async def read_the_latest_electric_signal(
     )
     final = {}
     for phase in ["u", "v", "w"]:
-        processed_res = fftransform(res[phase + "cur"])
+        processed_res = fast_fournier_transform(res[phase + "cur"])
         final[phase + "cur"] = processed_res["vib"]
         final[phase + "fft"] = processed_res["spec"][:300]
     return {**final, **{"id": res["id"], "time": res["time"]}}
@@ -103,7 +103,7 @@ async def read_electric_signal_by_id(
 
     final = {}
     for phase in ["u", "v", "w"]:
-        processed_res = fftransform(res[phase + "cur"])
+        processed_res = fast_fournier_transform(res[phase + "cur"])
         final[phase + "cur"] = processed_res["vib"]
         final[phase + "fft"] = processed_res["spec"][:300]
     return {**final, **{"id": res["id"], "time": res["time"]}}
