@@ -1,7 +1,6 @@
 from databases import Database
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateTable
 
 from crud.base import con_warpper, query2sql
@@ -96,24 +95,6 @@ async def get_info(session: Session, conn: Database, id: int):
     query = session.query(model).filter(model.asset_id == id)
     return await conn.fetch_one(query2sql(query))
 
-
-def get_multi_tree(session: Session, skip: int, limit: int):
-    query = (
-        session.query(Asset)
-        .filter(Asset.asset_level == 0)
-        .options(joinedload(Asset.children))
-        .order_by(Asset.id)
-        .offset(skip)
-        .limit(limit)
-    )
-
-    return query.all()  # sqlalchemy query do not support async/await
-
-
-def get_tree(session: Session, id: int):
-    query = session.query(Asset).filter(Asset.id == id)
-
-    return query.one()
 
 @con_warpper
 async def create(conn: Database, data):

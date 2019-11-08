@@ -10,7 +10,7 @@ from crud.data import get_latest, get_by_id, get_multi
 from db.conn_engine import STATION_URLS
 from db_model import ElecData
 from model.elec_data import ElecSignalListSchema, ElecSignalSchema
-from utils.vib_feature_tools import fast_fournier_transform
+from services.vibration_signal.processors import fast_fournier_transform
 
 router = APIRouter()
 

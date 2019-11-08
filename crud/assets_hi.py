@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from crud.base import con_warpper, query2sql
 from db import session_make
 from db_model import Asset
-from utils.query_result_reformat import format_timediff_result
+from services.query_processors.asset import format_timediff_result
 
 
 @con_warpper

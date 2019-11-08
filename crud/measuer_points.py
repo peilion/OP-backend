@@ -110,7 +110,7 @@ async def get_stat(
     return await conn.fetch_all(query2sql(query))
 
 
-def create(session: Session, data: MeasurePointInputSchema):
+def create(session: Session, data: MeasurePointInputSchema):  # TODO: rewrite to async func
     data = jsonable_encoder(data)
 
     latest_id = (

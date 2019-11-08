@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List,Any
 
 from pydantic import BaseModel
 
@@ -55,3 +55,9 @@ class VibrationCumtrapzSchema(BaseModel):
     acc: SubSampledArray
     vel_spec: SignalArray
     acc_spec: SignalArray
+
+
+class VibrationEMDSchema(BaseModel):
+    id: int
+    time: datetime
+    emd: List

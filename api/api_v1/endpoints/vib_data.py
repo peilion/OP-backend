@@ -17,15 +17,9 @@ from model.vib_data import (
     VibrationSTFTSchema,
     VibrationWelchSchema,
     VibrationCumtrapzSchema,
-)
-from utils.vib_feature_tools import (
-    fast_fournier_transform,
-    hilbert,
-    short_time_fournier_transform,
-    multi_scale_envelope_spectrum,
-    welch_spectrum_estimation,
-    acceleration_to_velocity,
-)
+    VibrationEMDSchema)
+from services.vibration_signal.processors import fast_fournier_transform, hilbert, short_time_fournier_transform, \
+    multi_scale_envelope_spectrum, welch_spectrum_estimation, acceleration_to_velocity, empirical_mode_decomposition
 
 router = APIRouter()
 
@@ -194,7 +188,7 @@ async def analyze_vibration_signal_with_musens(
         orm_model=VibData,
     )
 
-    processed_res = multi_scale_envelope_spectrum(res["vib"], n_Fs=10000, n_Ssta=1.0, n_Send=8.0, n_Sint=0.2)
+    processed_res = multi_scale_envelope_spectrum(res["vib"])
     x = json.dumps({**processed_res, **{"id": res["id"], "time": str(res["time"])}})
     # using json response directly to skip data validation, for extreme large
     # array.
@@ -252,4 +246,30 @@ async def analyze_vibration_signal_with_cumtrapz(
     )
 
     processed_res = acceleration_to_velocity(res["vib"])
+    return {**processed_res, **{"id": res["id"], "time": res["time"]}}
+
+@router.get(
+    "/mp/{mp_id}/vib_data/{data_id}/emd",
+    response_class=UJSONResponse,
+    response_model=VibrationEMDSchema,
+)
+async def analyze_vibration_signal_with_emd(
+    mp_id: int, data_id: int, mp_mapper: dict = Depends(get_mp_mapper)
+):
+    mp_shard_info = mp_mapper[mp_id]
+    if mp_shard_info["type"] == 1:
+        raise HTTPException(
+            status_code=400,
+            detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
+        )
+
+    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    res = await get_by_id(
+        conn=conn,
+        shard_id=mp_shard_info["inner_id"],
+        data_id=data_id,
+        orm_model=VibData,
+    )
+
+    processed_res = empirical_mode_decomposition(res["vib"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}

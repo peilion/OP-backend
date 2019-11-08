@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 from starlette.responses import UJSONResponse
 
-from crud.assets import get_multi, get, get_tree, get_info, create
+from crud.assets import get_multi, get, get_info, create
 from crud.assets_hi import (
     get_avg_hi_during_time,
     get_avg_hi_pre,
@@ -131,21 +131,16 @@ async def read_assets_statistic(group_by: List[GroupRule] = Query(None), ):
         raise HTTPException(status_code=400, detail="Bad query parameter")
 
 
-@router.get("/{id}/", response_class=UJSONResponse)
-async def read_by_id(id: int, iftree: bool = False):
+@router.get("/{id}/", response_class=UJSONResponse,response_model=FlattenAssetSchema)
+async def read_by_id(id: int):
     """
     Get Asset by ID.
     """
-    if not iftree:
-        conn = Database(META_URL)
-        item = await get(conn=conn, id=id)
-        if not item:
-            raise HTTPException(status_code=400, detail="Item not found")
-        return FlattenAssetSchema(**item)
-    elif iftree:
-        session = session_make(meta_engine)
-        item = get_tree(session=session, id=id)
-        return NestAssetSchema.from_orm(item)
+    conn = Database(META_URL)
+    res = await get(conn=conn, id=id)
+    if not res:
+        raise HTTPException(status_code=400, detail="Item not found")
+    return res
 
 
 @router.get("/{id}/info/", response_class=UJSONResponse)

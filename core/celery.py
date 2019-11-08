@@ -10,7 +10,7 @@ from db.db_config import session_make
 from db_model import ElecFeature, ElecData, VibFeature, VibData
 from db_model import MeasurePoint
 from utils import vib_feature_tools
-from utils.elec_feature_tools import threephase_deserialize, feature_calculator
+from services.electric_signal.elec_feature_tools import threephase_deserialize, feature_calculator
 
 Base = declarative_base()
 

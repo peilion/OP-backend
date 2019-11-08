@@ -44,6 +44,5 @@ class SignalArray(list):
 
     @classmethod
     def validate(cls, v: ndarray):
+
         return [round(float(item), TIME_DOMAIN_DECIMAL) for item in v]
-
-
