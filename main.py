@@ -32,7 +32,7 @@ app.add_middleware(GZipMiddleware,
 
 @app.on_event("startup")
 async def startup_event():
-    get_mp_mapper()
+    await get_mp_mapper()
 
 
 app.include_router(api_router, prefix=config.API_V1_STR)

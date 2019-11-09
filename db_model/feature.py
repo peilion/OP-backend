@@ -92,7 +92,7 @@ class VibFeature(object):
                     var=Column(Float, default=0),
                     kurtosis=Column(Float, default=0),
                     fr=Column(Float, default=0),
-                    fr_amp=Column(VARBINARY),
+                    fr_amp=Column(Float),
                     thd=Column(Float, default=0),
                     bpfi=Column(Float, default=0),
                     bpfo=Column(Float, default=0),

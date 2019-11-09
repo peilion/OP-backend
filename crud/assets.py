@@ -90,8 +90,10 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
 
 @con_warpper
 async def get_info(session: Session, conn: Database, id: int):
-    asset_type = session.query(Asset.asset_type).filter(Asset.id == id).one().asset_type
-    model = info_models_mapper[enum_mapper[asset_type]] # int -> asset_type -> model class
+
+    pre_query_res = await conn.fetch_one(query2sql(session.query(Asset.asset_type).filter(Asset.id == id)))
+    model = info_models_mapper[enum_mapper[pre_query_res['asset_type']]] # int -> asset_type -> model class
+
     query = session.query(model).filter(model.asset_id == id)
     return await conn.fetch_one(query2sql(query))
 
@@ -99,39 +101,20 @@ async def get_info(session: Session, conn: Database, id: int):
 @con_warpper
 async def create(conn: Database, data):
     data = jsonable_encoder(data)
-    query = Asset.__table__.insert()
-
     transaction = await conn.transaction()
+    id = 0
     try:
-        id = await conn.execute(query=query, values=data['base'])
+        id = await conn.execute(query=Asset.__table__.insert(), values=data['base'])
         model = AssetHI.model(point_id=id)  # register to metadata for all pump_unit
-        table_sql = CreateTable(model.__table__).compile(meta_engine)
         if data["base"]["asset_type"] == 0:
-            await conn.execute(str(table_sql))
-    except Exception as e:
-        print(e)
-        await transaction.rollback()
-        return False
-    else:
+            await conn.execute(str(CreateTable(model.__table__).compile(meta_engine)))
         await transaction.commit()
         return True
-    # asset = Asset(**data["base"])
-    # session.add(asset)
-    # if data["base"]["asset_type"] == 0:
-    #     session.flush()
-    #     model = AssetHI.model(point_id=36)  # register to metadata for all pump_unit
-    #     table_sql = CreateTable(model.__table__).compile(meta_engine)
-    #     try:
-    #         session.execute(table_sql.statement)
-    #         session.commit()
-    #         session.close()
-    #         return True
-    #     except Exception as e:
-    #         session.delete(asset)
-    #         session.commit()
-    #         session.close()
-    #         return False
-    # else:
-    #     session.commit()
-    #     session.close()
-    #     return True
+    except Exception as e:
+        # print(e)
+        if id:
+            query = Asset.__table__.delete().where(Asset.__table__.c.id==id)
+            await conn.execute(query=str(query.compile(compile_kwargs={"literal_binds": True})))
+            await transaction.commit()
+        return False
+

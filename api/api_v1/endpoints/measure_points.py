@@ -76,9 +76,8 @@ async def read_measure_point_by_id(id: int):
 
 @router.post("/", response_class=UJSONResponse)
 async def create_measure_point(mp: MeasurePointInputSchema):
-    session = session_make(meta_engine)
     try:
-        create(session, mp)
+        await create(mp)
         return {"msg": "Measure Point successfully added."}
     except IntegrityError:
         raise HTTPException(
