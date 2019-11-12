@@ -18,7 +18,7 @@ from model.vib_data import (
     VibrationWelchSchema,
     VibrationCumtrapzSchema,
     VibrationEMDSchema)
-from services.vibration_signal.processors import fast_fournier_transform, hilbert, short_time_fournier_transform, \
+from services.signal.vibration.processors import fast_fournier_transform, hilbert, short_time_fournier_transform, \
     multi_scale_envelope_spectrum, welch_spectrum_estimation, acceleration_to_velocity, empirical_mode_decomposition
 
 router = APIRouter()

@@ -1,20 +1,20 @@
 import numpy as np
+import pywt
 from numpy import ndarray
 from scipy import signal
 from scipy import stats
-from scipy.integrate import cumtrapz
 from scipy.signal import detrend
 
+from services.signal.thrid_party_lib.emd import EMD
 
-class VibrationSignal:
-    type_mapper = {0: "Displacement", 1: "Velocity", 2: "Acceleration", 3: "Envelope"}
 
-    def __init__(self, data: ndarray, fs: int, type=2, isdetrend=False):
+class DigitalSignal:  # Base class for vibration signal and electric signal
+    def __init__(
+            self, data: ndarray, fs: int, isdetrend=False, compute_axis: bool = True
+    ):
         """
-
         :param data:
         :param fs:
-        :param type: 0:位移 1:速度 2:加速度 3:加速度包络
         :param isdetrend:默认未消除趋势
         """
         if not isdetrend:
@@ -22,49 +22,22 @@ class VibrationSignal:
         else:
             self.data = data
         self.sampling_rate = fs
-        self.time_vector = np.linspace(
-            0.0, len(self.data) / self.sampling_rate, len(self.data)
-        )
+        if compute_axis:
+            self.time_vector = np.linspace(
+                0.0, len(self.data) / self.sampling_rate, len(self.data)
+            )
         self.N = len(data)
         self.nyq = 1 / 2 * self.sampling_rate
-        self.type = type
         self._kurtosis = None
-
-    # def acc2vel_fd(self):
-    #     data = self.data
-    #     N = len(data)
-    #     df = 1.0/(N*1/self.sampling_rate)
-    #     nyq = 1/(2*1/self.sampling_rate)
-    #     iomega_array = 1j*2*np.pi*np.linspace(-nyq,nyq,int(2*nyq/df))
-    #     A = fftshift(fft(data))
-    #     A = A * iomega_array
-    #     A = ifftshift(A)
-    #     self.v_data = np.real(ifft(A))
-    #
-    # def acc2vel_wj(self):
-    #     data = self.data
-    #     dt = self.time_vector[1] - self.time_vector[0]
-    #     baseline = np.mean(data)
-    #     datafft = np.fft.fft(data - baseline)
-    #     datafreq = np.fft.fftfreq(len(data), dt)
-    #     datafreq = [(i + 1) * datafreq[1] for i in range(len(datafft))]
-    #     self.v_data = np.real(np.fft.ifft(datafft / (2. * np.pi * np.abs(datafreq)))) + baseline
-
-    def to_velocity(self, detrend_type="poly"):
-        data = cumtrapz(self.data, self.time_vector)
-        detrend_meth = getattr(self, detrend_type + "_detrend")
-        return VibrationSignal(
-            detrend_meth(data), fs=self.sampling_rate, type=self.type - 1
-        )
 
     def to_filted_signal(self, filter_type: str, co_frequency):
         b, a = signal.butter(8, co_frequency, filter_type)
         data = signal.filtfilt(b, a, self.data)
-        return VibrationSignal(data=data, fs=self.sampling_rate, type=self.type)
+        return self.__class__(data=data, fs=self.sampling_rate)
 
     def to_envelope(self):
-        return VibrationSignal(
-            data=np.abs(signal.hilbert(self.data)), fs=self.sampling_rate, type=3
+        return self.__class__(
+            data=np.abs(signal.hilbert(self.data)), fs=self.sampling_rate
         )
 
     # def visualize(self, *args):
@@ -83,7 +56,7 @@ class VibrationSignal:
         freq = self.freq
         df = freq[1] - freq[0]
 
-        nfrs = [i * fr for i in range(1, upper)]
+        nfrs = [0.5 * fr] + [i * fr for i in range(1, upper)]
         harmonics = []
         harmonics_index = []
 
@@ -91,7 +64,7 @@ class VibrationSignal:
             upper_search = np.rint((nfr + nfr / fr * tolerance) / df).astype(np.int)
             lower_search = np.rint((nfr - nfr / fr * tolerance) / df).astype(np.int)
 
-            nfr_index = lower_search + np.argmax(spec[lower_search : upper_search + 1])
+            nfr_index = lower_search + np.argmax(spec[lower_search: upper_search + 1])
             nfr_amp = spec[nfr_index]
 
             harmonics_index.append(nfr_index)
@@ -121,7 +94,7 @@ class VibrationSignal:
             ).astype(np.int)
 
             nth_harmonic_index = lower_search + np.argmax(
-                spec[lower_search : upper_search + 1]
+                spec[lower_search: upper_search + 1]
             )
             nth_harmonic = spec[nth_harmonic_index]
 
@@ -131,16 +104,17 @@ class VibrationSignal:
         self.sub_harmonics = np.array(harmonics)
         self.sub_harmonics_index = np.array(harmonics_index)
 
-    def compute_spectrum(self):
-        spec = np.fft.fft(self.data)[0 : int(self.N / 2)] / self.N
+    def compute_spectrum(self, compute_axis: bool = True):
+        spec = np.fft.fft(self.data)[0: int(self.N / 2)] / self.N
         spec[1:] = 2 * spec[1:]
         self.spec = np.abs(spec)
-        self.freq = np.fft.fftfreq(self.N, 1.0 / self.sampling_rate)[
-            0 : int(self.N / 2)
-        ]
+        if compute_axis:
+            self.freq = np.fft.fftfreq(self.N, 1.0 / self.sampling_rate)[
+                        0: int(self.N / 2)
+                        ]
 
     def compute_bearing_frequency(
-        self, bpfi, bpfo, bsf, ftf, fr, upper=3, tolerance=0.025
+            self, bpfi, bpfo, bsf, ftf, fr, upper=3, tolerance=0.025
     ):
         assert self.spec is not None, "需先计算频谱"
         spec = self.spec
@@ -160,7 +134,7 @@ class VibrationSignal:
                 ).astype(np.int)
 
                 tmp_index = lower_search + np.argmax(
-                    spec[lower_search : upper_search + 1]
+                    spec[lower_search: upper_search + 1]
                 )
                 tmp_amp = spec[tmp_index]
 
@@ -169,87 +143,13 @@ class VibrationSignal:
         self.bearing_index = np.array(bearing_index)
         self.bearing_amp = np.array(bearing_amp)
 
-    def compute_half_harmonic(self, fr, tolerance=0.025):
-        spec = self.spec
-        freq = self.freq
-        df = freq[1] - freq[0]
-
-        half_fr_indexes = fr / 2
-
-        upper_search = np.rint(
-            (half_fr_indexes + tolerance * (half_fr_indexes / fr)) / df
-        ).astype(np.int)
-        lower_search = np.rint(
-            (half_fr_indexes - tolerance * (half_fr_indexes / fr)) / df
-        ).astype(np.int)
-
-        self.half_fr_indexes = lower_search + np.argmax(
-            spec[lower_search : upper_search + 1]
-        )
-        self.half_fr_amp = spec[self.half_fr_indexes]
-
-    def compute_mesh_frequency(
-        self, fr, mesh_ratio, sideband_order=6, upper_order=3, tolerance=0.025
-    ):
-        spec = self.spec
-        freq = self.freq
-        df = freq[1] - freq[0]
-        mesh_frequencies = [mesh_ratio * fr * i for i in range(1, upper_order + 1)]
-        self.sideband_amps = []
-        self.sideband_indexes = []
-        for mesh_frequency in mesh_frequencies:
-
-            for i in range(-sideband_order, sideband_order + 1):
-                frequecy = mesh_frequency + i * fr
-
-                if frequecy > self.sampling_rate / 2:
-                    self.sideband_indexes.append(0)
-                    self.sideband_amps.append(0)
-                    continue
-
-                upper_search = np.rint(
-                    (frequecy + (frequecy / fr) * tolerance) / df
-                ).astype(np.int)
-                lower_search = np.rint(
-                    (frequecy - (frequecy / fr) * tolerance) / df
-                ).astype(np.int)
-
-                sideband_index = lower_search + np.argmax(
-                    spec[lower_search : upper_search + 1]
-                )
-                sideband_amp = spec[sideband_index]
-                self.sideband_indexes.append(sideband_index)
-                self.sideband_amps.append(sideband_amp)
-
-        self.sideband_amps = np.reshape(
-            self.sideband_amps, (upper_order, sideband_order * 2 + 1)
-        )
-        self.sideband_indexes = np.reshape(
-            self.sideband_indexes, (upper_order, sideband_order * 2 + 1)
-        )
-
-    def compute_oilwhirl_frequency(self, fr):
-        spec = self.spec
-        freq = self.freq
-        df = freq[1] - freq[0]
-
-        ow_frequency_lower = fr * 0.45
-        ow_frequency_upper = fr * 0.48
-
-        lower_search = np.rint(ow_frequency_lower / df).astype(np.int)
-        upper_search = np.rint(ow_frequency_upper / df).astype(np.int)
-
-        self.ow_index = lower_search + np.argmax(spec[lower_search:upper_search])
-
-        self.ow_amp = spec[self.ow_index]
-
     def get_band_energy(self, fr: float, band_range: tuple):
         assert self.spec is not None, "需先计算频谱"
         assert len(band_range) == 2, "频带设置错误"
         df = self.freq[1] - self.freq[0]
         upper_search = np.rint(band_range[1] * fr / df).astype(np.int)
         lower_search = np.rint(band_range[0] * fr / df).astype(np.int)
-        search_range = self.spec[lower_search : upper_search + 1]
+        search_range = self.spec[lower_search: upper_search + 1]
         return lower_search + np.argmax(search_range), np.max(search_range)
 
     @staticmethod
@@ -269,7 +169,7 @@ class VibrationSignal:
 
     @staticmethod
     def diff_detrend(data):
-        return np.diff(data)
+        return np.diff(data)  # Detrend Method Region
 
     @property
     def kurtosis(self):
@@ -307,9 +207,61 @@ class VibrationSignal:
 
     @property
     def spectral_pow(self):
-        return np.mean(np.power(self.spec, 3))
+        return np.mean(np.power(self.spec, 3))  # Feature Property Region
+
+    def get_short_time_fournier_transform(self) -> dict:
+        f, t, z = signal.stft(self.data, self.sampling_rate, nperseg=256)
+        z = np.abs(z)
+        stft = []
+        for i in range(z.shape[0]):
+            for j in range(z.shape[1]):
+                stft.append([j, i, float(z[i, j])])
+        return {"t": t, "f": f, "stft": stft, "max": float(z.max())}
+
+    def get_multi_scale_envelope_spectrum(self, n_Ssta: float, n_Send: float,
+                                          n_Sint: float) -> dict:
+        length = len(self.data)
+
+        i = n_Ssta
+        scal = []
+        while i <= n_Send:
+            scal.append(i)
+            i = i + n_Sint
+        scal.append(i)
+        scal = np.array(scal).round(3).tolist()  # stupid
+        coef = pywt.cwt(self.data, scal, "cmor1-0.5")
+        coef = np.abs(coef[0])
+
+        z = []
+        for j in range(len(scal)):
+            tmp1 = coef[j, :]
+            tmp2 = np.fft.fft(tmp1)
+            tmp2 = np.abs(tmp2 * np.conj(tmp2)) / len(tmp2)
+            z.append(tmp2)
+
+        z = np.array(z)
+        z[:, 0:1] = 0
+
+        FreqExt = np.round(
+            (self.sampling_rate * np.linspace(0, length / 2, int(length / 2)) / length), decimals=3
+        ).tolist()
+        z = z[:, : len(FreqExt)]
+        value = []
+        for sIndex, scale in enumerate(scal):
+            for fIndex, freq in enumerate(FreqExt):
+                value.append([sIndex, fIndex, round(float(z[sIndex][fIndex]), 3)])
+        return {"scale": scal, "freq": FreqExt, "value": value}
+
+    def get_welch_spectrum_estimation(self) -> dict:
+        freq, spec = signal.welch(self.data, self.sampling_rate, scaling="spectrum")
+        return {"freq": freq, "spec": spec}
+
+    def get_empirical_mode_decomposition(self) -> dict:
+        decomposer = EMD(self.data)
+        IMFs = decomposer.decompose()
+        return {'emd': IMFs.round(3).tolist()}  # Advanced Transfrom Region
 
     def __repr__(self):
-        return "{0} Signal with a size of {1}, and the sampling rate is {2}.".format(
-            self.type_mapper[type], len(self.data), self.sampling_rate
+        return "Signal with a size of {0}, and the sampling rate is {1}.".format(
+            len(self.data), self.sampling_rate
         )

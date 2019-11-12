@@ -10,7 +10,7 @@ from crud.data import get_latest, get_by_id, get_multi
 from db.conn_engine import STATION_URLS
 from db_model import ElecData
 from model.elec_data import ElecSignalListSchema, ElecSignalSchema
-from services.vibration_signal.processors import fast_fournier_transform
+from services.signal.electric.processors import three_phase_fast_fournier_transform
 
 router = APIRouter()
 
@@ -34,12 +34,8 @@ async def read_the_latest_electric_signal(
     res = await get_latest(
         conn=conn, shard_id=mp_shard_info["inner_id"], orm_model=ElecData
     )
-    final = {}
-    for phase in ["u", "v", "w"]:
-        processed_res = fast_fournier_transform(res[phase + "cur"])
-        final[phase + "cur"] = processed_res["vib"]
-        final[phase + "fft"] = processed_res["spec"][:300]
-    return {**final, **{"id": res["id"], "time": res["time"]}}
+    processed = three_phase_fast_fournier_transform(u=res['ucur'],v=res['vcur'],w=res['wcur'])
+    return {**processed, **{"id": res["id"], "time": res["time"]}}
 
 
 @router.get(
@@ -101,9 +97,5 @@ async def read_electric_signal_by_id(
         orm_model=ElecData,
     )
 
-    final = {}
-    for phase in ["u", "v", "w"]:
-        processed_res = fast_fournier_transform(res[phase + "cur"])
-        final[phase + "cur"] = processed_res["vib"]
-        final[phase + "fft"] = processed_res["spec"][:300]
-    return {**final, **{"id": res["id"], "time": res["time"]}}
+    processed = three_phase_fast_fournier_transform(u=res['ucur'],v=res['vcur'],w=res['wcur'])
+    return {**processed, **{"id": res["id"], "time": res["time"]}}

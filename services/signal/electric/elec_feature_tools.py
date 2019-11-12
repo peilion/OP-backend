@@ -11,7 +11,6 @@ def cal_samples(phaseAOmega, phaseBOmega, phaseCOmega, end_time):
     samples = (max_freq ** 2) * 6 * end_time
     return samples
 
-
 def make_phase(mag, omega, phi, samples, end_time):
     """
     Create the phase signal in complex form.
@@ -23,6 +22,12 @@ def make_phase(mag, omega, phi, samples, end_time):
 
     return to_complex(mag, x), array_time
 
+def to_complex(r, x, real_offset=0, imag_offset=0):
+    real = r * np.cos(x) + real_offset
+
+    imag = r * np.sin(x) + imag_offset
+
+    return real + 1j * imag
 
 def parameter_estimation(wave, sampling_rate, initailization):
     fitfunc = lambda p, x: p[0] * np.sin(2 * np.pi * p[1] * x + p[2])  # Target function
@@ -63,14 +68,6 @@ def fftransform(Signal):
     # freq = np.linspace(0, 10240 / 2, fft_size / 2 + 1)
     spec = np.abs(spec)
     return spec
-
-
-def to_complex(r, x, real_offset=0, imag_offset=0):
-    real = r * np.cos(x) + real_offset
-
-    imag = r * np.sin(x) + imag_offset
-
-    return real + 1j * imag
 
 
 def threephase_deserialize(u, v, w):

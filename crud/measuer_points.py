@@ -111,7 +111,7 @@ async def get_stat(
 
 
 async def create(data: MeasurePointInputSchema,
-                 session: Session = session_make(engine=None)):  # TODO: rewrite to async func
+                 session: Session = session_make(engine=None)):
     data = jsonable_encoder(data)
     data_model = VibData if (data['type'] == 0) else ElecData
     feature_model = VibFeature if (data['type'] == 0) else ElecFeature

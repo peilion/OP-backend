@@ -8,7 +8,7 @@ from numpy import ndarray
 from sqlalchemy.sql import text
 
 from db import station_engines
-from services.electric_signal.elec_feature_tools import feature_calculator
+from services.signal.electric.elec_feature_tools import feature_calculator
 
 SAMPLING_RATE = 20480
 # ROOT_PATHS = [r"G:\Researchs\Motor fusion\30HzData", r"G:\Researchs\Motor fusion\40HzData", r"G:\Researchs\Motor fusion\50HzData"]
