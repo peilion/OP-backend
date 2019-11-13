@@ -1,3 +1,5 @@
+import abc
+
 import numpy as np
 import pywt
 from numpy import ndarray
@@ -50,8 +52,19 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
     #             plt.plot(data)
     #             plt.show()
 
-    def compute_harmonics(self, fr: float, upper: int, tolerance=0.025):
+    def calibrate_fr(self, basic_fr: float, tolerance: float = 0.5):
+
+        df = self.freq[1] - self.freq[0]
+
+        upper_search = np.rint((basic_fr + tolerance) / df).astype(np.int)
+        lower_search = np.rint((basic_fr - tolerance) / df).astype(np.int)
+
+        cali_fr = (lower_search + np.argmax(self.spec[lower_search:upper_search + 1])) * df
+        self.fr = cali_fr
+
+    def compute_harmonics(self, fr: float, upper: int, tolerance=None):
         assert self.spec is not None, "需先计算频谱"
+        tolerance = self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
         spec = self.spec
         freq = self.freq
         df = freq[1] - freq[0]
@@ -75,11 +88,10 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
 
         self.thd = np.sqrt((self.harmonics[1:] ** 2).sum()) / self.harmonics[0]
 
-    def compute_sub_harmonic(self, fr: float, upper=10, tolerance=0.025):
+    def compute_sub_harmonic(self, fr: float, upper=10, tolerance=None):
         assert self.spec is not None, "需先计算频谱"
-        spec = self.spec
-        freq = self.freq
-        df = freq[1] - freq[0]
+        tolerance = self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
+        df = self.df
 
         subhar_frequencies = [i * fr / 2 for i in range(1, upper, 2)]
         harmonics = []
@@ -94,9 +106,9 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
             ).astype(np.int)
 
             nth_harmonic_index = lower_search + np.argmax(
-                spec[lower_search: upper_search + 1]
+                self.spec[lower_search: upper_search + 1]
             )
-            nth_harmonic = spec[nth_harmonic_index]
+            nth_harmonic = self.spec[nth_harmonic_index]
 
             harmonics_index.append(nth_harmonic_index)
             harmonics.append(nth_harmonic)
@@ -112,14 +124,14 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
             self.freq = np.fft.fftfreq(self.N, 1.0 / self.sampling_rate)[
                         0: int(self.N / 2)
                         ]
+        self.df = self.freq[1] - self.freq[1]
 
     def compute_bearing_frequency(
-            self, bpfi, bpfo, bsf, ftf, fr, upper=3, tolerance=0.025
+            self, bpfi, bpfo, bsf, ftf, fr, upper=3, tolerance=None
     ):
         assert self.spec is not None, "需先计算频谱"
-        spec = self.spec
-        freq = self.freq
-        df = freq[1] - freq[0]
+        tolerance = self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
+        df = self.df
 
         bearing_index = []
         bearing_amp = []
@@ -134,9 +146,9 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
                 ).astype(np.int)
 
                 tmp_index = lower_search + np.argmax(
-                    spec[lower_search: upper_search + 1]
+                    self.spec[lower_search: upper_search + 1]
                 )
-                tmp_amp = spec[tmp_index]
+                tmp_amp = self.spec[tmp_index]
 
                 bearing_index.append(tmp_index)
                 bearing_amp.append(tmp_amp)
@@ -146,7 +158,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
     def get_band_energy(self, fr: float, band_range: tuple):
         assert self.spec is not None, "需先计算频谱"
         assert len(band_range) == 2, "频带设置错误"
-        df = self.freq[1] - self.freq[0]
+        df = self.df
         upper_search = np.rint(band_range[1] * fr / df).astype(np.int)
         lower_search = np.rint(band_range[0] * fr / df).astype(np.int)
         search_range = self.spec[lower_search: upper_search + 1]
@@ -215,7 +227,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
         stft = []
         for i in range(z.shape[0]):
             for j in range(z.shape[1]):
-                stft.append([j, i, float(z[i, j])])
+                stft.append([j, i, round(float(z[i, j]), 3)])
         return {"t": t, "f": f, "stft": stft, "max": float(z.max())}
 
     def get_multi_scale_envelope_spectrum(self, n_Ssta: float, n_Send: float,
@@ -265,3 +277,32 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
         return "Signal with a size of {0}, and the sampling rate is {1}.".format(
             len(self.data), self.sampling_rate
         )
+
+
+class MeasurePoint(metaclass=abc.ABCMeta):
+    fault_num_mapper = {
+        0: [0, 0, 0],
+        1: [1, 0, 0],
+        2: [0, 1, 0],
+        3: [0, 0, 1]
+    }
+    equip = None
+    # should be specified in sub classes
+    require_phase_diff = True
+
+    def __init__(self, data: dict, r: float):
+        self.data = data
+        self.r = r
+        self.fr = r / 60.0
+
+    @abc.abstractmethod
+    def diagnosis(self):
+        pass
+
+    def compute_fault_num(self):
+        self.fault_num = []
+
+        for item in type(self).__bases__:
+            if str(item).__contains__('Mixin'):
+                self.fault_num += self.fault_num_mapper[getattr(self, item.fault_num_name)]
+        self.fault_num = np.array(self.fault_num)

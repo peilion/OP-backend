@@ -1,12 +1,11 @@
 import numpy as np
 from numpy import ndarray
-from scipy import optimize
+from scipy import optimize, signal
 
 from services.signal.base import DigitalSignal
 
 
 class ElectricSignal(DigitalSignal):
-
     # def acc2vel_fd(self):
     #     data = self.data
     #     N = len(data)
@@ -26,12 +25,26 @@ class ElectricSignal(DigitalSignal):
     #     datafreq = np.fft.fftfreq(len(data), dt)
     #     datafreq = [(i + 1) * datafreq[1] for i in range(len(datafft))]
     #     self.v_data = np.real(np.fft.ifft(datafft / (2. * np.pi * np.abs(datafreq)))) + baseline
+    type_mapper = {0: "Raw", 1: "Envelope"}
 
     def __init__(
-            self, data: ndarray, fs: int, isdetrend=False, compute_axis: bool = True
+            self, data: ndarray, fs: int, type: int, isdetrend=False, compute_axis: bool = True,
     ):
         super().__init__(data, fs, isdetrend, compute_axis)
         self._fundamental = None
+        self.type = type
+
+    def to_envelope(self):
+        cutoff = int(self.N * 0.1)
+        return self.__class__(
+            data=np.abs(signal.hilbert(self.data)[cutoff:-cutoff]), fs=self.sampling_rate, type=1
+            # eliminate endpoint effect
+        )
+
+    def compute_brb_component(self):
+        assert self.type == 1, 'This method should be applied to envelope signal'
+        brb_range = int(10 / self.df)
+        self.brb_list = self.spec[:brb_range]
 
     def estimate_fundamental(self):
         if self.spec is None:
@@ -54,7 +67,7 @@ class ElectricSignal(DigitalSignal):
         self._fundamental = p1[1]
         self.phase = p1[2]
 
-    def make_phase(self,samples):
+    def make_phase(self, samples):
         array_time = np.linspace(0, self.data.shape[0] / self.sampling_rate, samples)
         x = self.fundamental * array_time + self.phase
         return self.to_complex(self.amplitude, x), array_time
@@ -86,7 +99,7 @@ class ThreePhaseElectric(object):
         self.v.estimate_params()
         self.w.estimate_params()
 
-    def cal_symm(self):
+    def cal_symm(self, require_sym_comps: bool=False):
         # 120 degree rotator
         self.cal_samples()
         b, _ = self.u.make_phase(samples=self.fake_samples_number)
@@ -106,8 +119,12 @@ class ThreePhaseElectric(object):
 
         # zero sequence
         zero = 1 / 3 * (a + b + c)
+        self.p_rms = np.sqrt(np.mean(np.square(a_pos)))
+        self.n_rms = np.sqrt(np.mean(np.square(a_neg)))
+        self.imbanlance = self.n_rms / self.p_rms
 
-        return a_pos, b_pos, c_pos, a_neg, b_neg, c_neg, zero
+        if require_sym_comps:
+            return a_pos, b_pos, c_pos, a_neg, b_neg, c_neg, zero
 
     def cal_samples(self):
         """
@@ -118,5 +135,3 @@ class ThreePhaseElectric(object):
                         abs(2 * np.pi * self.w.fundamental))
         max_freq = max_omega / (2 * np.pi)
         self.fake_samples_number = (max_freq ** 2) * 6 * self.u.data.shape[0] / self.u.sampling_rate
-
-

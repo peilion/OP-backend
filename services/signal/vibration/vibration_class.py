@@ -47,8 +47,10 @@ class VibrationSignal(DigitalSignal):
         )
 
     def compute_mesh_frequency(
-            self, fr, mesh_ratio, sideband_order=6, upper_order=3, tolerance=0.025
+            self, fr, mesh_ratio, sideband_order=6, upper_order=3, tolerance=None
     ):
+        tolerance = self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
+
         spec = self.spec
         freq = self.freq
         df = freq[1] - freq[0]
@@ -100,3 +102,15 @@ class VibrationSignal(DigitalSignal):
         self.ow_index = lower_search + np.argmax(spec[lower_search:upper_search])
 
         self.ow_amp = spec[self.ow_index]
+
+    def __sub__(self, other):  # minus method
+        assert isinstance(other, VibrationSignal), 'Unsupport Type.'
+        assert self.sampling_rate == other.sampling_rate, 'Unequal Sampling Rate'
+        trimed_x = self.data[:int(self.data.sampling_rate / 4)]  # 只取前 0.25秒! 的 加速度! 数据进行互相关计算,考虑计算量以及积分后的相位移动
+        trimed_y = other.data[:int(self.data.sampling_rate / 4)]
+        t = np.linspace(0.0, ((len(trimed_x) - 1) / self.data.sampling_rate), len(trimed_x))
+        cross_correlate = np.correlate(trimed_x, trimed_y, "full")
+        dt = np.linspace(-t[-1], t[-1], (2 * len(trimed_x)) - 1)
+        time_shift = dt[cross_correlate.argmax()]
+        _phase_diff = np.abs(((2.0 * np.pi) * ((time_shift / (1.0 / self.fr)) % 1.0)) - np.pi)
+        return _phase_diff
