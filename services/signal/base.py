@@ -8,8 +8,6 @@ from scipy import stats
 from scipy.signal import detrend
 
 from services.signal.thrid_party_lib.emd import EMD
-
-
 class DigitalSignal:  # Base class for vibration signal and electric signal
     def __init__(
             self, data: ndarray, fs: int, isdetrend=False, compute_axis: bool = True

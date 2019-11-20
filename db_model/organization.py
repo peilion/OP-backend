@@ -57,3 +57,4 @@ class Pipeline(Base):
     __table_args__ = table_args
     id = Column(Integer, primary_key=True)
     name = Column(String(32), unique=True)
+    length = Column(Float)

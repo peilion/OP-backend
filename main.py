@@ -2,10 +2,13 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
+from starlette.responses import HTMLResponse
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from api.api_v1.api import api_router
 from core import config
 from core.dependencies import get_mp_mapper
+from core.socket import NetIOSocket, NetIOMessagePusher
 
 app = FastAPI(title=config.PROJECT_NAME, openapi_url="/api/v1/openapi.json")
 
@@ -26,16 +29,72 @@ if config.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
-app.add_middleware(GZipMiddleware,
-                   minimum_size=300000)  # gzip compression do not enhance the performance in local test environment
+# app.add_middleware(GZipMiddleware,
+#                    minimum_size=300000)  # gzip compression do not enhance the performance in local test environment
+
+
+app.include_router(api_router, prefix=config.API_V1_STR)
+
+
+@app.get("/sock")
+async def get():
+    html = """
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>Chat</title>
+        </head>
+        <body>
+            <h1>WebSocket Chat</h1>
+            <form action="" onsubmit="sendMessage(event)">
+                <input type="text" id="messageText" autocomplete="off"/>
+                <button>Send</button>
+            </form>
+            <ul id='messages'>
+            </ul>
+            <script>
+                var ws = new WebSocket("ws://localhost:8000/ws/netio");
+                ws.onmessage = function(event) {
+                    var messages = document.getElementById('messages')
+                    var message = document.createElement('li')
+                    var content = document.createTextNode(event.data)
+                    message.appendChild(content)
+                    messages.appendChild(message)
+                };
+                function sendMessage(event) {
+                    var input = document.getElementById("messageText")
+                    ws.send(input.value)
+                    input.value = ''
+                    event.preventDefault()
+                }
+            </script>
+        </body>
+    </html>
+    """
+    return HTMLResponse(html)
+
+
+socket_manager = NetIOSocket()
+
+
+@app.websocket("/ws/netio")
+async def net_io_endpoint(websocket: WebSocket):
+    await socket_manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_json()
+    except WebSocketDisconnect:
+        socket_manager.remove(websocket)
 
 
 @app.on_event("startup")
 async def startup_event():
     await get_mp_mapper()
+    await socket_manager.generator.asend(None)
+    socket_manager.update_net_io()
+    heartbeat_pusher = NetIOMessagePusher(socket_manager)
+    heartbeat_pusher.start()
 
-
-app.include_router(api_router, prefix=config.API_V1_STR)
 
 if __name__ == "__main__":
     uvicorn.run(

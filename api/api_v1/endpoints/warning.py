@@ -19,17 +19,18 @@ class GroupRule(str, Enum):
     isread = "isread"
     branch = "branch"
     region = "region"
+    period = 'period'
 
 
 @router.get(
     "/", response_class=UJSONResponse, response_model=List[Optional[WarningLogSchema]]
 )
-async def read_warning_logs(skip: int = None, limit: int = None, asset_id: int = None):
+async def read_warning_logs(skip: int = None, limit: int = None, asset_id: int = None, isread: bool = None):
     """
     Get Warning List.
     """
     conn = Database(META_URL)
-    items = await get_multi(conn=conn, skip=skip, limit=limit, asset_id=asset_id)
+    items = await get_multi(conn=conn, skip=skip, limit=limit, asset_id=asset_id, isread=isread)
     return items
 
 
@@ -49,20 +50,23 @@ async def read_warning_logs_statistic(group_by: GroupRule,):
     if group_by == GroupRule.date:
         res = await get_warning_calendar(conn=conn)
         return res
-    if group_by == GroupRule.station:
+    elif group_by == GroupRule.station:
         res = await get_warning_stat_by_station(conn=conn)
         return res
-    if group_by == GroupRule.asset:
+    elif group_by == GroupRule.asset:
         res = await get_warning_stat_by_asset(conn=conn)
         return res
-    if group_by == GroupRule.isread:
+    elif group_by == GroupRule.isread:
         res = await get_warning_stat_by_isreadable(conn=conn)
         return res
-    if group_by == GroupRule.branch:
+    elif group_by == GroupRule.branch:
         res = await get_warning_stat_by_branch_company(conn=conn)
         return res
-    if group_by == GroupRule.region:
+    elif group_by == GroupRule.region:
         res = await get_warning_stat_by_region_company(conn=conn)
+        return res
+    elif group_by == GroupRule.period:
+        res = await get_warning_stat_by_period(conn=conn)
         return res
     else:
         raise HTTPException(status_code=400, detail="Bad query parameters")
