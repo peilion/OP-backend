@@ -122,7 +122,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
             self.freq = np.fft.fftfreq(self.N, 1.0 / self.sampling_rate)[
                         0: int(self.N / 2)
                         ]
-        self.df = self.freq[1] - self.freq[1]
+            self.df = self.freq[1] - self.freq[1]
 
     def compute_bearing_frequency(
             self, bpfi, bpfo, bsf, ftf, fr, upper=3, tolerance=None
