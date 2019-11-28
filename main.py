@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.gzip import GZipMiddleware
+from core.socket import socket_manager
 from starlette.responses import HTMLResponse
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
@@ -74,7 +74,7 @@ async def get():
     return HTMLResponse(html)
 
 
-socket_manager = NetIOSocket()
+# socket_manager = NetIOSocket()
 
 
 @app.websocket("/ws/netio")

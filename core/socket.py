@@ -99,3 +99,5 @@ class NetIOMessagePusher(threading.Thread):
                 print(e)
             finally:
                 time.sleep(10)
+
+socket_manager = NetIOSocket()

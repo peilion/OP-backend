@@ -11,13 +11,7 @@ from db.conn_engine import STATION_URLS
 from db_model import ElecFeature
 
 router = APIRouter()
-
-
-@router.get("/mp/{mp_id}/elec_feature/latest/", response_class=UJSONResponse)
-async def read_the_latest_vibration_feature(
-    mp_id: int,
-    features: List[str] = Query(
-        [
+FEATURE_FIELDS = [
             "urms",
             "uthd",
             "umax_current",
@@ -44,7 +38,13 @@ async def read_the_latest_vibration_feature(
             "z_rms",
             "imbalance",
             "health_indicator",
-        ],
+        ]
+
+@router.get("/mp/{mp_id}/elec_feature/latest/", response_class=UJSONResponse)
+async def read_the_latest_vibration_feature(
+    mp_id: int,
+    features: List[str] = Query(
+        FEATURE_FIELDS,
         description="Only these fileds can be returned now.",
     ),
     mp_mapper: dict = Depends(get_mp_mapper),
@@ -73,34 +73,7 @@ async def read_vibration_features(
     time_before: datetime = Query(default="2016-07-01 00:00:00"),
     time_after: datetime = Query(default="2016-01-10 00:00:00"),
     features: List[str] = Query(
-        [
-            "urms",
-            "uthd",
-            "umax_current",
-            "umin_current",
-            "ufrequency",
-            "uamplitude",
-            "uinitial_phase",
-            "vrms",
-            "vthd",
-            "vmax_current",
-            "vmin_current",
-            "vfrequency",
-            "vamplitude",
-            "vinitial_phase",
-            "wrms",
-            "wthd",
-            "wmax_current",
-            "wmin_current",
-            "wfrequency",
-            "wamplitude",
-            "winitial_phase",
-            "n_rms",
-            "p_rms",
-            "z_rms",
-            "imbalance",
-            "health_indicator",
-        ],
+        FEATURE_FIELDS, # TODO: refactor to body parameter
         description="Only these fileds can be returned now.",
     ),
     limit: int = None,
@@ -135,34 +108,7 @@ async def read_vibration_feature_by_id(
     mp_id: int,
     data_id: int,
     features: List[str] = Query(
-        [
-            "urms",
-            "uthd",
-            "umax_current",
-            "umin_current",
-            "ufrequency",
-            "uamplitude",
-            "uinitial_phase",
-            "vrms",
-            "vthd",
-            "vmax_current",
-            "vmin_current",
-            "vfrequency",
-            "vamplitude",
-            "vinitial_phase",
-            "wrms",
-            "wthd",
-            "wmax_current",
-            "wmin_current",
-            "wfrequency",
-            "wamplitude",
-            "winitial_phase",
-            "n_rms",
-            "p_rms",
-            "z_rms",
-            "imbalance",
-            "health_indicator",
-        ],
+        FEATURE_FIELDS,
         description="Only these fileds can be returned now.",
     ),
     mp_mapper: dict = Depends(get_mp_mapper),

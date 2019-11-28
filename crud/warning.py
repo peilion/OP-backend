@@ -152,7 +152,7 @@ async def get_warning_stat_by_isreadable(
         WarningLog.is_read
     )
     res = await conn.fetch_all(query2sql(query))
-    return [[row["is_read"], row["cnt"]] for row in res]
+    return {'unread': res[0]['cnt'], 'read': res[1]['cnt']}
 
 
 @con_warpper

@@ -42,6 +42,13 @@ async def get_count_by_pipeline(conn: Database):
 
 
 @con_warpper
+async def get_overall_avg(conn: Database):
+    query = ('SELECT avg(health_indicator) as avg from asset WHERE asset_level=0')
+    res = await conn.fetch_one(query)
+    return {'avg': res['avg']}
+
+
+@con_warpper
 async def get_count_by_oil_type(conn: Database):
     query = (
         "SELECT pu.oil_type, COUNT(*) as cnt "

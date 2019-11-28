@@ -5,7 +5,7 @@ from databases import Database
 from fastapi import APIRouter, HTTPException
 from starlette.responses import UJSONResponse
 
-from crud.maintenance_record import get_multi, get
+from crud.maintenance_record import get_multi, get, get_statu_stat
 from db.conn_engine import META_URL
 from model.log import MaintenanceRecordSchema
 
@@ -16,7 +16,7 @@ router = APIRouter()
     "/", response_class=UJSONResponse, response_model=List[Optional[MaintenanceRecordSchema]]
 )
 async def read_maintenance_record(
-    skip: int = None, limit: int = None, asset_id: int = None
+        skip: int = None, limit: int = None, asset_id: int = None
 ):
     """
     Get Warning List.
@@ -26,8 +26,20 @@ async def read_maintenance_record(
     return items
 
 
+@router.get("/stat/", response_class=UJSONResponse)
+async def read_maintenance_record_count_by_statu():
+    """
+    Get warning stats by ID.
+    """
+    conn = Database(META_URL)
+    res = await get_statu_stat(conn=conn)
+    if not res:
+        raise HTTPException(status_code=400, detail="Item not found")
+    return res
+
+
 @router.get("/{id}/", response_class=UJSONResponse, response_model=MaintenanceRecordSchema)
-async def read_maintenance_record_by_id(id: int,):
+async def read_maintenance_record_by_id(id: int):
     """
     Get warning log by ID.
     """

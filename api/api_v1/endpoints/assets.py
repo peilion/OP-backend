@@ -40,6 +40,7 @@ crud_meth_mapper = {
     "branch_company": (get_count_by_branch_company, get_statu_count_by_branch_company),
     "isdomestic": (get_count_by_isdomestic, get_statu_count_by_isdomestic),
     "manufacturer": (get_count_by_manufacturer, get_statu_count_by_manufacturer),
+    "avghi":(get_overall_avg,)
 }
 
 
@@ -54,6 +55,7 @@ class GroupRule(str, Enum):
     branch_company = "branch_company"
     isdomestic = "isdomestic"
     manufacturer = "manufacturer"
+    avghi = 'avghi'
 
 
 @router.get("/", response_class=UJSONResponse)
@@ -157,7 +159,6 @@ async def read_asset_info(id: int, ):
             detail="Item not found. / Asset Information have not been record.",
         )
     return dict(info)
-
 
 @router.get("/{id}/avghi/", response_class=UJSONResponse)
 async def read_asset_avghi(

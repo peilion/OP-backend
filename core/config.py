@@ -2,7 +2,7 @@ import os
 
 API_V1_STR = "/api/v1"
 SECRET_KEY = os.urandom(32)
-
+DATABASE_LOCALTION = 'REMOTE'
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days = 8 days
 
 SERVER_NAME = os.getenv("SERVER_NAME")

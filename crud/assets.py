@@ -1,5 +1,6 @@
 from databases import Database
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateTable
 
@@ -12,19 +13,20 @@ from db_model import (
     AssetHI,
 )
 from db_model.asset_info import info_models_mapper
+
 enum_mapper = Asset.TYPES
 
 
 @con_warpper
 async def get_multi(
-    conn: Database,
-    skip: int,
-    limit: int,
-    type: int,
-    station_name: str,
-    level: int,
-    station_id: int,
-    session: Session = session_make(engine=None),
+        conn: Database,
+        skip: int,
+        limit: int,
+        type: int,
+        station_name: str,
+        level: int,
+        station_id: int,
+        session: Session = session_make(engine=None),
 ):
     if level is None:
         query = (
@@ -45,10 +47,10 @@ async def get_multi(
                 Asset.repairs,
                 Station.name.label("station_name"),
             )
-            .join(Station, Station.id == Asset.station_id)
-            .order_by(Asset.id)
-            .offset(skip)
-            .limit(limit)
+                .join(Station, Station.id == Asset.station_id)
+                .order_by(Asset.id)
+                .offset(skip)
+                .limit(limit)
         )
     else:
         query = session.query(Asset.id, Asset.name).filter(
@@ -81,8 +83,8 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
             Asset.statu,
             Station.name.label("station_name"),
         )
-        .join(Station, Station.id == Asset.station_id)
-        .filter(Asset.id == id)
+            .join(Station, Station.id == Asset.station_id)
+            .filter(Asset.id == id)
     )
 
     return await conn.fetch_one(query2sql(query))
@@ -90,9 +92,8 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
 
 @con_warpper
 async def get_info(session: Session, conn: Database, id: int):
-
     pre_query_res = await conn.fetch_one(query2sql(session.query(Asset.asset_type).filter(Asset.id == id)))
-    model = info_models_mapper[enum_mapper[pre_query_res['asset_type']]] # int -> asset_type -> model class
+    model = info_models_mapper[enum_mapper[pre_query_res['asset_type']]]  # int -> asset_type -> model class
 
     query = session.query(model).filter(model.asset_id == id)
     return await conn.fetch_one(query2sql(query))
@@ -113,8 +114,7 @@ async def create(conn: Database, data):
     except Exception as e:
         # print(e)
         if id:
-            query = Asset.__table__.delete().where(Asset.__table__.c.id==id)
+            query = Asset.__table__.delete().where(Asset.__table__.c.id == id)
             await conn.execute(query=str(query.compile(compile_kwargs={"literal_binds": True})))
             await transaction.commit()
         return False
-
