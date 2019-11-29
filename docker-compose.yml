@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+  op-backend:
+    image: opb
+    environment:
+      - DATABASE_CONNECTION_URL=git:Fpl8315814.@123.56.7.137
+    ports:
+      - "80:80"
+  portainer:
+    image: portainer/portainer
+    ports:
+      - "9000:9000"
+    volumess: 
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  op-frontend:
+    image: nginx
+    ports:
+      - "9000:9000"
+    volumes:
+      - "$PWD/frontend:/usr/share/nginx/html"
