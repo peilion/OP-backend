@@ -38,7 +38,7 @@ class ElecData(object):
 
 class VibData(object):
     _mapper = {}
-    base_class_name = "vib_data"
+    base_class_name = "b_vib"
 
     @classmethod
     def model(cls, point_id: int, base: DeclarativeMeta = Base):
@@ -54,10 +54,11 @@ class VibData(object):
                     __tablename__=class_name,
                     id=Column(BigInteger, primary_key=True),
                     time=Column(DateTime, index=True),
-                    vib=Column(LargeBinary, nullable=False),
-                    __table_args__=table_args,
+                    ima=Column(LargeBinary, nullable=False),
+                    # __table_args__=table_args,
                 ),
             )
             cls._mapper[class_name] = ModelClass
         mapper = ModelClass
         return mapper
+

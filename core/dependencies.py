@@ -13,14 +13,14 @@ async def get_mp_mapper():
             session = session_make(engine=None)
             query = session.query(
                 MeasurePoint.id,
-                MeasurePoint.station_id,
+                MeasurePoint.db_id,
                 MeasurePoint.id_inner_station,
                 MeasurePoint.type,
             )
             res = await conn.fetch_all(query2sql(query))
             for row in res:
                 measure_point_regsiter[row['id']] = {
-                    "station_id": row['station_id'],
+                    "station_id": row['db_id'],
                     "inner_id": row['id_inner_station'],
                     "type": row['type'],
                 }

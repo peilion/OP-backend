@@ -10,7 +10,7 @@ class MeasurePoint(Base):
     __tablename__ = "measure_point"
     __table_args__ = (
         UniqueConstraint(
-            "station_id", "id_inner_station", name="uix_stationid_innerstationid"
+            "db_id", "id_inner_station", name="uix_db_innerid"
         ),
         table_args,
     )
@@ -29,6 +29,7 @@ class MeasurePoint(Base):
 
     asset_id = Column(Integer, ForeignKey("asset.id"))
     station_id = Column(Integer, ForeignKey("station.id"))
+    db_id = Column(Integer)
     id_inner_station = Column(Integer)  # 这里的做法极度不安全，可以考虑用uuid4作为分表索引
 
     asset = relationship("Asset", back_populates="measure_points")

@@ -2,7 +2,7 @@ from databases import Database
 
 from crud.base import con_warpper
 from db_model import Asset, Station, PumpUnit
-from model.assets import TypeStationSchema
+from model.assets import TypeStationSchema, StatuStatisticSchema
 from services.query_processors.asset import format_map_grouped_result
 from services.query_processors.general import format_double_grouped_result, format_single_grouped_result
 
@@ -12,7 +12,7 @@ async def get_count_by_statu(conn: Database):
     query = "SELECT statu, COUNT(*) as cnt " "FROM `asset` " "GROUP BY statu"
     res = await conn.fetch_all(query)
     res_dic = format_single_grouped_result(res=res, group_names=Asset.STATUS)
-    return res_dic
+    return  StatuStatisticSchema(**res_dic)
 
 
 @con_warpper

@@ -43,7 +43,7 @@ async def read_the_latest_vibration_signal(
     res = await get_latest(
         conn=conn, shard_id=mp_shard_info["inner_id"], orm_model=VibData
     )
-    processed_res = fast_fournier_transform(res["vib"])
+    processed_res = fast_fournier_transform(res["ima"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -105,7 +105,7 @@ async def read_vibration_signal_by_id(
         data_id=data_id,
         orm_model=VibData,
     )
-    processed_res = fast_fournier_transform(res["vib"])
+    processed_res = fast_fournier_transform(res["ima"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -132,7 +132,7 @@ async def analyze_vibration_signal_with_hilbert(
         orm_model=VibData,
     )
 
-    processed_res = hilbert(res["vib"])
+    processed_res = hilbert(res["ima"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -159,7 +159,7 @@ async def analyze_vibration_signal_with_stft(
         orm_model=VibData,
     )
 
-    processed_res = short_time_fournier_transform(res["vib"])
+    processed_res = short_time_fournier_transform(res["ima"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -188,7 +188,7 @@ async def analyze_vibration_signal_with_musens(
         orm_model=VibData,
     )
 
-    processed_res = multi_scale_envelope_spectrum(res["vib"])
+    processed_res = multi_scale_envelope_spectrum(res["ima"])
     x = json.dumps({**processed_res, **{"id": res["id"], "time": str(res["time"])}})
     # using json response directly to skip data validation, for extreme large
     # array.
@@ -218,7 +218,7 @@ async def analyze_vibration_signal_with_welch(
         orm_model=VibData,
     )
 
-    processed_res = welch_spectrum_estimation(res["vib"])
+    processed_res = welch_spectrum_estimation(res["ima"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -245,7 +245,7 @@ async def analyze_vibration_signal_with_cumtrapz(
         orm_model=VibData,
     )
 
-    processed_res = acceleration_to_velocity(res["vib"])
+    processed_res = acceleration_to_velocity(res["ima"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
 
 @router.get(
@@ -271,5 +271,5 @@ async def analyze_vibration_signal_with_emd(
         orm_model=VibData,
     )
 
-    processed_res = empirical_mode_decomposition(res["vib"])
+    processed_res = empirical_mode_decomposition(res["ima"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}

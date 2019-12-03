@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, DateTime, Float, LargeBinary, ForeignKey, VARBINARY
+from sqlalchemy import Column, BigInteger, DateTime, Float, LargeBinary, ForeignKey, VARBINARY,Integer
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from db import Base, table_args
@@ -69,7 +69,7 @@ class ElecFeature(object):
 
 class VibFeature(object):
     _mapper = {}
-    base_class_name = "vib_feature"
+    base_class_name = "b_fea"
 
     @classmethod
     def model(cls, point_id: int, base: DeclarativeMeta = Base):
@@ -83,7 +83,7 @@ class VibFeature(object):
                     __module__=__name__,
                     __name__=class_name,
                     __tablename__=class_name,
-                    id=Column(BigInteger, primary_key=True),
+                    id=Column(Integer, primary_key=True),
                     time=Column(DateTime, index=True),
                     rms=Column(Float, default=0),
                     max=Column(Float, default=0),
@@ -101,8 +101,8 @@ class VibFeature(object):
                     sideband=Column(Float, default=0),
                     health_indicator=Column(Float, default=85),
                     data_id=Column(
-                        BigInteger,
-                        ForeignKey("vib_data_{0}.id".format(point_id)),
+                        Integer,
+                        ForeignKey("b_vib_{0}.id".format(point_id)),
                         unique=True,
                     ),
                     __table_args__=table_args,

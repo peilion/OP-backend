@@ -19,7 +19,7 @@ class Asset(Base):
     } # should have the same name as the models been defined in .asset_info.py
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(64), unique=True)
+    name = Column(String(64))
     sn = Column(String(128), unique=True)
     lr_time = Column(DateTime, nullable=True)
     cr_time = Column(DateTime, nullable=True, default=func.now())
