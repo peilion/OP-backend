@@ -15,7 +15,9 @@ async def get_latest(
     session: Session = session_make(engine=None),
 ):
     model = orm_model.model(point_id=shard_id)
-    query = session.query(model).order_by(model.id.desc()).limit(1) # query all the defined fields
+    query = (
+        session.query(model).order_by(model.id.desc()).limit(1)
+    )  # query all the defined fields
     return await conn.fetch_one(query2sql(query))
 
 

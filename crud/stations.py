@@ -12,10 +12,9 @@ from db_model.organization import Station, BranchCompany, RegionCompany
 
 @con_warpper
 async def get_multi(
-        conn: Database, skip: int, limit: int, session: Session = session_make(engine=None)
+    conn: Database, skip: int, limit: int, session: Session = session_make(engine=None)
 ):
-    query = session.query(Station).order_by(
-        Station.id).offset(skip).limit(limit)
+    query = session.query(Station).order_by(Station.id).offset(skip).limit(limit)
     return await conn.fetch_all(query2sql(query))
 
 
@@ -29,40 +28,55 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
 @con_warpper
 async def get_tree(conn: Database, session: Session = session_make(engine=None)):
     assets = await conn.fetch_all(
-        query2sql(session.query(Asset.id, Asset.name, Asset.station_id.label('parent_id')).filter(
-            Asset.asset_level == 0
-        )))
+        query2sql(
+            session.query(
+                Asset.id, Asset.name, Asset.station_id.label("parent_id")
+            ).filter(Asset.asset_level == 0)
+        )
+    )
     stations = await conn.fetch_all(
-        query2sql(session.query(Station.id, Station.name, Station.bc_id.label('parent_id'))))
+        query2sql(
+            session.query(Station.id, Station.name, Station.bc_id.label("parent_id"))
+        )
+    )
     bcs = await conn.fetch_all(
-        query2sql(session.query(BranchCompany.id, BranchCompany.name, BranchCompany.rc_id.label('parent_id'))))
-    rcs = await conn.fetch_all(query2sql(session.query(RegionCompany.id, RegionCompany.name)))
+        query2sql(
+            session.query(
+                BranchCompany.id,
+                BranchCompany.name,
+                BranchCompany.rc_id.label("parent_id"),
+            )
+        )
+    )
+    rcs = await conn.fetch_all(
+        query2sql(session.query(RegionCompany.id, RegionCompany.name))
+    )
 
     tree = Tree()
     tree.create_node(tag="root", identifier="root")
 
-    color = ["#2D5F73",  "#538EA6", "#F2D1B3", "#F2B8A2", "#F28C8C"]
+    color = ["#2D5F73", "#538EA6", "#F2D1B3", "#F2B8A2", "#F28C8C"]
 
     def item_maker(item, parent_type, self_type):
         temp = dict(item)
         if parent_type:
-            temp['parent_id'] = parent_type + str(temp['parent_id'])
-        if self_type == 'asset':
-            temp['value'] = 1
-        temp['id'] = self_type + str(temp['id'])
+            temp["parent_id"] = parent_type + str(temp["parent_id"])
+        if self_type == "asset":
+            temp["value"] = 1
+        temp["id"] = self_type + str(temp["id"])
         temp["itemStyle"] = {"color": random.choice(color)}
         return temp
 
-    assets = [item_maker(row, 'st', 'asset') for row in assets]
-    stations = [item_maker(row, 'bc', 'st') for row in stations]
-    bcs = [item_maker(row, 'rc', 'bc') for row in bcs]
-    rcs = [item_maker(row, None, 'rc') for row in rcs]
+    assets = [item_maker(row, "st", "asset") for row in assets]
+    stations = [item_maker(row, "bc", "st") for row in stations]
+    bcs = [item_maker(row, "rc", "bc") for row in bcs]
+    rcs = [item_maker(row, None, "rc") for row in rcs]
 
     for item in rcs + bcs + stations + assets:
         tree.create_node(
             data=item,
-            identifier=item['id'],
-            parent=item['parent_id'] if 'parent_id' in item else 'root',
+            identifier=item["id"],
+            parent=item["parent_id"] if "parent_id" in item else "root",
         )
 
     return tree.to_dict(with_data=True)["children"]
@@ -70,7 +84,7 @@ async def get_tree(conn: Database, session: Session = session_make(engine=None))
 
 @con_warpper
 async def get_bc(
-        conn: Database, skip: int, limit: int, session: Session = session_make(engine=None)
+    conn: Database, skip: int, limit: int, session: Session = session_make(engine=None)
 ):
     query = (
         session.query(BranchCompany)
@@ -83,7 +97,7 @@ async def get_bc(
 
 @con_warpper
 async def get_rc(
-        conn: Database, skip: int, limit: int, session: Session = session_make(engine=None)
+    conn: Database, skip: int, limit: int, session: Session = session_make(engine=None)
 ):
     query = (
         session.query(RegionCompany)

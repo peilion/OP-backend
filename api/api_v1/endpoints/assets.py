@@ -19,7 +19,6 @@ from db.conn_engine import meta_engine, META_URL
 from model.assets import (
     FlattenAssetSchema,
     FlattenAssetListSchema,
-    NestAssetSchema,
     AssetPostSchema,
 )
 
@@ -40,7 +39,7 @@ crud_meth_mapper = {
     "branch_company": (get_count_by_branch_company, get_statu_count_by_branch_company),
     "isdomestic": (get_count_by_isdomestic, get_statu_count_by_isdomestic),
     "manufacturer": (get_count_by_manufacturer, get_statu_count_by_manufacturer),
-    "avghi":(get_overall_avg,)
+    "avghi": (get_overall_avg,),
 }
 
 
@@ -55,18 +54,18 @@ class GroupRule(str, Enum):
     branch_company = "branch_company"
     isdomestic = "isdomestic"
     manufacturer = "manufacturer"
-    avghi = 'avghi'
+    avghi = "avghi"
 
 
 @router.get("/", response_class=UJSONResponse)
 async def read_assets(
-        skip: int = None,
-        limit: int = None,
-        iftree: bool = False,
-        type: int = None,
-        level: int = None,
-        station_name: str = None,
-        station_id: int = None,
+    skip: int = None,
+    limit: int = None,
+    iftree: bool = False,
+    type: int = None,
+    level: int = None,
+    station_name: str = None,
+    station_id: int = None,
 ):
     """
     Get Asset List.
@@ -101,7 +100,7 @@ async def read_assets(
 
 
 @router.get("/stat/", response_class=UJSONResponse)
-async def read_assets_statistic(group_by: List[GroupRule] = Query(None), ):
+async def read_assets_statistic(group_by: List[GroupRule] = Query(None),):
     """
     **Supported Query Mode** are listed follow, other query mode will be informed a 400 bad query parameter error.
 
@@ -133,7 +132,7 @@ async def read_assets_statistic(group_by: List[GroupRule] = Query(None), ):
         raise HTTPException(status_code=400, detail="Bad query parameter")
 
 
-@router.get("/{id}/", response_class=UJSONResponse,response_model=FlattenAssetSchema)
+@router.get("/{id}/", response_class=UJSONResponse, response_model=FlattenAssetSchema)
 async def read_by_id(id: int):
     """
     Get Asset by ID.
@@ -146,7 +145,7 @@ async def read_by_id(id: int):
 
 
 @router.get("/{id}/info/", response_class=UJSONResponse)
-async def read_asset_info(id: int, ):
+async def read_asset_info(id: int,):
     """
     Get Asset Info by ID.
     """
@@ -160,14 +159,15 @@ async def read_asset_info(id: int, ):
         )
     return dict(info)
 
+
 @router.get("/{id}/avghi/", response_class=UJSONResponse)
 async def read_asset_avghi(
-        id: int,
-        time_before: str = Query(None, description="e.x. 2016-07-01 00:00:00"),
-        time_after: str = Query(None, description="e.x. 2016-01-10 00:00:00"),
-        interval: int = None,
-        limit: int = None,
-        pre_query: bool = True,
+    id: int,
+    time_before: str = Query(None, description="e.x. 2016-07-01 00:00:00"),
+    time_after: str = Query(None, description="e.x. 2016-01-10 00:00:00"),
+    interval: int = None,
+    limit: int = None,
+    pre_query: bool = True,
 ):
     """
     Get avg Asset HI by time range and interval.
@@ -207,7 +207,7 @@ async def read_asset_avghi(
 async def create_asset(asset: AssetPostSchema):
     try:
         conn = Database(META_URL)
-        res = await create(conn=conn, data = asset)
+        res = await create(conn=conn, data=asset)
         if res == True:
             return {"msg": "Asset successfully added."}
         else:

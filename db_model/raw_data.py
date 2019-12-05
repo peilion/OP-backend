@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, DateTime, LargeBinary
+from sqlalchemy import Column, BigInteger, DateTime, LargeBinary, Integer, Float
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from db import Base, table_args
@@ -38,7 +38,7 @@ class ElecData(object):
 
 class VibData(object):
     _mapper = {}
-    base_class_name = "b_vib"
+    base_class_name = "vib_data"
 
     @classmethod
     def model(cls, point_id: int, base: DeclarativeMeta = Base):
@@ -52,13 +52,13 @@ class VibData(object):
                     __module__=__name__,
                     __name__=class_name,
                     __tablename__=class_name,
-                    id=Column(BigInteger, primary_key=True),
+                    id=Column(Integer, primary_key=True),
                     time=Column(DateTime, index=True),
+                    rms=Column(Float, default=0),
                     ima=Column(LargeBinary, nullable=False),
-                    # __table_args__=table_args,
+                    __table_args__=table_args,
                 ),
             )
             cls._mapper[class_name] = ModelClass
         mapper = ModelClass
         return mapper
-

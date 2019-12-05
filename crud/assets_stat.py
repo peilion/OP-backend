@@ -4,7 +4,10 @@ from crud.base import con_warpper
 from db_model import Asset, Station, PumpUnit
 from model.assets import TypeStationSchema, StatuStatisticSchema
 from services.query_processors.asset import format_map_grouped_result
-from services.query_processors.general import format_double_grouped_result, format_single_grouped_result
+from services.query_processors.general import (
+    format_double_grouped_result,
+    format_single_grouped_result,
+)
 
 
 @con_warpper
@@ -12,7 +15,7 @@ async def get_count_by_statu(conn: Database):
     query = "SELECT statu, COUNT(*) as cnt " "FROM `asset` " "GROUP BY statu"
     res = await conn.fetch_all(query)
     res_dic = format_single_grouped_result(res=res, group_names=Asset.STATUS)
-    return  StatuStatisticSchema(**res_dic)
+    return StatuStatisticSchema(**res_dic)
 
 
 @con_warpper
@@ -43,9 +46,9 @@ async def get_count_by_pipeline(conn: Database):
 
 @con_warpper
 async def get_overall_avg(conn: Database):
-    query = ('SELECT avg(health_indicator) as avg from asset WHERE asset_level=0')
+    query = "SELECT avg(health_indicator) as avg from asset WHERE asset_level=0"
     res = await conn.fetch_one(query)
-    return {'avg': res['avg']}
+    return {"avg": res["avg"]}
 
 
 @con_warpper

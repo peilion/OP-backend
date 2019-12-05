@@ -1,8 +1,9 @@
-from db import session_make, meta_engine
+from databases import Database
+
+from crud.base import query2sql
+from db import session_make
 from db.conn_engine import META_URL
 from db_model import MeasurePoint
-from crud.base import query2sql
-from databases import Database
 
 measure_point_regsiter = {}
 
@@ -11,18 +12,12 @@ async def get_mp_mapper():
     if len(measure_point_regsiter) == 0:
         async with Database(META_URL) as conn:
             session = session_make(engine=None)
-            query = session.query(
-                MeasurePoint.id,
-                MeasurePoint.db_id,
-                MeasurePoint.id_inner_station,
-                MeasurePoint.type,
-            )
+            query = session.query(MeasurePoint)
             res = await conn.fetch_all(query2sql(query))
             for row in res:
-                measure_point_regsiter[row['id']] = {
-                    "station_id": row['db_id'],
-                    "inner_id": row['id_inner_station'],
-                    "type": row['type'],
+                measure_point_regsiter[row["id"]] = {
+                    "shard_id": row["id"],
+                    "type": row["type"],
                 }
     return measure_point_regsiter
 

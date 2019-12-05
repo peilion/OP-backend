@@ -5,10 +5,10 @@ import MySQLdb
 import numpy as np
 import scipy.io as sio
 from numpy import ndarray
+from services.signal.electric.elec_feature_tools import feature_calculator
 from sqlalchemy.sql import text
 
 from db import station_engines
-from services.signal.electric.elec_feature_tools import feature_calculator
 
 SAMPLING_RATE = 20480
 # ROOT_PATHS = [r"G:\Researchs\Motor fusion\30HzData", r"G:\Researchs\Motor fusion\40HzData", r"G:\Researchs\Motor fusion\50HzData"]

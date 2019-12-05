@@ -28,7 +28,12 @@ class ElectricSignal(DigitalSignal):
     type_mapper = {0: "Raw", 1: "Envelope"}
 
     def __init__(
-            self, data: ndarray, fs: int, type: int, isdetrend=False, compute_axis: bool = True,
+        self,
+        data: ndarray,
+        fs: int,
+        type: int,
+        isdetrend=False,
+        compute_axis: bool = True,
     ):
         super().__init__(data, fs, isdetrend, compute_axis)
         self._fundamental = None
@@ -37,12 +42,14 @@ class ElectricSignal(DigitalSignal):
     def to_envelope(self):
         cutoff = int(self.N * 0.1)
         return self.__class__(
-            data=np.abs(signal.hilbert(self.data)[cutoff:-cutoff]), fs=self.sampling_rate, type=1
+            data=np.abs(signal.hilbert(self.data)[cutoff:-cutoff]),
+            fs=self.sampling_rate,
+            type=1
             # eliminate endpoint effect
         )
 
     def compute_brb_component(self):
-        assert self.type == 1, 'This method should be applied to envelope signal'
+        assert self.type == 1, "This method should be applied to envelope signal"
         brb_range = int(10 / self.df)
         self.brb_list = self.spec[:brb_range]
 
@@ -87,9 +94,10 @@ class ElectricSignal(DigitalSignal):
 
 class ThreePhaseElectric(object):
     def __init__(self, u: ElectricSignal, v: ElectricSignal, w: ElectricSignal):
-        if (u.sampling_rate != v.sampling_rate != w.sampling_rate) | \
-                (u.data.shape[0] != v.data.shape[0] != w.data.shape[0]):
-            raise Exception('Unmatched sampling rate')
+        if (u.sampling_rate != v.sampling_rate != w.sampling_rate) | (
+            u.data.shape[0] != v.data.shape[0] != w.data.shape[0]
+        ):
+            raise Exception("Unmatched sampling rate")
         self.u = u
         self.v = v
         self.w = w
@@ -99,7 +107,7 @@ class ThreePhaseElectric(object):
         self.v.estimate_params()
         self.w.estimate_params()
 
-    def cal_symm(self, require_sym_comps: bool=False):
+    def cal_symm(self, require_sym_comps: bool = False):
         # 120 degree rotator
         self.cal_samples()
         b, _ = self.u.make_phase(samples=self.fake_samples_number)
@@ -130,8 +138,12 @@ class ThreePhaseElectric(object):
         """
         Calculate the number of samples needed.
         """
-        max_omega = max(abs(2 * np.pi * self.u.fundamental),
-                        abs(2 * np.pi * self.v.fundamental),
-                        abs(2 * np.pi * self.w.fundamental))
+        max_omega = max(
+            abs(2 * np.pi * self.u.fundamental),
+            abs(2 * np.pi * self.v.fundamental),
+            abs(2 * np.pi * self.w.fundamental),
+        )
         max_freq = max_omega / (2 * np.pi)
-        self.fake_samples_number = (max_freq ** 2) * 6 * self.u.data.shape[0] / self.u.sampling_rate
+        self.fake_samples_number = (
+            (max_freq ** 2) * 6 * self.u.data.shape[0] / self.u.sampling_rate
+        )

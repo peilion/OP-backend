@@ -1,14 +1,14 @@
 import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-from core.socket import socket_manager
 from starlette.responses import HTMLResponse
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from api.api_v1.api import api_router
 from core import config
 from core.dependencies import get_mp_mapper
-from core.socket import NetIOSocket, NetIOMessagePusher
+from core.socket import NetIOMessagePusher
+from core.socket import socket_manager
 
 app = FastAPI(title=config.PROJECT_NAME, openapi_url="/api/v1/openapi.json")
 

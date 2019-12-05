@@ -17,7 +17,7 @@ class NetIOSocket:
         self.net_record = deque(maxlen=2)
         self.update_time = 0  # must be numeric type
         self.version_info = (
-                str(sys.version_info.major) + "." + str(sys.version_info.minor)
+            str(sys.version_info.major) + "." + str(sys.version_info.minor)
         )
         self.platform = str(sys.platform)
 
@@ -63,10 +63,13 @@ class NetIOSocket:
         await websocket.send_json(
             {
                 **self.msg,
-                **{'server_info': {"boot_time": datetime.now().timestamp() - psutil.boot_time(),
-                                   "version": self.version_info,
-                                   "plat_form": self.platform}
-                   },
+                **{
+                    "server_info": {
+                        "boot_time": datetime.now().timestamp() - psutil.boot_time(),
+                        "version": self.version_info,
+                        "plat_form": self.platform,
+                    }
+                },
             }
         )
         self.connections.append(websocket)
@@ -99,5 +102,6 @@ class NetIOMessagePusher(threading.Thread):
                 print(e)
             finally:
                 time.sleep(10)
+
 
 socket_manager = NetIOSocket()

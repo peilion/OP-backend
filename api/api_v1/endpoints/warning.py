@@ -19,18 +19,22 @@ class GroupRule(str, Enum):
     isread = "isread"
     branch = "branch"
     region = "region"
-    period = 'period'
+    period = "period"
 
 
 @router.get(
     "/", response_class=UJSONResponse, response_model=List[Optional[WarningLogSchema]]
 )
-async def read_warning_logs(skip: int = None, limit: int = None, asset_id: int = None, isread: bool = None):
+async def read_warning_logs(
+    skip: int = None, limit: int = None, asset_id: int = None, isread: bool = None
+):
     """
     Get Warning List.
     """
     conn = Database(META_URL)
-    items = await get_multi(conn=conn, skip=skip, limit=limit, asset_id=asset_id, isread=isread)
+    items = await get_multi(
+        conn=conn, skip=skip, limit=limit, asset_id=asset_id, isread=isread
+    )
     return items
 
 

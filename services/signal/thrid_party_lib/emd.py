@@ -8,13 +8,13 @@
 
 """Empirical Mode Decomposition."""
 
-from numpy import pi
 import warnings
-from scipy.interpolate import splrep, splev
 
 import numpy as np
-from scipy.signal import argrelmax, argrelmin
+from numpy import pi
 from scipy import interpolate, angle
+from scipy.interpolate import splrep, splev
+from scipy.signal import argrelmax, argrelmin
 
 
 def inst_freq(x, t=None):
@@ -43,8 +43,7 @@ def inst_freq(x, t=None):
     if t is not None:
         if t.ndim != 1:
             if 1 not in t.shape:
-                raise TypeError("Time instants should be a one dimensional "
-                                "array.")
+                raise TypeError("Time instants should be a one dimensional " "array.")
             else:
                 t = t.ravel()
     else:
@@ -52,6 +51,7 @@ def inst_freq(x, t=None):
 
     fnorm = 0.5 * (angle(-x[t] * np.conj(x[t - 2])) + np.pi) / (2 * np.pi)
     return fnorm, t
+
 
 def boundary_conditions(signal, time_samples, z=None, nbsym=2):
     """
@@ -101,17 +101,24 @@ def boundary_conditions(signal, time_samples, z=None, nbsym=2):
 
     loffset_max = time_samples[tmax[:nbsym]] - time_samples[0]
     roffset_max = time_samples[-1] - time_samples[tmax[-nbsym:]]
-    new_tmax = np.r_[time_samples[0] - loffset_max[::-1],
-                     time_samples[tmax], roffset_max[::-1] + time_samples[-1]]
+    new_tmax = np.r_[
+        time_samples[0] - loffset_max[::-1],
+        time_samples[tmax],
+        roffset_max[::-1] + time_samples[-1],
+    ]
     new_vmax = np.r_[maxima[:nbsym][::-1], maxima, maxima[-nbsym:][::-1]]
 
     loffset_min = time_samples[tmin[:nbsym]] - time_samples[0]
     roffset_min = time_samples[-1] - time_samples[tmin[-nbsym:]]
 
-    new_tmin = np.r_[time_samples[0] - loffset_min[::-1],
-                     time_samples[tmin], roffset_min[::-1] + time_samples[-1]]
+    new_tmin = np.r_[
+        time_samples[0] - loffset_min[::-1],
+        time_samples[tmin],
+        roffset_min[::-1] + time_samples[-1],
+    ]
     new_vmin = np.r_[minima[:nbsym][::-1], minima, minima[-nbsym:][::-1]]
     return new_tmin, new_tmax, new_vmin, new_vmax
+
 
 def get_envelops(x, t=None):
     """
@@ -156,6 +163,7 @@ def get_envelops(x, t=None):
     lower = interpolate.splev(t, tck)
     return upper, lower
 
+
 def extr(x):
     """
     Extract the indices of the extrema and zero crossings.
@@ -173,7 +181,7 @@ def extr(x):
     """
     m = x.shape[0]
 
-    x1 = x[:m - 1]
+    x1 = x[: m - 1]
     x2 = x[1:m]
     indzer = np.where(x1 * x2 < 0)[0]
     if np.any(x == 0):
@@ -194,12 +202,25 @@ def extr(x):
 
     return indmin, indmax, indzer
 
+
 class EmpiricalModeDecomposition(object):
     """The EMD class."""
 
-    def __init__(self, x, t=None, threshold_1=0.05, threshold_2=0.5,
-                 alpha=0.05, ndirs=4, fixe=0, maxiter=2000, fixe_h=0, n_imfs=0,
-                 nbsym=2, bivariate_mode='bbox_center'):
+    def __init__(
+        self,
+        x,
+        t=None,
+        threshold_1=0.05,
+        threshold_2=0.5,
+        alpha=0.05,
+        ndirs=4,
+        fixe=0,
+        maxiter=2000,
+        fixe_h=0,
+        n_imfs=0,
+        nbsym=2,
+        bivariate_mode="bbox_center",
+    ):
         """Empirical mode decomposition.
         Parameters
         ----------
@@ -324,13 +345,14 @@ class EmpiricalModeDecomposition(object):
         self.nbits = []
 
         # FIXME: Masking disabled because it seems to be recursive.
-#        if np.any(mask):
-#            if mask.shape != x.shape:
-#                raise TypeError("Masking signal must have the same",
-#                                "dimensions as the input signal x.")
-#            if mask.shape[0]>1:
-#                mask = mask.ravel()
-#            imf1 = emd(x+mask, opts)
+
+    #        if np.any(mask):
+    #            if mask.shape != x.shape:
+    #                raise TypeError("Masking signal must have the same",
+    #                                "dimensions as the input signal x.")
+    #            if mask.shape[0]>1:
+    #                mask = mask.ravel()
+    #            imf1 = emd(x+mask, opts)
 
     def io(self):
         r"""Compute the index of orthoginality, as defined by:
@@ -370,8 +392,7 @@ class EmpiricalModeDecomposition(object):
             stop = False
             for k in range(self.ndirs):
                 phi = k * pi / self.ndirs
-                indmin, indmax, _ = extr(
-                    np.real(np.exp(1j * phi) * self.residue))
+                indmin, indmax, _ = extr(np.real(np.exp(1j * phi) * self.residue))
                 if len(indmin) + len(indmax) < 3:
                     stop = True
                     break
@@ -397,7 +418,7 @@ class EmpiricalModeDecomposition(object):
         # FIXME: The spline interpolation may not be identical with the MATLAB
         # implementation. Needs further investigation.
         if self.is_bivariate:
-            if self.bivariate_mode == 'centroid':
+            if self.bivariate_mode == "centroid":
                 nem = []
                 nzm = []
                 envmin = np.zeros((self.ndirs, len(self.t)))
@@ -410,7 +431,8 @@ class EmpiricalModeDecomposition(object):
                     nzm.append(len(indzer))
                     if self.nbsym:
                         tmin, tmax, zmin, zmax = boundary_conditions(
-                            y, self.t, m, self.nbsym)
+                            y, self.t, m, self.nbsym
+                        )
                     else:
                         tmin = np.r_[self.t[0], self.t[indmin], self.t[-1]]
                         tmax = np.r_[self.t[0], self.t[indmax], self.t[-1]]
@@ -427,7 +449,7 @@ class EmpiricalModeDecomposition(object):
                 envmoy = np.mean((envmin + envmax) / 2, axis=0)
                 amp = np.mean(abs(envmax - envmin), axis=0) / 2
 
-            elif self.bivariate_mode == 'bbox_center':
+            elif self.bivariate_mode == "bbox_center":
                 nem = []
                 nzm = []
                 envmin = np.zeros((self.ndirs, len(self.t)), dtype=complex)
@@ -440,18 +462,19 @@ class EmpiricalModeDecomposition(object):
                     nzm.append(len(indzer))
                     if self.nbsym:
                         tmin, tmax, zmin, zmax = boundary_conditions(
-                            y, self.t, m, self.nbsym)
+                            y, self.t, m, self.nbsym
+                        )
                     else:
                         tmin = np.r_[self.t[0], self.t[indmin], self.t[-1]]
                         tmax = np.r_[self.t[0], self.t[indmax], self.t[-1]]
                         zmin, zmax = m[tmin], m[tmax]
                     f = splrep(tmin, zmin)
                     spl = splev(self.t, f)
-                    envmin[k, ] = np.exp(1j * phi) * spl
+                    envmin[k,] = np.exp(1j * phi) * spl
 
                     f = splrep(tmax, zmax)
                     spl = splev(self.t, f)
-                    envmax[k, ] = np.exp(1j * phi) * spl
+                    envmax[k,] = np.exp(1j * phi) * spl
 
                 envmoy = np.mean((envmin + envmax), axis=0)
                 amp = np.mean(abs(envmax - envmin), axis=0) / 2
@@ -461,8 +484,7 @@ class EmpiricalModeDecomposition(object):
             nem = len(indmin) + len(indmax)
             nzm = len(indzer)
             if self.nbsym:
-                tmin, tmax, mmin, mmax = boundary_conditions(m, self.t, m,
-                                                             self.nbsym)
+                tmin, tmax, mmin, mmax = boundary_conditions(m, self.t, m, self.nbsym)
             else:
                 tmin = np.r_[self.t[0], self.t[indmin], self.t[-1]]
                 tmax = np.r_[self.t[0], self.t[indmax], self.t[-1]]
@@ -507,7 +529,7 @@ class EmpiricalModeDecomposition(object):
                     stop_count = 0
                 else:
                     stop_count += 1
-                    stop = (stop_count == self.fixe_h)
+                    stop = stop_count == self.fixe_h
             except:
                 moyenne = np.zeros((len(m)))
                 stop = 1
@@ -522,19 +544,26 @@ class EmpiricalModeDecomposition(object):
                 if err.args[0] == "Not enough extrema.":
                     return 1, np.zeros((len(m)))
             sx = np.abs(envmoy) / amp
-            stop = not(((np.mean(sx > self.threshold_1) > self.alpha) or
-                        np.any(sx > self.threshold_2)) and np.all(nem > 2))
+            stop = not (
+                (
+                    (np.mean(sx > self.threshold_1) > self.alpha)
+                    or np.any(sx > self.threshold_2)
+                )
+                and np.all(nem > 2)
+            )
             if not self.is_bivariate:
-                stop = stop and not(np.abs(nzm - nem) > 1)
+                stop = stop and not (np.abs(nzm - nem) > 1)
             stop_sift = stop
             moyenne = envmoy
         return stop_sift, moyenne
 
     def keep_decomposing(self):
         """Check whether to continue the sifting operation."""
-        return not(self.stop_EMD()) and \
-            (self.k < self.n_imfs + 1 or self.n_imfs == 0)  # and \
-# not(np.any(self.mask))
+        return not (self.stop_EMD()) and (
+            self.k < self.n_imfs + 1 or self.n_imfs == 0
+        )  # and \
+
+    # not(np.any(self.mask))
 
     def decompose(self):
         """Decompose the input signal into IMFs.
@@ -558,14 +587,13 @@ class EmpiricalModeDecomposition(object):
             # in case current mode is small enough to cause spurious extrema
             if np.max(np.abs(m)) < (1e-10) * np.max(np.abs(self.x)):
                 if not stop_sift:
-                    warnings.warn(
-                        "EMD Warning: Amplitude too small, stopping.")
+                    warnings.warn("EMD Warning: Amplitude too small, stopping.")
                 else:
                     print("Force stopping EMD: amplitude too small.")
                 return
 
             # SIFTING LOOP:
-            while not(stop_sift) and (self.nbit < self.maxiter):
+            while not (stop_sift) and (self.nbit < self.maxiter):
                 # The following should be controlled by a verbosity parameter.
                 # if (not(self.is_bivariate) and
                 #     (self.nbit > self.maxiter / 5) and

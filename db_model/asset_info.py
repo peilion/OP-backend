@@ -103,5 +103,8 @@ class Stator(Base):
     asset = relationship("Asset", uselist=False)
 
 
-info_models_mapper = {key: value for key, value in locals().items() if
-                      (value.__class__ == DeclarativeMeta) & (key != 'Base')}
+info_models_mapper = {
+    key: value
+    for key, value in locals().items()
+    if (value.__class__ == DeclarativeMeta) & (key != "Base")
+}

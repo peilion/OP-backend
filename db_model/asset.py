@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, SmallInteger, ForeignKey, Float, DateTime, func, BigInteger
+from sqlalchemy import (
+    Column,
+    Integer,
+    SmallInteger,
+    ForeignKey,
+    Float,
+    DateTime,
+    func,
+    BigInteger,
+)
 from sqlalchemy import String, Text
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm import relationship
@@ -16,7 +25,7 @@ class Asset(Base):
         3: "Rotor",
         4: "Stator",
         5: "Bearing",
-    } # should have the same name as the models been defined in .asset_info.py
+    }  # should have the same name as the models been defined in .asset_info.py
 
     id = Column(Integer, primary_key=True)
     name = Column(String(64))

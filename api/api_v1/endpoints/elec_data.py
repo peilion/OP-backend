@@ -7,7 +7,7 @@ from starlette.responses import UJSONResponse
 
 from core.dependencies import get_mp_mapper
 from crud.data import get_latest, get_by_id, get_multi
-from db.conn_engine import STATION_URLS
+from db.conn_engine import META_URL
 from db_model import ElecData
 from model.elec_data import ElecSignalListSchema, ElecSignalSchema
 from services.signal.electric.processors import three_phase_fast_fournier_transform
@@ -30,11 +30,13 @@ async def read_the_latest_electric_signal(
             detail="The given measure point collect vibration data, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_latest(
-        conn=conn, shard_id=mp_shard_info["inner_id"], orm_model=ElecData
+        conn=conn, shard_id=mp_shard_info["shard_id"], orm_model=ElecData
     )
-    processed = three_phase_fast_fournier_transform(u=res['ucur'],v=res['vcur'],w=res['wcur'])
+    processed = three_phase_fast_fournier_transform(
+        u=res["ucur"], v=res["vcur"], w=res["wcur"]
+    )
     return {**processed, **{"id": res["id"], "time": res["time"]}}
 
 
@@ -59,10 +61,10 @@ async def read_all_electric_signal_info(
             detail="The given measure point collect vibration data, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_multi(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         time_before=time_before,
         time_after=time_after,
         orm_model=ElecData,
@@ -89,13 +91,15 @@ async def read_electric_signal_by_id(
             detail="The given measure point collect vibration data, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_by_id(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         data_id=data_id,
         orm_model=ElecData,
     )
 
-    processed = three_phase_fast_fournier_transform(u=res['ucur'],v=res['vcur'],w=res['wcur'])
+    processed = three_phase_fast_fournier_transform(
+        u=res["ucur"], v=res["vcur"], w=res["wcur"]
+    )
     return {**processed, **{"id": res["id"], "time": res["time"]}}

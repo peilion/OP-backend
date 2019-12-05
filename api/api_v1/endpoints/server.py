@@ -25,4 +25,5 @@ async def read_equip_level_mapper():
         "memory_statu": psutil.virtual_memory().percent,
     }
 
+
 psutil.net_io_counters()

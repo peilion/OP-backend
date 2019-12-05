@@ -7,7 +7,7 @@ from starlette.responses import UJSONResponse
 
 from core.dependencies import get_mp_mapper
 from crud.feature import get_latest, get_multi, get
-from db.conn_engine import STATION_URLS
+from db.conn_engine import META_URL
 from db_model import VibFeature
 
 router = APIRouter()
@@ -29,11 +29,11 @@ async def read_the_latest_vibration_feature(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
 
     res = await get_latest(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         fileds=features,
         orm_model=VibFeature,
     )
@@ -59,10 +59,10 @@ async def read_vibration_features(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_multi(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         fileds=features,
         time_before=str(time_before),
         time_after=str(time_after),
@@ -93,10 +93,10 @@ async def read_vibration_feature_by_id(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         data_id=data_id,
         fileds=features,
         orm_model=VibFeature,

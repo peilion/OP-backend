@@ -8,9 +8,11 @@ from scipy import stats
 from scipy.signal import detrend
 
 from services.signal.thrid_party_lib.emd import EMD
+
+
 class DigitalSignal:  # Base class for vibration signal and electric signal
     def __init__(
-            self, data: ndarray, fs: int, isdetrend=False, compute_axis: bool = True
+        self, data: ndarray, fs: int, isdetrend=False, compute_axis: bool = True
     ):
         """
         :param data:
@@ -57,12 +59,16 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
         upper_search = np.rint((basic_fr + tolerance) / df).astype(np.int)
         lower_search = np.rint((basic_fr - tolerance) / df).astype(np.int)
 
-        cali_fr = (lower_search + np.argmax(self.spec[lower_search:upper_search + 1])) * df
+        cali_fr = (
+            lower_search + np.argmax(self.spec[lower_search : upper_search + 1])
+        ) * df
         self.fr = cali_fr
 
     def compute_harmonics(self, fr: float, upper: int, tolerance=None):
         assert self.spec is not None, "需先计算频谱"
-        tolerance = self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
+        tolerance = (
+            self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
+        )
         spec = self.spec
         freq = self.freq
         df = freq[1] - freq[0]
@@ -75,7 +81,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
             upper_search = np.rint((nfr + nfr / fr * tolerance) / df).astype(np.int)
             lower_search = np.rint((nfr - nfr / fr * tolerance) / df).astype(np.int)
 
-            nfr_index = lower_search + np.argmax(spec[lower_search: upper_search + 1])
+            nfr_index = lower_search + np.argmax(spec[lower_search : upper_search + 1])
             nfr_amp = spec[nfr_index]
 
             harmonics_index.append(nfr_index)
@@ -88,7 +94,9 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
 
     def compute_sub_harmonic(self, fr: float, upper=10, tolerance=None):
         assert self.spec is not None, "需先计算频谱"
-        tolerance = self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
+        tolerance = (
+            self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
+        )
         df = self.df
 
         subhar_frequencies = [i * fr / 2 for i in range(1, upper, 2)]
@@ -104,7 +112,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
             ).astype(np.int)
 
             nth_harmonic_index = lower_search + np.argmax(
-                self.spec[lower_search: upper_search + 1]
+                self.spec[lower_search : upper_search + 1]
             )
             nth_harmonic = self.spec[nth_harmonic_index]
 
@@ -115,20 +123,22 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
         self.sub_harmonics_index = np.array(harmonics_index)
 
     def compute_spectrum(self, compute_axis: bool = True):
-        spec = np.fft.fft(self.data)[0: int(self.N / 2)] / self.N
+        spec = np.fft.fft(self.data)[0 : int(self.N / 2)] / self.N
         spec[1:] = 2 * spec[1:]
         self.spec = np.abs(spec)
         if compute_axis:
             self.freq = np.fft.fftfreq(self.N, 1.0 / self.sampling_rate)[
-                        0: int(self.N / 2)
-                        ]
+                0 : int(self.N / 2)
+            ]
             self.df = self.freq[1] - self.freq[1]
 
     def compute_bearing_frequency(
-            self, bpfi, bpfo, bsf, ftf, fr, upper=3, tolerance=None
+        self, bpfi, bpfo, bsf, ftf, fr, upper=3, tolerance=None
     ):
         assert self.spec is not None, "需先计算频谱"
-        tolerance = self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
+        tolerance = (
+            self.sampling_rate * 1.0 / self.N / 2 if tolerance is None else tolerance
+        )
         df = self.df
 
         bearing_index = []
@@ -144,7 +154,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
                 ).astype(np.int)
 
                 tmp_index = lower_search + np.argmax(
-                    self.spec[lower_search: upper_search + 1]
+                    self.spec[lower_search : upper_search + 1]
                 )
                 tmp_amp = self.spec[tmp_index]
 
@@ -159,7 +169,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
         df = self.df
         upper_search = np.rint(band_range[1] * fr / df).astype(np.int)
         lower_search = np.rint(band_range[0] * fr / df).astype(np.int)
-        search_range = self.spec[lower_search: upper_search + 1]
+        search_range = self.spec[lower_search : upper_search + 1]
         return lower_search + np.argmax(search_range), np.max(search_range)
 
     @staticmethod
@@ -228,8 +238,9 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
                 stft.append([j, i, round(float(z[i, j]), 3)])
         return {"t": t, "f": f, "stft": stft, "max": float(z.max())}
 
-    def get_multi_scale_envelope_spectrum(self, n_Ssta: float, n_Send: float,
-                                          n_Sint: float) -> dict:
+    def get_multi_scale_envelope_spectrum(
+        self, n_Ssta: float, n_Send: float, n_Sint: float
+    ) -> dict:
         length = len(self.data)
 
         i = n_Ssta
@@ -253,7 +264,8 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
         z[:, 0:1] = 0
 
         FreqExt = np.round(
-            (self.sampling_rate * np.linspace(0, length / 2, int(length / 2)) / length), decimals=3
+            (self.sampling_rate * np.linspace(0, length / 2, int(length / 2)) / length),
+            decimals=3,
         ).tolist()
         z = z[:, : len(FreqExt)]
         value = []
@@ -269,7 +281,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
     def get_empirical_mode_decomposition(self) -> dict:
         decomposer = EMD(self.data)
         IMFs = decomposer.decompose()
-        return {'emd': IMFs.round(3).tolist()}  # Advanced Transfrom Region
+        return {"emd": IMFs.round(3).tolist()}  # Advanced Transfrom Region
 
     def __repr__(self):
         return "Signal with a size of {0}, and the sampling rate is {1}.".format(
@@ -278,12 +290,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
 
 
 class MeasurePoint(metaclass=abc.ABCMeta):
-    fault_num_mapper = {
-        0: [0, 0, 0],
-        1: [1, 0, 0],
-        2: [0, 1, 0],
-        3: [0, 0, 1]
-    }
+    fault_num_mapper = {0: [0, 0, 0], 1: [1, 0, 0], 2: [0, 1, 0], 3: [0, 0, 1]}
     equip = None
     # should be specified in sub classes
     require_phase_diff = True
@@ -301,6 +308,8 @@ class MeasurePoint(metaclass=abc.ABCMeta):
         self.fault_num = []
 
         for item in type(self).__bases__:
-            if str(item).__contains__('Mixin'):
-                self.fault_num += self.fault_num_mapper[getattr(self, item.fault_num_name)]
+            if str(item).__contains__("Mixin"):
+                self.fault_num += self.fault_num_mapper[
+                    getattr(self, item.fault_num_name)
+                ]
         self.fault_num = np.array(self.fault_num)

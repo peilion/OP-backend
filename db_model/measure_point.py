@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, SmallInteger, ForeignKey, DateTime, func, Float
 from sqlalchemy import String
-from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from db import Base, table_args
@@ -8,12 +7,7 @@ from db import Base, table_args
 
 class MeasurePoint(Base):
     __tablename__ = "measure_point"
-    __table_args__ = (
-        UniqueConstraint(
-            "db_id", "id_inner_station", name="uix_db_innerid"
-        ),
-        table_args,
-    )
+    __table_args__ = table_args
 
     TYPES = {0: "Vibration", 1: "Current", 2: "Third party Integration"}
 
@@ -29,8 +23,6 @@ class MeasurePoint(Base):
 
     asset_id = Column(Integer, ForeignKey("asset.id"))
     station_id = Column(Integer, ForeignKey("station.id"))
-    db_id = Column(Integer)
-    id_inner_station = Column(Integer)  # 这里的做法极度不安全，可以考虑用uuid4作为分表索引
 
     asset = relationship("Asset", back_populates="measure_points")
     station = relationship("Station", back_populates="measure_points")

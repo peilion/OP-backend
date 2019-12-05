@@ -1,6 +1,6 @@
 from databases import Database
-from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from crud.base import con_warpper, query2sql
 from db.db_config import session_make
@@ -14,9 +14,12 @@ async def get_multi(
     query = session.query(Pipeline).order_by(Pipeline.id).offset(skip).limit(limit)
     return await conn.fetch_all(query2sql(query))
 
+
 @con_warpper
 async def get_total_length(
     conn: Database, session: Session = session_make(engine=None)
 ):
-    query = session.query(func.sum(Pipeline.length).label('value')).select_from(Pipeline)
+    query = session.query(func.sum(Pipeline.length).label("value")).select_from(
+        Pipeline
+    )
     return await conn.fetch_one(query2sql(query))

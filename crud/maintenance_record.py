@@ -11,18 +11,18 @@ from services.query_processors.general import format_single_grouped_result
 
 @con_warpper
 async def get_multi(
-        conn: Database,
-        skip: int,
-        limit: int,
-        asset_id: int,
-        session: Session = session_make(engine=None),
+    conn: Database,
+    skip: int,
+    limit: int,
+    asset_id: int,
+    session: Session = session_make(engine=None),
 ):
     query = (
         session.query(MaintenanceRecord, Asset.name.label("asset_name"))
-            .join(Asset, Asset.id == MaintenanceRecord.asset_id)
-            .order_by(MaintenanceRecord.statu.desc())
-            .offset(skip)
-            .limit(limit)
+        .join(Asset, Asset.id == MaintenanceRecord.asset_id)
+        .order_by(MaintenanceRecord.statu.desc())
+        .offset(skip)
+        .limit(limit)
     )
     if asset_id:
         query = query.filter(Asset.id == asset_id)
@@ -31,12 +31,12 @@ async def get_multi(
 
 @con_warpper
 async def get(
-        conn: Database, id: int, session: Session = session_make(engine=meta_engine)
+    conn: Database, id: int, session: Session = session_make(engine=meta_engine)
 ):
     query = (
         session.query(MaintenanceRecord, Asset.name.label("asset_name"))
-            .join(Asset, Asset.id == MaintenanceRecord.asset_id)
-            .filter(MaintenanceRecord.id == id)
+        .join(Asset, Asset.id == MaintenanceRecord.asset_id)
+        .filter(MaintenanceRecord.id == id)
     )
     res = await conn.fetch_one(query2sql(query))
 
@@ -45,12 +45,12 @@ async def get(
 
 @con_warpper
 async def get_statu_stat(
-        conn: Database, session: Session = session_make(engine=meta_engine)
+    conn: Database, session: Session = session_make(engine=meta_engine)
 ):
     query = (
-        session.query(MaintenanceRecord.statu, func.count('*'))
-            .select_from(MaintenanceRecord)
-            .group_by(MaintenanceRecord.statu)
+        session.query(MaintenanceRecord.statu, func.count("*"))
+        .select_from(MaintenanceRecord)
+        .group_by(MaintenanceRecord.statu)
     )
     res = await conn.fetch_all(query2sql(query))
 

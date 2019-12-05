@@ -61,7 +61,7 @@ async def get_multi(
     model = orm_model.model(point_id=shard_id)
 
     query = session.query(model)
-    for filed in fileds + ["id", "time","data_id"]:
+    for filed in fileds + ["id", "time", "data_id"]:
         query = query.options(load_only(filed))
 
     if time_before != "None":

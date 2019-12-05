@@ -20,6 +20,7 @@ class AssetPostSchema(BaseModel):
         parent_id: Optional[int]
         memo: Optional[str]
         statu: int = 0
+
     base: asset
     info: dict
 
@@ -67,9 +68,9 @@ class NestAssetSchema(BaseModel):
 
 NestAssetSchema.update_forward_refs()  # for self referencing orm model
 
+
 class NestAssetListSchema(BaseModel):
     asset: Optional[List[Optional["NestAssetSchema"]]]
-
 
 
 class StatuStatisticSchema(BaseModel):

@@ -3,7 +3,7 @@ from typing import List, Optional
 from databases import Database
 from fastapi import APIRouter
 
-from crud.pipeline import get_multi,get_total_length
+from crud.pipeline import get_multi, get_total_length
 from db.conn_engine import META_URL
 from model.organizations import PipelineSchema
 

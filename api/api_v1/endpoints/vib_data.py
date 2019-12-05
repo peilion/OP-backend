@@ -8,7 +8,7 @@ from starlette.responses import UJSONResponse, JSONResponse
 
 from core.dependencies import get_mp_mapper
 from crud.data import get_latest, get_by_id, get_multi
-from db.conn_engine import STATION_URLS
+from db.conn_engine import META_URL
 from db_model import VibData
 from model.vib_data import (
     VibrationSignalSchema,
@@ -17,9 +17,17 @@ from model.vib_data import (
     VibrationSTFTSchema,
     VibrationWelchSchema,
     VibrationCumtrapzSchema,
-    VibrationEMDSchema)
-from services.signal.vibration.processors import fast_fournier_transform, hilbert, short_time_fournier_transform, \
-    multi_scale_envelope_spectrum, welch_spectrum_estimation, acceleration_to_velocity, empirical_mode_decomposition
+    VibrationEMDSchema,
+)
+from services.signal.vibration.processors import (
+    fast_fournier_transform,
+    hilbert,
+    short_time_fournier_transform,
+    multi_scale_envelope_spectrum,
+    welch_spectrum_estimation,
+    acceleration_to_velocity,
+    empirical_mode_decomposition,
+)
 
 router = APIRouter()
 
@@ -39,9 +47,9 @@ async def read_the_latest_vibration_signal(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_latest(
-        conn=conn, shard_id=mp_shard_info["inner_id"], orm_model=VibData
+        conn=conn, shard_id=mp_shard_info["shard_id"], orm_model=VibData
     )
     processed_res = fast_fournier_transform(res["ima"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
@@ -68,10 +76,10 @@ async def read_all_vibration_signal_info(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_multi(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         time_before=time_before,
         time_after=time_after,
         orm_model=VibData,
@@ -98,7 +106,7 @@ async def read_vibration_signal_by_id(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_by_id(
         conn=conn,
         shard_id=mp_shard_info["inner_id"],
@@ -124,10 +132,10 @@ async def analyze_vibration_signal_with_hilbert(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_by_id(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         data_id=data_id,
         orm_model=VibData,
     )
@@ -151,10 +159,10 @@ async def analyze_vibration_signal_with_stft(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_by_id(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         data_id=data_id,
         orm_model=VibData,
     )
@@ -180,10 +188,10 @@ async def analyze_vibration_signal_with_musens(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_by_id(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         data_id=data_id,
         orm_model=VibData,
     )
@@ -210,10 +218,10 @@ async def analyze_vibration_signal_with_welch(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_by_id(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         data_id=data_id,
         orm_model=VibData,
     )
@@ -237,16 +245,17 @@ async def analyze_vibration_signal_with_cumtrapz(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_by_id(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         data_id=data_id,
         orm_model=VibData,
     )
 
     processed_res = acceleration_to_velocity(res["ima"])
     return {**processed_res, **{"id": res["id"], "time": res["time"]}}
+
 
 @router.get(
     "/mp/{mp_id}/vib_data/{data_id}/emd",
@@ -263,10 +272,10 @@ async def analyze_vibration_signal_with_emd(
             detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
         )
 
-    conn = Database(STATION_URLS[mp_shard_info["station_id"] - 1])
+    conn = Database(META_URL)
     res = await get_by_id(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         data_id=data_id,
         orm_model=VibData,
     )

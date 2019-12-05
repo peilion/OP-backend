@@ -7,8 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from starlette.responses import UJSONResponse
 
 from crud.measuer_points import get_multi, get, get_stat, create
-from db import session_make
-from db.conn_engine import META_URL, meta_engine
+from db.conn_engine import META_URL
 from model.measure_points import MeasurePointSchema, MeasurePointInputSchema
 
 router = APIRouter()

@@ -13,10 +13,12 @@ router = APIRouter()
 
 
 @router.get(
-    "/", response_class=UJSONResponse, response_model=List[Optional[MaintenanceRecordSchema]]
+    "/",
+    response_class=UJSONResponse,
+    response_model=List[Optional[MaintenanceRecordSchema]],
 )
 async def read_maintenance_record(
-        skip: int = None, limit: int = None, asset_id: int = None
+    skip: int = None, limit: int = None, asset_id: int = None
 ):
     """
     Get Warning List.
@@ -38,7 +40,9 @@ async def read_maintenance_record_count_by_statu():
     return res
 
 
-@router.get("/{id}/", response_class=UJSONResponse, response_model=MaintenanceRecordSchema)
+@router.get(
+    "/{id}/", response_class=UJSONResponse, response_model=MaintenanceRecordSchema
+)
 async def read_maintenance_record_by_id(id: int):
     """
     Get warning log by ID.

@@ -13,19 +13,19 @@ from db_model.organization import BranchCompany, RegionCompany
 
 @con_warpper
 async def get_multi(
-        conn: Database,
-        skip: int,
-        limit: int,
-        asset_id: int,
-        isread: bool,
-        session: Session = session_make(engine=None),
+    conn: Database,
+    skip: int,
+    limit: int,
+    asset_id: int,
+    isread: bool,
+    session: Session = session_make(engine=None),
 ):
     query = (
         session.query(WarningLog, Asset.name.label("asset_name"))
-            .join(Asset, Asset.id == WarningLog.asset_id)
-            .order_by(WarningLog.cr_time.desc())
-            .offset(skip)
-            .limit(limit)
+        .join(Asset, Asset.id == WarningLog.asset_id)
+        .order_by(WarningLog.cr_time.desc())
+        .offset(skip)
+        .limit(limit)
     )
     if asset_id:
         query = query.filter(Asset.id == asset_id)
@@ -36,12 +36,12 @@ async def get_multi(
 
 @con_warpper
 async def get(
-        conn: Database, id: int, session: Session = session_make(engine=meta_engine)
+    conn: Database, id: int, session: Session = session_make(engine=meta_engine)
 ):
     query = (
         session.query(WarningLog, Asset.name.label("asset_name"))
-            .join(Asset, Asset.id == WarningLog.asset_id)
-            .filter(WarningLog.id == id)
+        .join(Asset, Asset.id == WarningLog.asset_id)
+        .filter(WarningLog.id == id)
     )
     res = await conn.fetch_one(query2sql(query))
     if not res.is_read:
@@ -68,16 +68,16 @@ async def get_warning_calendar(conn: Database):
 
 @con_warpper
 async def get_warning_stat_by_station(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = (
         session.query(
             Asset.station_id, Station.name, func.count(WarningLog.asset_id).label("cnt")
         )
-            .select_from(WarningLog)
-            .join(Asset)
-            .join(Station, Asset.station_id == Station.id)
-            .group_by(Asset.station_id)
+        .select_from(WarningLog)
+        .join(Asset)
+        .join(Station, Asset.station_id == Station.id)
+        .group_by(Asset.station_id)
     )
 
     res = await conn.fetch_all(query2sql(query))
@@ -91,15 +91,15 @@ async def get_warning_stat_by_station(
 
 @con_warpper
 async def get_warning_stat_by_branch_company(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = (
         session.query(BranchCompany.name, func.count(WarningLog.asset_id).label("cnt"))
-            .select_from(WarningLog)
-            .join(Asset)
-            .join(Station, Asset.station_id == Station.id)
-            .join(BranchCompany, Station.bc_id == BranchCompany.id)
-            .group_by(Asset.station_id)
+        .select_from(WarningLog)
+        .join(Asset)
+        .join(Station, Asset.station_id == Station.id)
+        .join(BranchCompany, Station.bc_id == BranchCompany.id)
+        .group_by(Asset.station_id)
     )
 
     res = await conn.fetch_all(query2sql(query))
@@ -113,15 +113,15 @@ async def get_warning_stat_by_branch_company(
 
 @con_warpper
 async def get_warning_stat_by_region_company(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = (
         session.query(RegionCompany.name, func.count(WarningLog.asset_id).label("cnt"))
-            .select_from(WarningLog)
-            .join(Asset)
-            .join(Station, Asset.station_id == Station.id)
-            .join(RegionCompany, Station.rc_id == RegionCompany.id)
-            .group_by(Asset.station_id)
+        .select_from(WarningLog)
+        .join(Asset)
+        .join(Station, Asset.station_id == Station.id)
+        .join(RegionCompany, Station.rc_id == RegionCompany.id)
+        .group_by(Asset.station_id)
     )
 
     res = await conn.fetch_all(query2sql(query))
@@ -135,7 +135,7 @@ async def get_warning_stat_by_region_company(
 
 @con_warpper
 async def get_warning_stat_by_asset(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = session.query(WarningLog.asset_id, func.count("*").label("cnt")).group_by(
         WarningLog.asset_id
@@ -146,18 +146,18 @@ async def get_warning_stat_by_asset(
 
 @con_warpper
 async def get_warning_stat_by_isreadable(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = session.query(WarningLog.is_read, func.count("*").label("cnt")).group_by(
         WarningLog.is_read
     )
     res = await conn.fetch_all(query2sql(query))
-    return {'unread': res[0]['cnt'], 'read': res[1]['cnt']}
+    return {"unread": res[0]["cnt"], "read": res[1]["cnt"]}
 
 
 @con_warpper
 async def get_warning_stat_by_period(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     now = datetime.datetime.now()
     last_day = now - datetime.timedelta(days=1)
@@ -168,8 +168,8 @@ async def get_warning_stat_by_period(
     for start_date in [last_day, last_week, last_month, last_year]:
         query = (
             session.query(func.count("*").label("cnt"))
-                .select_from(WarningLog)
-                .filter(WarningLog.cr_time.between(str(start_date), str(now)))
+            .select_from(WarningLog)
+            .filter(WarningLog.cr_time.between(str(start_date), str(now)))
         )
         res = await conn.fetch_one(query2sql(query))
         final.append(res["cnt"])
