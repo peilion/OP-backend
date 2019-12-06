@@ -197,7 +197,7 @@ async def read_asset_avghi(
 
         if not res["time_list"]:
             raise HTTPException(
-                status_code=400,
+                status_code=200,
                 detail="No health indicator calculated in the time range",
             )
         return res
