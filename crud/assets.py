@@ -102,7 +102,7 @@ async def get_info(session: Session, conn: Database, id: int):
 async def create(conn: Database, data):
     data = jsonable_encoder(data)
     transaction = await conn.transaction()
-    id = 0
+    id = False
     try:
         id = await conn.execute(query=Asset.__table__.insert(), values=data["base"])
         model = AssetHI.model(point_id=id)  # register to metadata for all pump_unit

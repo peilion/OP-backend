@@ -70,8 +70,8 @@ async def read_the_latest_vibration_feature(
 @router.get("/mp/{mp_id}/elec_feature/list/", response_class=UJSONResponse)
 async def read_vibration_features(
     mp_id: int,
-    time_before: datetime = Query(default="2016-07-01 00:00:00"),
-    time_after: datetime = Query(default="2016-01-10 00:00:00"),
+    time_before: datetime = Query(None, description="e.x. 2016-07-01 00:00:00"),
+    time_after: datetime = Query(None, description="e.x. 2016-01-10 00:00:00"),
     features: List[str] = Query(
         FEATURE_FIELDS,  # TODO: refactor to body parameter
         description="Only these fileds can be returned now.",

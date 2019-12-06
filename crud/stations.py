@@ -55,8 +55,7 @@ async def get_tree(conn: Database, session: Session = session_make(engine=None))
     tree = Tree()
     tree.create_node(tag="root", identifier="root")
 
-    color = ["#2D5F73", "#538EA6", "#F2D1B3", "#F2B8A2", "#F28C8C"]
-
+    color = ["#2D5F73", "#538EA6", "#378524", "#736893", "#646464"]
     def item_maker(item, parent_type, self_type):
         temp = dict(item)
         if parent_type:
