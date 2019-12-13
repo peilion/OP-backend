@@ -95,8 +95,7 @@ async def startup_event():
     heartbeat_pusher = NetIOMessagePusher(socket_manager)
     heartbeat_pusher.start()
 
-
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app", host="0.0.0.0", port=8000, log_level="info", reload=True, debug=True
+        "main:app", host="0.0.0.0", port=8000, log_level="info"
     )

@@ -17,7 +17,7 @@ databases==0.2.5
 dataclasses==0.6
 dnspython==1.16.0
 eventlet==0.25.1
-fastapi==0.42.0
+fastapi==0.44.1
 flower==0.9.3
 greenlet==0.4.15
 h11==0.8.1
@@ -34,7 +34,7 @@ numpy==1.17.2
 psutil==5.6.3
 pycodestyle==2.5.0
 pycparser==2.19
-pydantic==0.32.2
+pydantic==1.2
 PyMySQL==0.9.2
 pytz==2019.2
 PyWavelets==1.1.1

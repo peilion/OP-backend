@@ -107,6 +107,11 @@ class ThreePhaseElectric(object):
         self.v.estimate_params()
         self.w.estimate_params()
 
+    def dq0_transform(self):
+        d = (np.sqrt(2 / 3) * self.u.data - (1 / (np.sqrt(6))) * self.v.data - (1 / (np.sqrt(6))) * self.w.data)
+        q = ((1 / (np.sqrt(2))) * self.v.data - (1 / (np.sqrt(2))) * self.w.data)
+        return d, q
+
     def cal_symm(self, require_sym_comps: bool = False):
         # 120 degree rotator
         self.cal_samples()

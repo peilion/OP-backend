@@ -9,8 +9,9 @@ from core.dependencies import get_mp_mapper
 from crud.data import get_latest, get_by_id, get_multi
 from db.conn_engine import META_URL
 from db_model import ElecData
-from model.elec_data import ElecSignalListSchema, ElecSignalSchema
-from services.signal.electric.processors import three_phase_fast_fournier_transform
+from model.elec_data import ElecSignalListSchema, ElecSignalSchema, ElecEnvelopeSchema, ElecDQSchema
+from services.signal.electric.processors import three_phase_fast_fournier_transform, three_phase_hilbert_transform, \
+    dq_transform
 
 router = APIRouter()
 
@@ -21,7 +22,7 @@ router = APIRouter()
     response_model=ElecSignalSchema,
 )
 async def read_the_latest_electric_signal(
-    mp_id: int, mp_mapper: dict = Depends(get_mp_mapper)
+        mp_id: int, mp_mapper: dict = Depends(get_mp_mapper)
 ):
     mp_shard_info = mp_mapper[mp_id]
     if mp_shard_info["type"] == 0:
@@ -46,10 +47,10 @@ async def read_the_latest_electric_signal(
     response_model=List[ElecSignalListSchema],
 )
 async def read_all_electric_signal_info(
-    mp_id: int,
-    time_before: datetime = Query(default="2016-01-01 00:00:00"),
-    time_after: datetime = Query(default="2016-07-10 00:00:00"),
-    mp_mapper: dict = Depends(get_mp_mapper),
+        mp_id: int,
+        time_before: datetime = Query(default="2016-01-01 00:00:00"),
+        time_after: datetime = Query(default="2016-07-10 00:00:00"),
+        mp_mapper: dict = Depends(get_mp_mapper),
 ):
     """
     Diagnosis info will be joined to the response in the future.
@@ -82,7 +83,7 @@ async def read_all_electric_signal_info(
     response_model=ElecSignalSchema,
 )
 async def read_electric_signal_by_id(
-    mp_id: int, data_id: int, mp_mapper: dict = Depends(get_mp_mapper)
+        mp_id: int, data_id: int, mp_mapper: dict = Depends(get_mp_mapper)
 ):
     mp_shard_info = mp_mapper[mp_id]
     if mp_shard_info["type"] == 0:
@@ -103,3 +104,57 @@ async def read_electric_signal_by_id(
         u=res["ucur"], v=res["vcur"], w=res["wcur"]
     )
     return {**processed, **{"id": res["id"], "time": res["time"]}}
+
+
+@router.get(
+    "/mp/{mp_id}/elec/{data_id}/hilbert",
+    response_class=UJSONResponse,
+    response_model=ElecEnvelopeSchema,
+)
+async def analyze_electric_signal_with_hilbert(
+        mp_id: int, data_id: int, mp_mapper: dict = Depends(get_mp_mapper)
+):
+    mp_shard_info = mp_mapper[mp_id]
+    if mp_shard_info["type"] == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="The given measure point collect vibration data, try to use the approaprite endpoint.",
+        )
+
+    conn = Database(META_URL)
+    res = await get_by_id(
+        conn=conn,
+        shard_id=mp_shard_info["shard_id"],
+        data_id=data_id,
+        orm_model=ElecData,
+    )
+
+    processed_res = three_phase_hilbert_transform(u=res["ucur"], v=res["vcur"], w=res["wcur"])
+    return {**processed_res, **{"id": res["id"], "time": res["time"]}}
+
+
+@router.get(
+    "/mp/{mp_id}/elec/{data_id}/dq",
+    response_class=UJSONResponse,
+    response_model=ElecDQSchema,
+)
+async def analyze_electric_signal_with_dq(
+        mp_id: int, data_id: int, mp_mapper: dict = Depends(get_mp_mapper)
+):
+    mp_shard_info = mp_mapper[mp_id]
+    if mp_shard_info["type"] == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="The given measure point collect vibration data, try to use the approaprite endpoint.",
+        )
+
+    conn = Database(META_URL)
+    res = await get_by_id(
+        conn=conn,
+        shard_id=mp_shard_info["shard_id"],
+        data_id=data_id,
+        orm_model=ElecData,
+    )
+
+    processed_res = dq_transform(u=res["ucur"], v=res["vcur"], w=res["wcur"])
+    return {**processed_res, **{"id": res["id"], "time": res["time"]}}
