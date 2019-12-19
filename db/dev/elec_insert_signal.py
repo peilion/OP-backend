@@ -21,7 +21,7 @@ ROOT_PATHS = [
     r"G:\\Researches\Motor fusion\40HzData",
     r"G:\\Researches\Motor fusion\50HzData",
     r"G:\\Researches\Motor fusion\40HzData",
-    r"G:\\Researches\Motor fusion\50HzData"
+    r"G:\\Researches\Motor fusion\50HzData",
 ]
 PHASE_SHIFT = [171, 137, 171, 137, 171, 137]
 SUFFIX = [61, 62, 63, 64, 65, 66]
@@ -54,17 +54,17 @@ for root_path, shift, suffix in zip(ROOT_PATHS, PHASE_SHIFT, SUFFIX):
                     time=str(initial_datetime),
                     u=MySQLdb.Binary(
                         data[
-                        1000 + i * 10000 - shift: 1000 + i * 10000 + 8192 - shift
+                            1000 + i * 10000 - shift : 1000 + i * 10000 + 8192 - shift
                         ].astype(np.float32)
                     ),
                     v=MySQLdb.Binary(
-                        data[1000 + i * 10000: 1000 + i * 10000 + 8192].astype(
+                        data[1000 + i * 10000 : 1000 + i * 10000 + 8192].astype(
                             np.float32
                         )
                     ),
                     w=MySQLdb.Binary(
                         data[
-                        1000 + i * 10000 + shift: 1000 + i * 10000 + 8192 + shift
+                            1000 + i * 10000 + shift : 1000 + i * 10000 + 8192 + shift
                         ].astype(np.float32)
                     ),
                 )

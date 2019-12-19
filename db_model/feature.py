@@ -8,6 +8,7 @@ from sqlalchemy import (
     Integer,
 )
 from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import relationship
 
 from db import Base, table_args
 

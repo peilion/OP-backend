@@ -1,5 +1,6 @@
 from sqlalchemy import Column, BigInteger, DateTime, LargeBinary, Integer, Float
 from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import relationship
 
 from db import Base, table_args
 

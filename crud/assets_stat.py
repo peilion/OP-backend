@@ -93,12 +93,14 @@ async def get_count_by_branch_company(conn: Database):
 
 @con_warpper
 async def get_count_by_station(conn: Database):
-    query = ("SELECT a.station_id as id, COUNT(*) as cnt, s.name as name "
-             "FROM asset a "
-             "JOIN station s on a.station_id = s.id "
-             "GROUP BY a.station_id")
+    query = (
+        "SELECT a.station_id as id, COUNT(*) as cnt, s.name as name "
+        "FROM asset a "
+        "JOIN station s on a.station_id = s.id "
+        "GROUP BY a.station_id"
+    )
     res = await conn.fetch_all(query)
-    station_mapper ={ row['id']: row['name'] for row in res}
+    station_mapper = {row["id"]: row["name"] for row in res}
     res_dic = format_single_grouped_result(res=res, group_names=station_mapper)
     return res_dic
 

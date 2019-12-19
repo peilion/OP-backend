@@ -21,6 +21,17 @@ class SubSampledBinaryArray(list):
         ]
 
 
+class BinaryArray(list):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        raw = np.fromstring(v, dtype=np.float32)
+        return [round(float(item), TIME_DOMAIN_DECIMAL) for item in raw]
+
+
 class SubSampledArray(list):
     @classmethod
     def __get_validators__(cls):

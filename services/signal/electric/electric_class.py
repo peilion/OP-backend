@@ -108,8 +108,12 @@ class ThreePhaseElectric(object):
         self.w.estimate_params()
 
     def dq0_transform(self):
-        d = (np.sqrt(2 / 3) * self.u.data - (1 / (np.sqrt(6))) * self.v.data - (1 / (np.sqrt(6))) * self.w.data)
-        q = ((1 / (np.sqrt(2))) * self.v.data - (1 / (np.sqrt(2))) * self.w.data)
+        d = (
+            np.sqrt(2 / 3) * self.u.data
+            - (1 / (np.sqrt(6))) * self.v.data
+            - (1 / (np.sqrt(6))) * self.w.data
+        )
+        q = (1 / (np.sqrt(2))) * self.v.data - (1 / (np.sqrt(2))) * self.w.data
         return d, q
 
     def cal_symm(self, require_sym_comps: bool = False):
@@ -152,3 +156,47 @@ class ThreePhaseElectric(object):
         self.fake_samples_number = (
             (max_freq ** 2) * 6 * self.u.data.shape[0] / self.u.sampling_rate
         )
+
+
+def to_complex(r, x, real_offset=0, imag_offset=0):
+    real = r * np.cos(x) + real_offset
+
+    imag = r * np.sin(x) + imag_offset
+
+    return real + 1j * imag
+
+
+def make_phase(mag, omega, phi, samples, end_time):
+    """
+    Create the phase signal in complex form.
+    """
+
+    array_time = np.linspace(0, end_time, samples)
+
+    x = omega * array_time + phi
+
+    return to_complex(mag, x), array_time
+
+
+def cal_symm(a, b, c):
+    # 120 degree rotator
+    ALPHA = np.exp(1j * 2 / 3 * np.pi)
+
+    # Positive sequence
+    a_pos = 1 / 3 * (a + b * ALPHA + c * (ALPHA ** 2))
+
+    b_pos = 1 / 3 * (a * (ALPHA ** 2) + b + c * ALPHA)
+
+    c_pos = 1 / 3 * (a * ALPHA + b * (ALPHA ** 2) + c)
+
+    # Negative sequence
+    a_neg = 1 / 3 * (a + b * (ALPHA ** 2) + c * ALPHA)
+
+    b_neg = 1 / 3 * (a * ALPHA + b + c * (ALPHA ** 2))
+
+    c_neg = 1 / 3 * (a * (ALPHA ** 2) + b * ALPHA + c)
+
+    # zero sequence
+    zero = 1 / 3 * (a + b + c)
+
+    return a_pos, b_pos, c_pos, a_neg, b_neg, c_neg, zero

@@ -23,4 +23,4 @@ async def get_mp_mapper():
 
 
 def mp_change_commit():
-    measure_point_regsiter = {}
+    measure_point_router = {}

@@ -16,11 +16,7 @@ from crud.assets_stat import *
 from custom_lib.treelib import Tree
 from db import session_make
 from db.conn_engine import meta_engine, META_URL
-from model.assets import (
-    FlattenAssetSchema,
-    FlattenAssetListSchema,
-    AssetPostSchema,
-)
+from model.assets import FlattenAssetSchema, FlattenAssetListSchema, AssetPostSchema
 
 router = APIRouter()
 
