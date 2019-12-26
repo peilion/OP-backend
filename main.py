@@ -37,7 +37,7 @@ app.include_router(api_router, prefix=config.API_V1_STR)
 
 
 @app.get("/sock")
-async def get():
+async def socket_test_page():
     html = """
     <!DOCTYPE html>
     <html>
@@ -97,4 +97,4 @@ async def startup_event():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info")
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info", reload=True)

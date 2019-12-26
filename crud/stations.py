@@ -55,7 +55,7 @@ async def get_tree(conn: Database, session: Session = session_make(engine=None))
     tree = Tree()
     tree.create_node(tag="root", identifier="root")
 
-    def item_maker(item, parent_type, self_type, color):
+    def item_maker(item, parent_type, self_type, color, value):
         temp = dict(item)
         if parent_type:
             temp["parent_id"] = parent_type + str(temp["parent_id"])
@@ -63,13 +63,14 @@ async def get_tree(conn: Database, session: Session = session_make(engine=None))
             temp["value"] = 1
         temp["id"] = self_type + str(temp["id"])
         temp["itemStyle"] = {"color": color}
+        temp["value"] = value
         return temp
 
     color = ["#1a8bff", "#51a2f7", "#79b8ff", "#93ccff"]
-    assets = [item_maker(row, "st", "asset", color[3]) for row in assets]
-    stations = [item_maker(row, "bc", "st", color[2]) for row in stations]
-    bcs = [item_maker(row, "rc", "bc", color[1]) for row in bcs]
-    rcs = [item_maker(row, None, "rc", color[0]) for row in rcs]
+    assets = [item_maker(row, "st", "asset", color[3],40) for row in assets]
+    stations = [item_maker(row, "bc", "st", color[2],60) for row in stations]
+    bcs = [item_maker(row, "rc", "bc", color[1],80) for row in bcs]
+    rcs = [item_maker(row, None, "rc", color[0],130) for row in rcs]
 
     for item in rcs + bcs + stations + assets:
         tree.create_node(

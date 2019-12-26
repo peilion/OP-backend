@@ -16,6 +16,7 @@ cryptography==2.7
 databases==0.2.5
 dataclasses==0.6
 dnspython==1.16.0
+email-validator==1.0.5
 eventlet==0.25.1
 fastapi==0.44.1
 flower==0.9.3
@@ -47,7 +48,7 @@ tornado==5.1.1
 treelib==1.5.5
 ujson==1.35
 urllib3==1.25.7
-uvicorn==0.10.8
+uvicorn==0.11.1
 vine==1.3.0
 websockets==8.0.2
 zipp==0.6.0
