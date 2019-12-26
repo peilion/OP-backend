@@ -109,7 +109,7 @@ async def read_vibration_signal_by_id(
     conn = Database(META_URL)
     res = await get_by_id(
         conn=conn,
-        shard_id=mp_shard_info["inner_id"],
+        shard_id=mp_shard_info["shard_id"],
         data_id=data_id,
         orm_model=VibData,
     )
