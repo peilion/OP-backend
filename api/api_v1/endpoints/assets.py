@@ -1,56 +1,31 @@
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
+from databases import Database
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 from starlette.responses import UJSONResponse
 
-from crud.assets import get_multi, get, get_info, create
+from crud.assets import get_multi, get, get_info, create, get_cards
 from crud.assets_hi import (
     get_avg_hi_during_time,
     get_avg_hi_pre,
     get_avg_hi_before_limit,
     get_avg_hi_multi,
+    get_avg_hi_limit_latest,
 )
-from crud.assets_stat import *
-from custom_lib.treelib import Tree
+
 from db import session_make
 from db.conn_engine import meta_engine, META_URL
-from model.assets import FlattenAssetSchema, FlattenAssetListSchema, AssetPostSchema
+from model.assets import (
+    FlattenAssetSchema,
+    FlattenAssetListSchema,
+    AssetPostSchema,
+    AssetCardSchema,
+)
+from services.query_processors.asset import tree_list_format
 
 router = APIRouter()
-
-crud_meth_mapper = {
-    "statu": (get_count_by_statu,),
-    "station": (
-        get_count_by_station,
-        get_statu_count_by_station,
-        get_type_count_by_station,
-    ),
-    "type": (get_count_by_asset_type, get_statu_count_by_type),
-    "province": (get_count_by_province, get_statu_count_by_province),
-    "pipeline": (get_count_by_pipeline, get_statu_count_by_pipeline),
-    "oil_type": (get_count_by_oil_type, get_statu_count_by_oiltype),
-    "region_company": (get_count_by_region_company, get_statu_count_by_region_company),
-    "branch_company": (get_count_by_branch_company, get_statu_count_by_branch_company),
-    "isdomestic": (get_count_by_isdomestic, get_statu_count_by_isdomestic),
-    "manufacturer": (get_count_by_manufacturer, get_statu_count_by_manufacturer),
-    "avghi": (get_overall_avg,),
-}
-
-
-class GroupRule(str, Enum):
-    station = "station"
-    statu = "statu"
-    type = "type"
-    province = "province"
-    pipeline = "pipeline"
-    oil_type = "oil_type"
-    region_company = "region_company"
-    branch_company = "branch_company"
-    isdomestic = "isdomestic"
-    manufacturer = "manufacturer"
-    avghi = "avghi"
 
 
 @router.get("/", response_class=UJSONResponse)
@@ -79,53 +54,26 @@ async def read_assets(
     if not iftree:
         return FlattenAssetListSchema(asset=items)
     elif iftree:
-        tree = Tree()
-        tree.create_node(tag="root", identifier="root")
-        items = [dict(row) for row in items]
-        for item in items:
-            # For tree table editable fields
-            item = {**item, "originalSTtime": item["st_time"], "edit": False}
-            tree.create_node(data=item, identifier=item["id"], parent="root")
-
-        for node in tree.expand_tree(mode=Tree.WIDTH):
-            if node != "root":
-                if tree[node].data["parent_id"]:
-                    tree.move_node(node, tree[node].data["parent_id"])
-        return tree.to_dict(with_data=True)["children"]
+        return tree_list_format(items)
     # return NestAssetListSchema(asset=res)
 
 
-@router.get("/stat/", response_class=UJSONResponse)
-async def read_assets_statistic(group_by: List[GroupRule] = Query(None),):
+@router.get(
+    "/cards/",
+    response_class=UJSONResponse,
+    response_model=Optional[List[Optional[AssetCardSchema]]],
+)
+async def read_assets_card(skip: int = None, limit: int = None):
     """
-    **Supported Query Mode** are listed follow, other query mode will be informed a 400 bad query parameter error.
-
-    - One of the listed filed
-    - Filed **'statu' and** one of the other fileds
-    - Filed **'type' and 'station'**
+    Get Asset List.
     """
     conn = Database(META_URL)
-
-    if len(group_by) == 1:
-        crud_meth = crud_meth_mapper[group_by[0]][0]
-        res = await crud_meth(conn=conn)
-        return res
-
-    elif len(group_by) == 2:
-        if "statu" in group_by:
-            group_by.pop(group_by.index("statu"))
-            crud_meth = crud_meth_mapper[group_by[0]][1]
-            res = await crud_meth(conn=conn)
-            return res
-        elif "type" in group_by:
-            group_by.pop(group_by.index("type"))
-            crud_meth = crud_meth_mapper[group_by[0]][2]
-            res = await crud_meth(conn=conn)
-
-            return res
-
-    else:
-        raise HTTPException(status_code=400, detail="Bad query parameter")
+    items = await get_cards(conn=conn, skip=skip, limit=limit)
+    items = await get_avg_hi_limit_latest(
+        conn=conn, assets=[dict(item) for item in items], limit=20
+    )
+    return items
+    # return NestAssetListSchema(asset=res)
 
 
 @router.get("/{id}/", response_class=UJSONResponse, response_model=FlattenAssetSchema)

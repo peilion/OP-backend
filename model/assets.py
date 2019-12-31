@@ -46,6 +46,12 @@ class FlattenAssetListSchema(BaseModel):
     asset: Optional[List[Optional["FlattenAssetSchema"]]]
 
 
+class AssetCardSchema(FlattenAssetSchema):
+    is_domestic: bool
+    oil_type: int
+    design_output: float
+    health_indicator_history: Optional[List]
+
 class NestAssetSchema(BaseModel):
     id: int
     name: str

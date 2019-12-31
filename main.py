@@ -82,7 +82,7 @@ async def net_io_endpoint(websocket: WebSocket):
     await socket_manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_json()
+            await websocket.receive_json()
     except WebSocketDisconnect:
         socket_manager.remove(websocket)
 

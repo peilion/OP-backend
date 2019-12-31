@@ -9,7 +9,6 @@ from services.query_processors.general import (
     format_single_grouped_result,
 )
 
-
 @con_warpper
 async def get_count_by_statu(conn: Database):
     query = "SELECT statu, COUNT(*) as cnt " "FROM `asset` " "GROUP BY statu"
@@ -325,3 +324,21 @@ async def get_type_count_by_station(conn: Database):
     res2 = await conn.fetch_one(query2)
 
     return TypeStationSchema(res=res_list, update_time=res2["cr_time"])
+
+crud_meth_mapper = {
+    "statu": (get_count_by_statu,),
+    "station": (
+        get_count_by_station,
+        get_statu_count_by_station,
+        get_type_count_by_station,
+    ),
+    "type": (get_count_by_asset_type, get_statu_count_by_type),
+    "province": (get_count_by_province, get_statu_count_by_province),
+    "pipeline": (get_count_by_pipeline, get_statu_count_by_pipeline),
+    "oil_type": (get_count_by_oil_type, get_statu_count_by_oiltype),
+    "region_company": (get_count_by_region_company, get_statu_count_by_region_company),
+    "branch_company": (get_count_by_branch_company, get_statu_count_by_branch_company),
+    "isdomestic": (get_count_by_isdomestic, get_statu_count_by_isdomestic),
+    "manufacturer": (get_count_by_manufacturer, get_statu_count_by_manufacturer),
+    "avghi": (get_overall_avg,),
+}

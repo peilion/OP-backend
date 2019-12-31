@@ -6,7 +6,7 @@ from sqlalchemy.schema import CreateTable
 from crud.base import con_warpper, query2sql
 from db import meta_engine
 from db.db_config import session_make
-from db_model import Asset, Station, AssetHI
+from db_model import Asset, Station, AssetHI, PumpUnit
 from db_model.asset_info import info_models_mapper
 
 enum_mapper = Asset.TYPES
@@ -14,14 +14,14 @@ enum_mapper = Asset.TYPES
 
 @con_warpper
 async def get_multi(
-    conn: Database,
-    skip: int,
-    limit: int,
-    type: int,
-    station_name: str,
-    level: int,
-    station_id: int,
-    session: Session = session_make(engine=None),
+        conn: Database,
+        skip: int,
+        limit: int,
+        type: int,
+        station_name: str,
+        level: int,
+        station_id: int,
+        session: Session = session_make(engine=None),
 ):
     if level is None:
         query = (
@@ -42,15 +42,15 @@ async def get_multi(
                 Asset.repairs,
                 Station.name.label("station_name"),
             )
-            .join(Station, Station.id == Asset.station_id)
-            .order_by(Asset.id)
-            .offset(skip)
-            .limit(limit)
+                .join(Station, Station.id == Asset.station_id)
+                .order_by(Asset.id)
+                .offset(skip)
+                .limit(limit)
         )
     else:
         query = session.query(Asset.id, Asset.name).filter(
             Asset.asset_level == level
-        )  # short query when the level filed is given.
+        )  # short query when the level filed is given, for relate asset dropdown
     if station_id is not None:
         query = query.filter(Asset.station_id == station_id)
     if type is not None:
@@ -78,8 +78,8 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
             Asset.statu,
             Station.name.label("station_name"),
         )
-        .join(Station, Station.id == Asset.station_id)
-        .filter(Asset.id == id)
+            .join(Station, Station.id == Asset.station_id)
+            .filter(Asset.id == id)
     )
 
     return await conn.fetch_one(query2sql(query))
@@ -96,6 +96,44 @@ async def get_info(session: Session, conn: Database, id: int):
 
     query = session.query(model).filter(model.asset_id == id)
     return await conn.fetch_one(query2sql(query))
+
+
+@con_warpper
+async def get_cards(
+        conn: Database,
+        skip: int,
+        limit: int,
+        session: Session = session_make(engine=None),
+):
+    query = (
+        session.query(
+            Asset.id,
+            Asset.name,
+            Asset.sn,
+            Asset.lr_time,
+            Asset.cr_time,
+            Asset.md_time,
+            Asset.st_time,
+            Asset.asset_level,
+            Asset.memo,
+            Asset.health_indicator,
+            Asset.statu,
+            Asset.parent_id,
+            Asset.station_id,
+            Asset.repairs,
+            Station.name.label("station_name"),
+            PumpUnit.is_domestic,
+            PumpUnit.oil_type,
+            PumpUnit.design_output
+        )
+            .join(Station, Station.id == Asset.station_id)
+            .join(PumpUnit, PumpUnit.asset_id == Asset.id)
+            .order_by(Asset.id)
+            .filter(Asset.asset_type == 0)
+            .offset(skip)
+            .limit(limit)
+    )
+    return await conn.fetch_all(query2sql(query))
 
 
 @con_warpper

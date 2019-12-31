@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from api.api_v1.endpoints import (
     users,
     assets,
+    asset_stat,
     stations,
     constant,
     warning,
@@ -24,6 +25,8 @@ api_router.include_router(constant.router, prefix="/const", tags=["Constants"])
 
 api_router.include_router(users.router, prefix="/users", tags=["Users"])
 api_router.include_router(assets.router, prefix="/assets", tags=["Assets"])
+api_router.include_router(asset_stat.router, prefix="/assets", tags=["Assets"])
+
 api_router.include_router(stations.router, prefix="/stations", tags=["Stations"])
 api_router.include_router(
     organizations.router, prefix="/organizations", tags=["Organizations"]

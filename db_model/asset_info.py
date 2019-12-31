@@ -69,7 +69,6 @@ class PumpUnit(Base):
     design_output = Column(Float)
     asset_id = Column(Integer, ForeignKey("asset.id"))
     pipeline_id = Column(Integer, ForeignKey("pipeline.id"))
-
     asset = relationship("Asset", uselist=False)
 
 

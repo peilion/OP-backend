@@ -63,7 +63,7 @@ async def get_tree(conn: Database, session: Session = session_make(engine=None))
             temp["value"] = 1
         temp["id"] = self_type + str(temp["id"])
         temp["itemStyle"] = {"color": color}
-        temp["value"] = value
+        temp["am_value"] = value
         return temp
 
     color = ["#1a8bff", "#51a2f7", "#79b8ff", "#93ccff"]

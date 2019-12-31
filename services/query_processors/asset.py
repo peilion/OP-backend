@@ -1,6 +1,6 @@
 import datetime
 from typing import Optional
-
+from custom_lib.treelib import Tree
 
 def format_map_grouped_result(
     res: list, fisrt_group_names: Optional[dict], second_group_names: dict
@@ -35,3 +35,18 @@ def format_timediff_result(res: list, time_after: str, interval: int):
         )
         res_list.append(item["avg"])
     return {"time_list": time_list, "res_list": res_list}
+
+def tree_list_format(items: list):
+    tree = Tree()
+    tree.create_node(tag="root", identifier="root")
+    items = [dict(row) for row in items]
+    for item in items:
+        # For tree table editable fields
+        item = {**item, "originalSTtime": item["st_time"], "edit": False}
+        tree.create_node(data=item, identifier=item["id"], parent="root")
+
+    for node in tree.expand_tree(mode=Tree.WIDTH):
+        if node != "root":
+            if tree[node].data["parent_id"]:
+                tree.move_node(node, tree[node].data["parent_id"])
+    return tree.to_dict(with_data=True)["children"]

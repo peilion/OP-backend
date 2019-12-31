@@ -103,7 +103,7 @@ async def read_vibration_signal_by_id(
     if mp_shard_info["type"] == 1:
         raise HTTPException(
             status_code=400,
-            detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
+            detail="The given measure point collect elecdata, try to use the appropriate endpoint.",
         )
 
     conn = Database(META_URL)
