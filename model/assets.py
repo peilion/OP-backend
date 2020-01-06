@@ -52,6 +52,7 @@ class AssetCardSchema(FlattenAssetSchema):
     design_output: float
     health_indicator_history: Optional[List]
 
+
 class NestAssetSchema(BaseModel):
     id: int
     name: str

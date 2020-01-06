@@ -26,6 +26,7 @@ async def read_measure_points(
     skip: int = None,
     limit: int = None,
     brief: bool = False,
+    type: int = None,
     station_id: int = Query(
         default=None, description="Filtering measure points with station's id"
     ),
@@ -47,6 +48,7 @@ async def read_measure_points(
         brief=brief,
         station_id=station_id,
         asset_id=asset_id,
+        type=type,
     )
     return item
 

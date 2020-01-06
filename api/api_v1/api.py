@@ -24,8 +24,8 @@ api_router = APIRouter()
 api_router.include_router(constant.router, prefix="/const", tags=["Constants"])
 
 api_router.include_router(users.router, prefix="/users", tags=["Users"])
-api_router.include_router(assets.router, prefix="/assets", tags=["Assets"])
 api_router.include_router(asset_stat.router, prefix="/assets", tags=["Assets"])
+api_router.include_router(assets.router, prefix="/assets", tags=["Assets"])
 
 api_router.include_router(stations.router, prefix="/stations", tags=["Stations"])
 api_router.include_router(

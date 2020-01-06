@@ -9,6 +9,7 @@ from services.query_processors.general import (
     format_single_grouped_result,
 )
 
+
 @con_warpper
 async def get_count_by_statu(conn: Database):
     query = "SELECT statu, COUNT(*) as cnt " "FROM `asset` " "GROUP BY statu"
@@ -324,6 +325,7 @@ async def get_type_count_by_station(conn: Database):
     res2 = await conn.fetch_one(query2)
 
     return TypeStationSchema(res=res_list, update_time=res2["cr_time"])
+
 
 crud_meth_mapper = {
     "statu": (get_count_by_statu,),

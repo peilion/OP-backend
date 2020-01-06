@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 from starlette.responses import UJSONResponse
 
-from crud.assets import get_multi, get, get_info, create, get_cards
+from crud.assets import get_multi, get, get_info, create, get_cards, get_card_by_id
 from crud.assets_hi import (
     get_avg_hi_during_time,
     get_avg_hi_pre,
@@ -85,6 +85,17 @@ async def read_by_id(id: int):
     res = await get(conn=conn, id=id)
     if not res:
         raise HTTPException(status_code=400, detail="Item not found")
+    return res
+
+
+@router.get("/{id}/card/", response_class=UJSONResponse)
+async def read_card_by_id(id: int):
+    conn = Database(META_URL)
+    res = await get_card_by_id(conn=conn, id=id)
+    if res["asset_type"] != 0:
+        raise HTTPException(
+            status_code=400, detail="The queried asset do not support card info."
+        )
     return res
 
 

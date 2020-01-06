@@ -88,9 +88,18 @@ for item in SUFFIX:
         v = np.fromstring(result[1], dtype=np.float32)
         w = np.fromstring(result[2], dtype=np.float32)
 
-        rms_list, THD_list, harmonics_list, max_list, min_list, brb_list, params, n_rms, p_rms, z_rms = feature_calculator(
-            u, v, w
-        )
+        (
+            rms_list,
+            THD_list,
+            harmonics_list,
+            max_list,
+            min_list,
+            brb_list,
+            params,
+            n_rms,
+            p_rms,
+            z_rms,
+        ) = feature_calculator(u, v, w)
 
         s = text(
             "INSERT INTO elec_feature_{} ("

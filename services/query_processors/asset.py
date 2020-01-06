@@ -2,6 +2,7 @@ import datetime
 from typing import Optional
 from custom_lib.treelib import Tree
 
+
 def format_map_grouped_result(
     res: list, fisrt_group_names: Optional[dict], second_group_names: dict
 ):
@@ -35,6 +36,7 @@ def format_timediff_result(res: list, time_after: str, interval: int):
         )
         res_list.append(item["avg"])
     return {"time_list": time_list, "res_list": res_list}
+
 
 def tree_list_format(items: list):
     tree = Tree()

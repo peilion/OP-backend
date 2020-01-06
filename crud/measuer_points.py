@@ -62,7 +62,11 @@ async def get_multi(
         query = query.filter(MeasurePoint.station_id == kwargs["station_id"])
     if kwargs["asset_id"]:
         query = query.filter(MeasurePoint.asset_id == kwargs["asset_id"])
-    query = query.order_by(MeasurePoint.id)
+    if kwargs["type"] is not None:
+        query = query.filter(MeasurePoint.type == kwargs["type"])
+    query = query.order_by(
+        MeasurePoint.name
+    )  # important, relate to the order display in asset detail page.
     return await conn.fetch_all(query2sql(query))
 
 

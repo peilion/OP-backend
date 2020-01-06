@@ -67,10 +67,10 @@ async def get_tree(conn: Database, session: Session = session_make(engine=None))
         return temp
 
     color = ["#1a8bff", "#51a2f7", "#79b8ff", "#93ccff"]
-    assets = [item_maker(row, "st", "asset", color[3],40) for row in assets]
-    stations = [item_maker(row, "bc", "st", color[2],60) for row in stations]
-    bcs = [item_maker(row, "rc", "bc", color[1],80) for row in bcs]
-    rcs = [item_maker(row, None, "rc", color[0],130) for row in rcs]
+    assets = [item_maker(row, "st", "asset", color[3], 40) for row in assets]
+    stations = [item_maker(row, "bc", "st", color[2], 60) for row in stations]
+    bcs = [item_maker(row, "rc", "bc", color[1], 80) for row in bcs]
+    rcs = [item_maker(row, None, "rc", color[0], 130) for row in rcs]
 
     for item in rcs + bcs + stations + assets:
         tree.create_node(

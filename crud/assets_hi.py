@@ -17,7 +17,7 @@ async def get_avg_hi_pre(conn: Database, session: Session = session_make(engine=
 
 @con_warpper
 async def get_avg_hi_during_time(
-        conn: Database, asset_id: int, time_before: str, time_after: str, interval: int
+    conn: Database, asset_id: int, time_before: str, time_after: str, interval: int
 ):
     query = text(
         "SELECT datediff( time, '{0}' ) DIV {3} AS diff, AVG( health_indicator ) as avg FROM asset_hi_{2} "
@@ -34,7 +34,7 @@ async def get_avg_hi_during_time(
 
 @con_warpper
 async def get_avg_hi_before_limit(
-        conn: Database, asset_id: int, interval: int, limit: int
+    conn: Database, asset_id: int, interval: int, limit: int
 ):
     import datetime
 
@@ -76,9 +76,11 @@ async def get_avg_hi_limit_latest(conn: Database, assets: list, limit: int):
         query = text(
             "SELECT time, health_indicator FROM asset_hi_{0} "
             "order by id desc "
-            "limit {1}".format(asset['id'], limit)
+            "limit {1}".format(asset["id"], limit)
         )
         res = await conn.fetch_all(query)
-        assets[index]['health_indicator_history'] = [row["health_indicator"] for row in res]
+        assets[index]["health_indicator_history"] = [
+            row["health_indicator"] for row in res
+        ]
 
     return assets
