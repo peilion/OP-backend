@@ -115,16 +115,9 @@ async def get_cards(
             Asset.id,
             Asset.name,
             Asset.sn,
-            Asset.lr_time,
-            Asset.cr_time,
-            Asset.md_time,
             Asset.st_time,
-            Asset.asset_level,
-            Asset.memo,
             Asset.health_indicator,
             Asset.statu,
-            Asset.parent_id,
-            Asset.station_id,
             Asset.repairs,
             Station.name.label("station_name"),
             PumpUnit.is_domestic,
@@ -140,9 +133,32 @@ async def get_cards(
     )
     return await conn.fetch_all(query2sql(query))
 
-
 @con_warpper
 async def get_card_by_id(
+    conn: Database, id: int, session: Session = session_make(engine=None),
+):
+    query = (
+        session.query(
+            Asset.id,
+            Asset.name,
+            Asset.sn,
+            Asset.st_time,
+            Asset.health_indicator,
+            Asset.statu,
+            Asset.repairs,
+            Station.name.label("station_name"),
+            PumpUnit.is_domestic,
+            PumpUnit.oil_type,
+            PumpUnit.design_output,
+        )
+        .join(Station, Station.id == Asset.station_id)
+        .join(PumpUnit, PumpUnit.asset_id == Asset.id)
+        .filter(Asset.id == id)
+    )
+    return await conn.fetch_one(query2sql(query))
+
+@con_warpper
+async def get_detail_by_id(
     conn: Database, id: int, session: Session = session_make(engine=None),
 ):
     query = (
