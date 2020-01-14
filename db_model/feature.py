@@ -18,8 +18,8 @@ class ElecFeature(object):
     base_class_name = "elec_feature"
 
     @classmethod
-    def model(cls, point_id: int, base: DeclarativeMeta = Base):
-        class_name = cls.base_class_name + "_%d" % point_id
+    def model(cls, station_id: int, inner_id: int, base: DeclarativeMeta = Base):
+        class_name = cls.base_class_name + "_{0}_{1}".format(station_id,inner_id)
         ModelClass = cls._mapper.get(class_name, None)
         if ModelClass is None:
             ModelClass = type(
@@ -65,7 +65,7 @@ class ElecFeature(object):
                     health_indicator=Column(Float, default=85),
                     data_id=Column(
                         BigInteger,
-                        ForeignKey("elec_data_{0}.id".format(point_id)),
+                        ForeignKey("elec_data_{0}_{1}.id".format(station_id,inner_id)),
                         unique=True,
                     ),
                     __table_args__=table_args,
@@ -81,8 +81,8 @@ class VibFeature(object):
     base_class_name = "vib_feature"
 
     @classmethod
-    def model(cls, point_id: int, base: DeclarativeMeta = Base):
-        class_name = cls.base_class_name + "_%d" % point_id
+    def model(cls, station_id: int, inner_id: int, base: DeclarativeMeta = Base):
+        class_name = cls.base_class_name + "_{0}_{1}".format(station_id,inner_id)
         ModelClass = cls._mapper.get(class_name, None)
         if ModelClass is None:
             ModelClass = type(
@@ -111,7 +111,7 @@ class VibFeature(object):
                     health_indicator=Column(Float, default=85),
                     data_id=Column(
                         Integer,
-                        ForeignKey("vib_data_{0}.id".format(point_id)),
+                        ForeignKey("vib_data_{0}_{1}.id".format(station_id,inner_id)),
                         unique=True,
                     ),
                     __table_args__=table_args,

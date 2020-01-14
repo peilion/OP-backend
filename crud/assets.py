@@ -133,6 +133,7 @@ async def get_cards(
     )
     return await conn.fetch_all(query2sql(query))
 
+
 @con_warpper
 async def get_card_by_id(
     conn: Database, id: int, session: Session = session_make(engine=None),
@@ -156,6 +157,7 @@ async def get_card_by_id(
         .filter(Asset.id == id)
     )
     return await conn.fetch_one(query2sql(query))
+
 
 @con_warpper
 async def get_detail_by_id(

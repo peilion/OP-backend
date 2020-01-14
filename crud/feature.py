@@ -4,20 +4,22 @@ from databases import Database
 from fastapi import HTTPException
 from sqlalchemy.orm import Session, load_only
 
+from core.dependencies import get_shard_model
 from crud.base import con_warpper, query2sql
 from db.db_config import session_make
 
 
 @con_warpper
 async def get(
-    conn: Database,
-    shard_id: int,
-    orm_model,
-    fileds: List[str],
-    data_id: int,
-    session: Session = session_make(engine=None),
+        conn: Database,
+        mp_id: int,
+        require_mp_type: int,
+        orm_model,
+        fileds: List[str],
+        data_id: int,
+        session: Session = session_make(engine=None),
 ):
-    model = orm_model.model(point_id=shard_id)
+    model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)
 
     query = session.query(model)
     for filed in fileds + ["id", "time"]:
@@ -30,13 +32,14 @@ async def get(
 
 @con_warpper
 async def get_latest(
-    conn: Database,
-    shard_id: int,
-    orm_model,
-    fileds: List[str],
-    session: Session = session_make(engine=None),
+        conn: Database,
+        mp_id: int,
+        require_mp_type: int,
+        orm_model,
+        fileds: List[str],
+        session: Session = session_make(engine=None),
 ):
-    model = orm_model.model(point_id=shard_id)
+    model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)
 
     query = session.query(model)
     for filed in fileds:
@@ -49,16 +52,17 @@ async def get_latest(
 
 @con_warpper
 async def get_multi(
-    conn: Database,
-    shard_id: int,
-    orm_model,
-    fileds: List[str],
-    time_before: str,
-    time_after: str,
-    limit: int,
-    session: Session = session_make(engine=None),
+        conn: Database,
+        mp_id: int,
+        require_mp_type: int,
+        orm_model,
+        fileds: List[str],
+        time_before: str,
+        time_after: str,
+        limit: int,
+        session: Session = session_make(engine=None),
 ):
-    model = orm_model.model(point_id=shard_id)
+    model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)
 
     query = session.query(model)
     for filed in fileds + ["id", "time", "data_id"]:

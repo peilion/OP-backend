@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import List, Optional
 
 from databases import Database
@@ -6,7 +5,15 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 from starlette.responses import UJSONResponse
 
-from crud.assets import get_multi, get, get_info, create, get_cards, get_detail_by_id, get_card_by_id
+from crud.assets import (
+    get_multi,
+    get,
+    get_info,
+    create,
+    get_cards,
+    get_detail_by_id,
+    get_card_by_id,
+)
 from crud.assets_hi import (
     get_avg_hi_during_time,
     get_avg_hi_pre,
@@ -30,13 +37,13 @@ router = APIRouter()
 
 @router.get("/", response_class=UJSONResponse)
 async def read_assets(
-        skip: int = None,
-        limit: int = None,
-        iftree: bool = False,
-        type: int = None,
-        level: int = None,
-        station_name: str = None,
-        station_id: int = None,
+    skip: int = None,
+    limit: int = None,
+    iftree: bool = False,
+    type: int = None,
+    level: int = None,
+    station_name: str = None,
+    station_id: int = None,
 ):
     """
     Get Asset List.
@@ -88,16 +95,18 @@ async def read_by_id(id: int):
     return res
 
 
-@router.get("/{id}/card/", response_class=UJSONResponse, response_model=Optional[AssetCardSchema])
+@router.get(
+    "/{id}/card/",
+    response_class=UJSONResponse,
+    response_model=Optional[AssetCardSchema],
+)
 async def read_assets_card(id: int):
     """
     Get Asset List.
     """
     conn = Database(META_URL)
     items = await get_card_by_id(conn=conn, id=id)
-    items = await get_avg_hi_limit_latest(
-        conn=conn, assets=[dict(items)], limit=20
-    )
+    items = await get_avg_hi_limit_latest(conn=conn, assets=[dict(items)], limit=20)
     return items[0]
 
 
@@ -116,7 +125,7 @@ async def read_pump_detail_by_id(id: int):
 
 
 @router.get("/{id}/info/", response_class=UJSONResponse)
-async def read_asset_info(id: int, ):
+async def read_asset_info(id: int,):
     """
     Get Asset Info by ID.
     """
@@ -133,12 +142,12 @@ async def read_asset_info(id: int, ):
 
 @router.get("/{id}/avghi/", response_class=UJSONResponse)
 async def read_asset_avghi(
-        id: int,
-        time_before: str = Query(None, description="e.x. 2016-07-01 00:00:00"),
-        time_after: str = Query(None, description="e.x. 2016-01-10 00:00:00"),
-        interval: int = None,
-        limit: int = None,
-        pre_query: bool = True,
+    id: int,
+    time_before: str = Query(None, description="e.x. 2016-07-01 00:00:00"),
+    time_after: str = Query(None, description="e.x. 2016-01-10 00:00:00"),
+    interval: int = None,
+    limit: int = None,
+    pre_query: bool = True,
 ):
     """
     Get avg Asset HI by time range and interval.

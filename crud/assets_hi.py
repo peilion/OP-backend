@@ -71,7 +71,7 @@ async def get_avg_hi_multi(conn: Database, asset_id: int, time_before: str, limi
 
 
 @con_warpper
-async def get_avg_hi_limit_latest(conn: Database, assets: list, limit: int):
+async def get_avg_hi_limit_latest(conn: Database, assets: list, limit: int) -> list:
     for index, asset in enumerate(assets):
         query = text(
             "SELECT time, health_indicator FROM asset_hi_{0} "

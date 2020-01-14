@@ -20,20 +20,14 @@ async def read_the_latest_vibration_feature(
         ["rms", "max", "p2p", "avg", "var", "kurtosis"],
         description="Only these fileds can be returned now.",
     ),
-    mp_mapper: dict = Depends(get_mp_mapper),
 ):
-    mp_shard_info = mp_mapper[mp_id]
-    if mp_shard_info["type"] == 1:
-        raise HTTPException(
-            status_code=400,
-            detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
-        )
 
     conn = Database(META_URL)
 
     res = await get_latest(
         conn=conn,
-        shard_id=mp_shard_info["shard_id"],
+        mp_id=mp_id,
+        require_mp_type=0,
         fileds=features,
         orm_model=VibFeature,
     )
@@ -50,19 +44,12 @@ async def read_vibration_features(
         description="Only these fileds can be returned now.",
     ),
     limit: int = None,
-    mp_mapper: dict = Depends(get_mp_mapper),
 ):
-    mp_shard_info = mp_mapper[mp_id]
-    if mp_shard_info["type"] == 1:
-        raise HTTPException(
-            status_code=400,
-            detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
-        )
-
     conn = Database(META_URL)
     res = await get_multi(
         conn=conn,
-        shard_id=mp_shard_info["shard_id"],
+        mp_id=mp_id,
+        require_mp_type=0,
         fileds=features,
         time_before=str(time_before),
         time_after=str(time_after),
@@ -84,19 +71,13 @@ async def read_vibration_feature_by_id(
         ["rms", "max", "p2p", "avg", "var", "kurtosis"],
         description="Only these fileds can be returned now.",
     ),
-    mp_mapper: dict = Depends(get_mp_mapper),
 ):
-    mp_shard_info = mp_mapper[mp_id]
-    if mp_shard_info["type"] == 1:
-        raise HTTPException(
-            status_code=400,
-            detail="The given measure point collect elecdata, try to use the approaprite endpoint.",
-        )
 
     conn = Database(META_URL)
     res = await get(
         conn=conn,
-        shard_id=mp_shard_info["shard_id"],
+        mp_id=mp_id,
+        require_mp_type=0,
         data_id=data_id,
         fileds=features,
         orm_model=VibFeature,

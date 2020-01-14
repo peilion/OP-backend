@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, SmallInteger, ForeignKey, DateTime, func, Float
-from sqlalchemy import String
+from sqlalchemy import String,UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from db import Base, table_args
@@ -7,7 +7,10 @@ from db import Base, table_args
 
 class MeasurePoint(Base):
     __tablename__ = "measure_point"
-    __table_args__ = table_args
+    __table_args__ = (
+        UniqueConstraint("station_id", "inner_station_id", name='uix_stationid_innerstationid'),
+        table_args
+    )
 
     TYPES = {0: "Vibration", 1: "Current", 2: "Third party Integration"}
 
@@ -23,6 +26,6 @@ class MeasurePoint(Base):
 
     asset_id = Column(Integer, ForeignKey("asset.id"))
     station_id = Column(Integer, ForeignKey("station.id"))
-
+    inner_station_id = Column(Integer)
     asset = relationship("Asset", back_populates="measure_points")
     station = relationship("Station", back_populates="measure_points")
