@@ -1,10 +1,11 @@
 from typing import List, Optional
 
 from databases import Database
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.exc import IntegrityError
 from starlette.responses import UJSONResponse
 
+from core.dependencies import get_db
 from crud.assets import (
     get_multi,
     get,
@@ -21,9 +22,8 @@ from crud.assets_hi import (
     get_avg_hi_multi,
     get_avg_hi_limit_latest,
 )
-
 from db import session_make
-from db.conn_engine import meta_engine, META_URL
+from db.conn_engine import meta_engine
 from model.assets import (
     FlattenAssetSchema,
     FlattenAssetListSchema,
@@ -44,11 +44,11 @@ async def read_assets(
     level: int = None,
     station_name: str = None,
     station_id: int = None,
+    conn: Database = Depends(get_db),
 ):
     """
     Get Asset List.
     """
-    conn = Database(META_URL)
     items = await get_multi(
         conn=conn,
         skip=skip,
@@ -70,11 +70,12 @@ async def read_assets(
     response_class=UJSONResponse,
     response_model=Optional[List[Optional[AssetCardSchema]]],
 )
-async def read_assets_card(skip: int = None, limit: int = None):
+async def read_assets_card(
+    skip: int = None, limit: int = None, conn: Database = Depends(get_db)
+):
     """
     Get Asset List.
     """
-    conn = Database(META_URL)
     items = await get_cards(conn=conn, skip=skip, limit=limit)
     items = await get_avg_hi_limit_latest(
         conn=conn, assets=[dict(item) for item in items], limit=20
@@ -84,11 +85,10 @@ async def read_assets_card(skip: int = None, limit: int = None):
 
 
 @router.get("/{id}/", response_class=UJSONResponse, response_model=FlattenAssetSchema)
-async def read_by_id(id: int):
+async def read_by_id(id: int, conn: Database = Depends(get_db)):
     """
     Get Asset by ID.
     """
-    conn = Database(META_URL)
     res = await get(conn=conn, id=id)
     if not res:
         raise HTTPException(status_code=400, detail="Item not found")
@@ -100,22 +100,20 @@ async def read_by_id(id: int):
     response_class=UJSONResponse,
     response_model=Optional[AssetCardSchema],
 )
-async def read_assets_card(id: int):
+async def read_assets_card(id: int, conn: Database = Depends(get_db)):
     """
     Get Asset List.
     """
-    conn = Database(META_URL)
     items = await get_card_by_id(conn=conn, id=id)
     items = await get_avg_hi_limit_latest(conn=conn, assets=[dict(items)], limit=20)
     return items[0]
 
 
 @router.get("/{id}/detail/", response_class=UJSONResponse)
-async def read_pump_detail_by_id(id: int):
+async def read_pump_detail_by_id(id: int, conn: Database = Depends(get_db)):
     """
     Support pump unit only.
     """
-    conn = Database(META_URL)
     res = await get_detail_by_id(conn=conn, id=id)
     if res["asset_type"] != 0:
         raise HTTPException(
@@ -125,11 +123,10 @@ async def read_pump_detail_by_id(id: int):
 
 
 @router.get("/{id}/info/", response_class=UJSONResponse)
-async def read_asset_info(id: int,):
+async def read_asset_info(id: int, conn: Database = Depends(get_db)):
     """
     Get Asset Info by ID.
     """
-    conn = Database(META_URL)
     session = session_make(meta_engine)
     info = await get_info(session=session, conn=conn, id=id)
     if not info:
@@ -148,11 +145,11 @@ async def read_asset_avghi(
     interval: int = None,
     limit: int = None,
     pre_query: bool = True,
+    conn: Database = Depends(get_db),
 ):
     """
     Get avg Asset HI by time range and interval.
     """
-    conn = Database(META_URL)
     if pre_query:
         res = await get_avg_hi_pre(conn=conn)
         return res
@@ -184,9 +181,8 @@ async def read_asset_avghi(
 
 
 @router.post("/", response_class=UJSONResponse)
-async def create_asset(asset: AssetPostSchema):
+async def create_asset(asset: AssetPostSchema, conn: Database = Depends(get_db)):
     try:
-        conn = Database(META_URL)
         res = await create(conn=conn, data=asset)
         if res == True:
             return {"msg": "Asset successfully added."}

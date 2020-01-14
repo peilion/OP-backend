@@ -4,14 +4,13 @@ from databases import Database
 from sqlalchemy import text, func
 from sqlalchemy.orm import Session
 
-from crud.base import con_warpper, query2sql
+from crud.base import query2sql
 from db import meta_engine
 from db.db_config import session_make
 from db_model import WarningLog, Asset, Station
 from db_model.organization import BranchCompany, RegionCompany
 
 
-@con_warpper
 async def get_multi(
     conn: Database,
     skip: int,
@@ -34,7 +33,6 @@ async def get_multi(
     return await conn.fetch_all(query2sql(query))
 
 
-@con_warpper
 async def get(
     conn: Database, id: int, session: Session = session_make(engine=meta_engine)
 ):
@@ -53,7 +51,6 @@ async def get(
     return res
 
 
-@con_warpper
 async def get_warning_calendar(conn: Database):
     query = text(
         "SELECT date(warning_log.cr_time) as date ,count(*) as num "
@@ -66,7 +63,6 @@ async def get_warning_calendar(conn: Database):
     return [{"date": row["date"], "count": row["num"]} for row in res]
 
 
-@con_warpper
 async def get_warning_stat_by_station(
     conn: Database, session: Session = session_make(engine=None)
 ):
@@ -89,7 +85,6 @@ async def get_warning_stat_by_station(
     return {"series": series, "labels": labels}
 
 
-@con_warpper
 async def get_warning_stat_by_branch_company(
     conn: Database, session: Session = session_make(engine=None)
 ):
@@ -111,7 +106,6 @@ async def get_warning_stat_by_branch_company(
     return {"series": series, "labels": labels}
 
 
-@con_warpper
 async def get_warning_stat_by_region_company(
     conn: Database, session: Session = session_make(engine=None)
 ):
@@ -133,7 +127,6 @@ async def get_warning_stat_by_region_company(
     return {"series": series, "labels": labels}
 
 
-@con_warpper
 async def get_warning_stat_by_asset(
     conn: Database, session: Session = session_make(engine=None)
 ):
@@ -144,7 +137,6 @@ async def get_warning_stat_by_asset(
     return [[row["asset_id"], row["cnt"]] for row in res]
 
 
-@con_warpper
 async def get_warning_stat_by_isreadable(
     conn: Database, session: Session = session_make(engine=None)
 ):
@@ -155,7 +147,6 @@ async def get_warning_stat_by_isreadable(
     return {"unread": res[0]["cnt"], "read": res[1]["cnt"]}
 
 
-@con_warpper
 async def get_warning_stat_by_period(
     conn: Database, session: Session = session_make(engine=None)
 ):

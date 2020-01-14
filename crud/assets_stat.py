@@ -1,7 +1,6 @@
 from databases import Database
 
-from crud.base import con_warpper
-from db_model import Asset, Station, PumpUnit
+from db_model import Asset, PumpUnit
 from model.assets import TypeStationSchema, StatuStatisticSchema
 from services.query_processors.asset import format_map_grouped_result
 from services.query_processors.general import (
@@ -10,7 +9,6 @@ from services.query_processors.general import (
 )
 
 
-@con_warpper
 async def get_count_by_statu(conn: Database):
     query = "SELECT statu, COUNT(*) as cnt " "FROM `asset` " "GROUP BY statu"
     res = await conn.fetch_all(query)
@@ -18,7 +16,6 @@ async def get_count_by_statu(conn: Database):
     return StatuStatisticSchema(**res_dic)
 
 
-@con_warpper
 async def get_count_by_province(conn: Database):
     query = (
         "SELECT s.location, COUNT(*) as cnt "
@@ -30,7 +27,6 @@ async def get_count_by_province(conn: Database):
     return dict(res)
 
 
-@con_warpper
 async def get_count_by_pipeline(conn: Database):
     query = (
         "SELECT p.name, COUNT(*) as cnt "
@@ -44,14 +40,12 @@ async def get_count_by_pipeline(conn: Database):
     return dict(res)
 
 
-@con_warpper
 async def get_overall_avg(conn: Database):
     query = "SELECT avg(health_indicator) as avg from asset WHERE asset_level=0"
     res = await conn.fetch_one(query)
     return {"avg": res["avg"]}
 
 
-@con_warpper
 async def get_count_by_oil_type(conn: Database):
     query = (
         "SELECT pu.oil_type, COUNT(*) as cnt "
@@ -65,7 +59,6 @@ async def get_count_by_oil_type(conn: Database):
     return res_dic
 
 
-@con_warpper
 async def get_count_by_region_company(conn: Database):
     query = (
         "SELECT rc.name, COUNT(*) as cnt "
@@ -78,7 +71,6 @@ async def get_count_by_region_company(conn: Database):
     return dict(res)
 
 
-@con_warpper
 async def get_count_by_branch_company(conn: Database):
     query = (
         "SELECT bc.name, COUNT(*) as cnt "
@@ -91,7 +83,6 @@ async def get_count_by_branch_company(conn: Database):
     return dict(res)
 
 
-@con_warpper
 async def get_count_by_station(conn: Database):
     query = (
         "SELECT a.station_id as id, COUNT(*) as cnt, s.name as name "
@@ -105,7 +96,6 @@ async def get_count_by_station(conn: Database):
     return res_dic
 
 
-@con_warpper
 async def get_count_by_asset_type(conn: Database):
     query = "SELECT asset_type, COUNT(*) as cnt " "FROM `asset` " "GROUP BY asset_type"
     res = await conn.fetch_all(query)
@@ -113,7 +103,6 @@ async def get_count_by_asset_type(conn: Database):
     return res_dic
 
 
-@con_warpper
 async def get_count_by_isdomestic(conn: Database):
     query = (
         "SELECT pu.is_domestic, COUNT(*) as cnt "
@@ -129,7 +118,6 @@ async def get_count_by_isdomestic(conn: Database):
     return res_dic
 
 
-@con_warpper
 async def get_count_by_manufacturer(conn: Database):
     query = (
         "SELECT m.name, COUNT(*) as cnt "
@@ -142,7 +130,6 @@ async def get_count_by_manufacturer(conn: Database):
     return dict(res)
 
 
-@con_warpper
 async def get_statu_count_by_station(conn: Database):
     query = (
         "SELECT station.NAME, statu, COUNT( * ),station.longitude, station.latitude AS cnt "
@@ -158,7 +145,6 @@ async def get_statu_count_by_station(conn: Database):
     return formatted_res
 
 
-@con_warpper
 async def get_statu_count_by_type(conn: Database):
     query = (
         "SELECT asset_type,statu, COUNT(*) as cnt "
@@ -173,7 +159,6 @@ async def get_statu_count_by_type(conn: Database):
     return formatted_res
 
 
-@con_warpper
 async def get_statu_count_by_province(conn: Database):
     query = (
         "SELECT s.location,a.statu, COUNT(*) as cnt "
@@ -191,7 +176,6 @@ async def get_statu_count_by_province(conn: Database):
     return formatted_res
 
 
-@con_warpper
 async def get_statu_count_by_pipeline(conn: Database):
     query = (
         "SELECT p.name, a.statu, COUNT(*) as cnt "
@@ -209,7 +193,6 @@ async def get_statu_count_by_pipeline(conn: Database):
     return formatted_res
 
 
-@con_warpper
 async def get_statu_count_by_oiltype(conn: Database):
     query = (
         "SELECT pu.oil_type,a.statu, COUNT(*) as cnt "
@@ -227,7 +210,6 @@ async def get_statu_count_by_oiltype(conn: Database):
     return formatted_res
 
 
-@con_warpper
 async def get_statu_count_by_region_company(conn: Database):
     query = (
         "SELECT rc.name,a.statu, COUNT(*) as cnt "
@@ -245,7 +227,6 @@ async def get_statu_count_by_region_company(conn: Database):
     return formatted_res
 
 
-@con_warpper
 async def get_statu_count_by_branch_company(conn: Database):
     query = (
         "SELECT bc.name,a.statu, COUNT(*) as cnt "
@@ -262,7 +243,6 @@ async def get_statu_count_by_branch_company(conn: Database):
     return formatted_res
 
 
-@con_warpper
 async def get_statu_count_by_isdomestic(conn: Database):
     query = (
         "SELECT pu.is_domestic,a.statu, COUNT(*) as cnt "
@@ -280,7 +260,6 @@ async def get_statu_count_by_isdomestic(conn: Database):
     return formatted_res
 
 
-@con_warpper
 async def get_statu_count_by_manufacturer(conn: Database):
     query = (
         "SELECT m.name,a.statu, COUNT(*) as cnt "
@@ -296,7 +275,6 @@ async def get_statu_count_by_manufacturer(conn: Database):
     return formatted_res
 
 
-@con_warpper
 async def get_type_count_by_station(conn: Database):
     query = (
         "SELECT  "

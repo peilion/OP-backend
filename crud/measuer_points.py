@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.ddl import CreateTable
 
 from core.dependencies import mp_change_commit
-from crud.base import con_warpper, query2sql
+from crud.base import query2sql
 from db.conn_engine import META_URL, meta_engine
 from db.db_config import session_make
 from db_model import (
@@ -20,7 +20,6 @@ from db_model import (
 from model.measure_points import MeasurePointInputSchema
 
 
-@con_warpper
 async def get_multi(
     conn: Database,
     skip: int,
@@ -70,7 +69,6 @@ async def get_multi(
     return await conn.fetch_all(query2sql(query))
 
 
-@con_warpper
 async def get(conn: Database, id: int, session: Session = session_make(engine=None)):
     query = (
         session.query(
@@ -92,7 +90,6 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
     return await conn.fetch_one(query2sql(query))
 
 
-@con_warpper
 async def get_stat(
     conn: Database, rule: str, session: Session = session_make(engine=None)
 ):

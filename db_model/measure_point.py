@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, SmallInteger, ForeignKey, DateTime, func, Float
-from sqlalchemy import String,UniqueConstraint
+from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from db import Base, table_args
@@ -8,8 +8,10 @@ from db import Base, table_args
 class MeasurePoint(Base):
     __tablename__ = "measure_point"
     __table_args__ = (
-        UniqueConstraint("station_id", "inner_station_id", name='uix_stationid_innerstationid'),
-        table_args
+        UniqueConstraint(
+            "station_id", "inner_station_id", name="uix_stationid_innerstationid"
+        ),
+        table_args,
     )
 
     TYPES = {0: "Vibration", 1: "Current", 2: "Third party Integration"}

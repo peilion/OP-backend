@@ -2,11 +2,11 @@ from enum import Enum
 from typing import List
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from starlette.responses import UJSONResponse
 
+from core.dependencies import get_db
 from crud.warning import *
-from db.conn_engine import META_URL
 from model.log import WarningLogSchema
 
 router = APIRouter()
@@ -26,12 +26,15 @@ class GroupRule(str, Enum):
     "/", response_class=UJSONResponse, response_model=List[Optional[WarningLogSchema]]
 )
 async def read_warning_logs(
-    skip: int = None, limit: int = None, asset_id: int = None, isread: bool = None
+    skip: int = None,
+    limit: int = None,
+    asset_id: int = None,
+    isread: bool = None,
+    conn: Database = Depends(get_db),
 ):
     """
     Get Warning List.
     """
-    conn = Database(META_URL)
     items = await get_multi(
         conn=conn, skip=skip, limit=limit, asset_id=asset_id, isread=isread
     )
@@ -39,7 +42,9 @@ async def read_warning_logs(
 
 
 @router.get("/stat/", response_class=UJSONResponse)
-async def read_warning_logs_statistic(group_by: GroupRule,):
+async def read_warning_logs_statistic(
+    group_by: GroupRule, conn: Database = Depends(get_db)
+):
     """
     Response Schema:
 
@@ -49,7 +54,6 @@ async def read_warning_logs_statistic(group_by: GroupRule,):
     - if **group_by = isread**: [[ 0,unread warninglog],[1,read warninglog]]
 
     """
-    conn = Database(META_URL)
 
     if group_by == GroupRule.date:
         res = await get_warning_calendar(conn=conn)
@@ -77,11 +81,10 @@ async def read_warning_logs_statistic(group_by: GroupRule,):
 
 
 @router.get("/{id}/", response_class=UJSONResponse, response_model=WarningLogSchema)
-async def read_warning_logs_by_id(id: int,):
+async def read_warning_logs_by_id(id: int, conn: Database = Depends(get_db)):
     """
     Get warning log by ID.
     """
-    conn = Database(META_URL)
     item = await get(conn=conn, id=id)
     if not item:
         raise HTTPException(status_code=400, detail="Item not found")

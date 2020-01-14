@@ -5,19 +5,18 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session, load_only
 
 from core.dependencies import get_shard_model
-from crud.base import con_warpper, query2sql
+from crud.base import query2sql
 from db.db_config import session_make
 
 
-@con_warpper
 async def get(
-        conn: Database,
-        mp_id: int,
-        require_mp_type: int,
-        orm_model,
-        fileds: List[str],
-        data_id: int,
-        session: Session = session_make(engine=None),
+    conn: Database,
+    mp_id: int,
+    require_mp_type: int,
+    orm_model,
+    fileds: List[str],
+    data_id: int,
+    session: Session = session_make(engine=None),
 ):
     model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)
 
@@ -30,14 +29,13 @@ async def get(
     return res
 
 
-@con_warpper
 async def get_latest(
-        conn: Database,
-        mp_id: int,
-        require_mp_type: int,
-        orm_model,
-        fileds: List[str],
-        session: Session = session_make(engine=None),
+    conn: Database,
+    mp_id: int,
+    require_mp_type: int,
+    orm_model,
+    fileds: List[str],
+    session: Session = session_make(engine=None),
 ):
     model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)
 
@@ -50,17 +48,16 @@ async def get_latest(
     return res
 
 
-@con_warpper
 async def get_multi(
-        conn: Database,
-        mp_id: int,
-        require_mp_type: int,
-        orm_model,
-        fileds: List[str],
-        time_before: str,
-        time_after: str,
-        limit: int,
-        session: Session = session_make(engine=None),
+    conn: Database,
+    mp_id: int,
+    require_mp_type: int,
+    orm_model,
+    fileds: List[str],
+    time_before: str,
+    time_after: str,
+    limit: int,
+    session: Session = session_make(engine=None),
 ):
     model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)
 

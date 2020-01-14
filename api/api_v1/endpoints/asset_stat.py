@@ -1,10 +1,12 @@
-from crud.assets_stat import crud_meth_mapper
-from db.conn_engine import META_URL
-from fastapi import APIRouter, HTTPException, Query
-from starlette.responses import UJSONResponse
-from typing import List
 from enum import Enum
+from typing import List
+
 from databases import Database
+from fastapi import APIRouter, HTTPException, Query, Depends
+from starlette.responses import UJSONResponse
+
+from core.dependencies import get_db
+from crud.assets_stat import crud_meth_mapper
 
 router = APIRouter()
 
@@ -24,7 +26,9 @@ class GroupRule(str, Enum):
 
 
 @router.get("/stat/", response_class=UJSONResponse)
-async def read_assets_statistic(group_by: List[GroupRule] = Query(None),):
+async def read_assets_statistic(
+    group_by: List[GroupRule] = Query(None), conn: Database = Depends(get_db)
+):
     """
     **Supported Query Mode** are listed follow, other query mode will be informed a 400 bad query parameter error.
 
@@ -32,7 +36,6 @@ async def read_assets_statistic(group_by: List[GroupRule] = Query(None),):
     - Filed **'statu' and** one of the other fileds
     - Filed **'type' and 'station'**
     """
-    conn = Database(META_URL)
 
     if len(group_by) == 1:
         crud_meth = crud_meth_mapper[group_by[0]][0]

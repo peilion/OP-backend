@@ -11,7 +11,7 @@ class ElecData(object):
 
     @classmethod
     def model(cls, station_id: int, inner_id: int, base: DeclarativeMeta = Base):
-        class_name = cls.base_class_name + "_{0}_{1}".format(station_id,inner_id)
+        class_name = cls.base_class_name + "_{0}_{1}".format(station_id, inner_id)
         ModelClass = cls._mapper.get(class_name, None)
         if ModelClass is None:
             ModelClass = type(
@@ -43,7 +43,7 @@ class VibData(object):
 
     @classmethod
     def model(cls, station_id: int, inner_id: int, base: DeclarativeMeta = Base):
-        class_name = cls.base_class_name + "_{0}_{1}".format(station_id,inner_id)
+        class_name = cls.base_class_name + "_{0}_{1}".format(station_id, inner_id)
         ModelClass = cls._mapper.get(class_name, None)
         if ModelClass is None:
             ModelClass = type(

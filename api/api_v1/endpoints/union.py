@@ -1,11 +1,11 @@
 from typing import List, Optional
 
 from databases import Database
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from starlette.responses import UJSONResponse
 
+from core.dependencies import get_db
 from crud.union import get_warning_and_maintenace
-from db.conn_engine import META_URL
 from model.log import WarningAndMainteSchema
 
 router = APIRouter()
@@ -16,7 +16,6 @@ router = APIRouter()
     response_class=UJSONResponse,
     response_model=List[Optional[WarningAndMainteSchema]],
 )
-async def read_by_id(id: int,):
-    conn = Database(META_URL)
+async def read_by_id(id: int, conn: Database = Depends(get_db)):
     res = await get_warning_and_maintenace(conn=conn, asset_id=id)
     return res

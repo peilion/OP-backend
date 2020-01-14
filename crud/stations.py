@@ -1,16 +1,13 @@
-import random
-
 from databases import Database
 from sqlalchemy.orm import Session
 
-from crud.base import con_warpper, query2sql
+from crud.base import query2sql
 from custom_lib.treelib import Tree
 from db.db_config import session_make
 from db_model import Asset
 from db_model.organization import Station, BranchCompany, RegionCompany
 
 
-@con_warpper
 async def get_multi(
     conn: Database, skip: int, limit: int, session: Session = session_make(engine=None)
 ):
@@ -18,14 +15,12 @@ async def get_multi(
     return await conn.fetch_all(query2sql(query))
 
 
-@con_warpper
 async def get(conn: Database, id: int, session: Session = session_make(engine=None)):
     query = session.query(Station).filter(Station.id == id)
 
     return await conn.fetch_one(query2sql(query))
 
 
-@con_warpper
 async def get_tree(conn: Database, session: Session = session_make(engine=None)):
     assets = await conn.fetch_all(
         query2sql(
@@ -82,7 +77,6 @@ async def get_tree(conn: Database, session: Session = session_make(engine=None))
     return tree.to_dict(with_data=True)["children"]
 
 
-@con_warpper
 async def get_bc(
     conn: Database, skip: int, limit: int, session: Session = session_make(engine=None)
 ):
@@ -95,7 +89,6 @@ async def get_bc(
     return await conn.fetch_all(query2sql(query))
 
 
-@con_warpper
 async def get_rc(
     conn: Database, skip: int, limit: int, session: Session = session_make(engine=None)
 ):

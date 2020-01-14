@@ -1,9 +1,6 @@
 from databases import Database
 
-from crud.base import con_warpper
 
-
-@con_warpper
 async def get_warning_and_maintenace(conn: Database, asset_id: int):
     query = (
         "SELECT cr_time,description,'mainte' as t_name "

@@ -5,9 +5,8 @@ from databases import Database
 from fastapi import APIRouter, Depends, HTTPException, Query
 from starlette.responses import UJSONResponse
 
-from core.dependencies import get_mp_mapper
+from core.dependencies import get_db
 from crud.feature import get_latest, get_multi, get
-from db.conn_engine import META_URL
 from db_model import VibFeature
 
 router = APIRouter()
@@ -20,9 +19,8 @@ async def read_the_latest_vibration_feature(
         ["rms", "max", "p2p", "avg", "var", "kurtosis"],
         description="Only these fileds can be returned now.",
     ),
+    conn: Database = Depends(get_db),
 ):
-
-    conn = Database(META_URL)
 
     res = await get_latest(
         conn=conn,
@@ -44,8 +42,8 @@ async def read_vibration_features(
         description="Only these fileds can be returned now.",
     ),
     limit: int = None,
+    conn: Database = Depends(get_db),
 ):
-    conn = Database(META_URL)
     res = await get_multi(
         conn=conn,
         mp_id=mp_id,
@@ -71,9 +69,8 @@ async def read_vibration_feature_by_id(
         ["rms", "max", "p2p", "avg", "var", "kurtosis"],
         description="Only these fileds can be returned now.",
     ),
+    conn: Database = Depends(get_db),
 ):
-
-    conn = Database(META_URL)
     res = await get(
         conn=conn,
         mp_id=mp_id,

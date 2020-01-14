@@ -2,20 +2,18 @@ from databases import Database
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from crud.base import con_warpper, query2sql
+from crud.base import query2sql
 from db import session_make
 from db_model import Asset
 from services.query_processors.asset import format_timediff_result
 
 
-@con_warpper
 async def get_avg_hi_pre(conn: Database, session: Session = session_make(engine=None)):
     query = session.query(Asset.id, Asset.name).filter(Asset.asset_type == 0)
     res = await conn.fetch_all(query2sql(query))
     return res
 
 
-@con_warpper
 async def get_avg_hi_during_time(
     conn: Database, asset_id: int, time_before: str, time_after: str, interval: int
 ):
@@ -32,7 +30,6 @@ async def get_avg_hi_during_time(
     return res
 
 
-@con_warpper
 async def get_avg_hi_before_limit(
     conn: Database, asset_id: int, interval: int, limit: int
 ):
@@ -53,7 +50,6 @@ async def get_avg_hi_before_limit(
     return res
 
 
-@con_warpper
 async def get_avg_hi_multi(conn: Database, asset_id: int, time_before: str, limit: int):
     query = text(
         "SELECT time, health_indicator FROM asset_hi_{0} "
@@ -70,7 +66,6 @@ async def get_avg_hi_multi(conn: Database, asset_id: int, time_before: str, limi
     return dic
 
 
-@con_warpper
 async def get_avg_hi_limit_latest(conn: Database, assets: list, limit: int) -> list:
     for index, asset in enumerate(assets):
         query = text(

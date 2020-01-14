@@ -1,5 +1,6 @@
 from databases import Database
 from fastapi import HTTPException
+
 from crud.base import query2sql
 from db import session_make
 from db.conn_engine import META_URL
@@ -34,4 +35,13 @@ def get_shard_model(model, mp_id: int, require_mp_type: int):
             status_code=400,
             detail="The given measure point collect different type, try to use the appropriate endpoint.",
         )
-    return model.model(station_id=mp_shard_info['sid'], inner_id=mp_shard_info['iid'])
+    return model.model(station_id=mp_shard_info["sid"], inner_id=mp_shard_info["iid"])
+
+
+async def get_db():
+    try:
+        db = Database(META_URL)
+        await db.connect()
+        yield db
+    finally:
+        await db.disconnect()

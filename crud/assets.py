@@ -3,7 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateTable
 
-from crud.base import con_warpper, query2sql
+from crud.base import query2sql
 from db import meta_engine
 from db.db_config import session_make
 from db_model import (
@@ -20,7 +20,6 @@ from db_model.asset_info import info_models_mapper
 enum_mapper = Asset.TYPES
 
 
-@con_warpper
 async def get_multi(
     conn: Database,
     skip: int,
@@ -69,7 +68,6 @@ async def get_multi(
     return await conn.fetch_all(query2sql(query))
 
 
-@con_warpper
 async def get(conn: Database, id: int, session: Session = session_make(engine=None)):
     query = (
         session.query(
@@ -93,7 +91,6 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
     return await conn.fetch_one(query2sql(query))
 
 
-@con_warpper
 async def get_info(session: Session, conn: Database, id: int):
     pre_query_res = await conn.fetch_one(
         query2sql(session.query(Asset.asset_type).filter(Asset.id == id))
@@ -106,7 +103,6 @@ async def get_info(session: Session, conn: Database, id: int):
     return await conn.fetch_one(query2sql(query))
 
 
-@con_warpper
 async def get_cards(
     conn: Database, skip: int, limit: int, session: Session = session_make(engine=None),
 ):
@@ -134,7 +130,6 @@ async def get_cards(
     return await conn.fetch_all(query2sql(query))
 
 
-@con_warpper
 async def get_card_by_id(
     conn: Database, id: int, session: Session = session_make(engine=None),
 ):
@@ -159,7 +154,6 @@ async def get_card_by_id(
     return await conn.fetch_one(query2sql(query))
 
 
-@con_warpper
 async def get_detail_by_id(
     conn: Database, id: int, session: Session = session_make(engine=None),
 ):
@@ -195,7 +189,6 @@ async def get_detail_by_id(
     return await conn.fetch_one(query2sql(query))
 
 
-@con_warpper
 async def create(conn: Database, data):
     data = jsonable_encoder(data)
     transaction = await conn.transaction()
