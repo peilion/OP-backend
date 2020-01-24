@@ -42,24 +42,21 @@ app.conf.beat_schedule = {
 def cal_vib_feature():
     session = session_make(engine=meta_engine)
     mps = (
-        session.query(MeasurePoint.id, MeasurePoint.type)
+        session.query(MeasurePoint.station_id, MeasurePoint.inner_station_id)
         .filter(MeasurePoint.type == 0)
         .all()
     )
     session.close()
 
-    mp_ids = []
-    for mp in mps:
-        mp_ids.append(mp.id)
 
-    for mp_id in mp_ids:
+    for mp in mps:
         engine = meta_engine
         s = text(
             "SELECT d.id,d.time as time, d.ima as vib "
-            "from vib_data_{} as d "
-            "LEFT JOIN vib_feature_{} as f on d.id = f.data_id "
+            "from vib_data_{0}_{1} as d "
+            "LEFT JOIN vib_feature_{0}_{1} as f on d.id = f.data_id "
             "where f.data_id is null "
-            "limit 10;".format(mp_id, mp_id)
+            "limit 10;".format(mp['station_id'], mp['inner_station_id'])
         )
         conn = engine.connect()
         result = conn.execute(s)
@@ -68,8 +65,7 @@ def cal_vib_feature():
 
         if len(data) > 0:
 
-            data_model = VibData.model(point_id=mp_id, base=Base)
-            feature = VibFeature.model(point_id=mp_id, base=Base)
+            feature = VibFeature.model(station_id=mp['station_id'],inner_id=mp['inner_station_id'])
 
             to_save = []
             for row in data:
