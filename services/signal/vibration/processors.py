@@ -40,7 +40,7 @@ def welch_spectrum_estimation(data: str) -> dict:
         data=binary_deserializer(data), fs=10000, compute_axis=False
     )
     res = signal.get_welch_spectrum_estimation()
-    return res
+    return {"vib": signal.data, **res}
 
 
 def acceleration_to_velocity(data: str) -> dict:

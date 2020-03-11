@@ -46,6 +46,7 @@ class VibrationWelchSchema(BaseModel):
     time: datetime
     spec: SignalArray
     freq: SignalArray
+    vib: SubSampledBinaryArray
 
 
 class VibrationCumtrapzSchema(BaseModel):
