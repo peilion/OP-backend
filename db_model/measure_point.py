@@ -25,9 +25,9 @@ class MeasurePoint(Base):
     sample_interval = Column(Integer)  # 单位为 s
     sample_freq = Column(Integer)  # 单位为 Hz
     statu = Column(SmallInteger, default=4)  # 值含义见 STATUS
-
     asset_id = Column(Integer, ForeignKey("asset.id"))
     station_id = Column(Integer, ForeignKey("station.id"))
     inner_station_id = Column(Integer)
     asset = relationship("Asset", back_populates="measure_points")
     station = relationship("Station", back_populates="measure_points")
+    model_name = Column(String(255)) # used to record MSET model file path
