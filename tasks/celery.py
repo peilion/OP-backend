@@ -91,6 +91,8 @@ def cal_vib_feature():
                 sim = calculate_similarity(feature_matrix, Kest)
                 thres, warning_index = threshold_caculate(sim)
 
+                Kest = Kest * (feature_matrix_max - feature_matrix_min) + feature_matrix_min
+
                 to_save.append(
                     feature(
                         rms=feature_row[0],
@@ -116,7 +118,7 @@ def cal_vib_feature():
                 session.add_all(to_save)
                 session.commit()
                 session.close()
-                processed_rows += to_save
+                processed_rows += len(to_save)
             except Exception as e:
                 session.rollback()
                 print(e)

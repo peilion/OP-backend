@@ -36,12 +36,13 @@ async def read_the_latest_vibration_feature(
 async def read_vibration_features(
     mp_id: int,
     time_before: datetime = Query(None, description="e.x. 2016-07-01 00:00:00"),
-    time_after: datetime = Query(None, description="e.x. 2016-01-10 00:00:00"),
+    time_after: datetime = Query(None, description="e.x. 2016-01-01 00:00:00"),
     features: List[str] = Query(
-        ["rms", "max", "p2p", "avg", "var", "kurtosis"],
+        ["rms", "max", "p2p", "avg", "var", "kurtosis", "similarity"],
         description="Only these fileds can be returned now.",
     ),
     limit: int = None,
+    with_estimated: bool = False,
     conn: Database = Depends(get_db),
 ):
     res = await get_multi(
@@ -52,6 +53,7 @@ async def read_vibration_features(
         time_before=str(time_before),
         time_after=str(time_after),
         limit=limit,
+        with_estimated = with_estimated,
         orm_model=VibFeature,
     )
     if not res:

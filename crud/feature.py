@@ -10,13 +10,13 @@ from db.db_config import session_make
 
 
 async def get(
-    conn: Database,
-    mp_id: int,
-    require_mp_type: int,
-    orm_model,
-    fileds: List[str],
-    data_id: int,
-    session: Session = session_make(engine=None),
+        conn: Database,
+        mp_id: int,
+        require_mp_type: int,
+        orm_model,
+        fileds: List[str],
+        data_id: int,
+        session: Session = session_make(engine=None),
 ):
     model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)
 
@@ -30,12 +30,12 @@ async def get(
 
 
 async def get_latest(
-    conn: Database,
-    mp_id: int,
-    require_mp_type: int,
-    orm_model,
-    fileds: List[str],
-    session: Session = session_make(engine=None),
+        conn: Database,
+        mp_id: int,
+        require_mp_type: int,
+        orm_model,
+        fileds: List[str],
+        session: Session = session_make(engine=None),
 ):
     model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)
 
@@ -49,21 +49,26 @@ async def get_latest(
 
 
 async def get_multi(
-    conn: Database,
-    mp_id: int,
-    require_mp_type: int,
-    orm_model,
-    fileds: List[str],
-    time_before: str,
-    time_after: str,
-    limit: int,
-    session: Session = session_make(engine=None),
+        conn: Database,
+        mp_id: int,
+        require_mp_type: int,
+        orm_model,
+        fileds: List[str],
+        time_before: str,
+        time_after: str,
+        limit: int,
+        with_estimated: bool,
+        session: Session = session_make(engine=None),
 ):
     model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)
 
     query = session.query(model)
     for filed in fileds + ["id", "time", "data_id"]:
         query = query.options(load_only(filed))
+
+    if with_estimated:
+        for filed in fileds:
+            query = query.options(load_only('est_' + filed)) if filed != 'similarity' else query
 
     if time_before != "None":
         query = query.filter(model.time.between(str(time_after), str(time_before)))
