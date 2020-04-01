@@ -21,6 +21,7 @@ class Station(Base):
     sharding_db_id = Column(Integer, nullable=False)  # 指向该站数据库id
     latitude = Column(Float)
     longitude = Column(Float)
+    weather = Column(Text, nullable=True)
 
     assets = relationship("Asset", back_populates="station")
     measure_points = relationship("MeasurePoint", back_populates="station")

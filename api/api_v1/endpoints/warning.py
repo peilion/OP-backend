@@ -3,7 +3,7 @@ from typing import List
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Depends
-from starlette.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
 from crud.warning import *
@@ -23,7 +23,7 @@ class GroupRule(str, Enum):
 
 
 @router.get(
-    "/", response_class=UJSONResponse, response_model=List[Optional[WarningLogSchema]]
+    "/", response_class=ORJSONResponse, response_model=List[Optional[WarningLogSchema]]
 )
 async def read_warning_logs(
     skip: int = None,
@@ -41,7 +41,7 @@ async def read_warning_logs(
     return items
 
 
-@router.get("/stat/", response_class=UJSONResponse)
+@router.get("/stat/", response_class=ORJSONResponse)
 async def read_warning_logs_statistic(
     group_by: GroupRule, conn: Database = Depends(get_db)
 ):
@@ -80,7 +80,7 @@ async def read_warning_logs_statistic(
         raise HTTPException(status_code=400, detail="Bad query parameters")
 
 
-@router.get("/{id}/", response_class=UJSONResponse, response_model=WarningLogSchema)
+@router.get("/{id}/", response_class=ORJSONResponse, response_model=WarningLogSchema)
 async def read_warning_logs_by_id(id: int, conn: Database = Depends(get_db)):
     """
     Get warning log by ID.

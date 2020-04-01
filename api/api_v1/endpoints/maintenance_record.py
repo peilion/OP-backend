@@ -3,7 +3,7 @@ from typing import Optional
 
 from databases import Database
 from fastapi import APIRouter, HTTPException, Depends
-from starlette.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
 from crud.maintenance_record import get_multi, get, get_statu_stat
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get(
     "/",
-    response_class=UJSONResponse,
+    response_class=ORJSONResponse,
     response_model=List[Optional[MaintenanceRecordSchema]],
 )
 async def read_maintenance_record(
@@ -30,7 +30,7 @@ async def read_maintenance_record(
     return items
 
 
-@router.get("/stat/", response_class=UJSONResponse)
+@router.get("/stat/", response_class=ORJSONResponse)
 async def read_maintenance_record_count_by_statu(conn: Database = Depends(get_db)):
     """
     Get warning stats by ID.
@@ -42,7 +42,7 @@ async def read_maintenance_record_count_by_statu(conn: Database = Depends(get_db
 
 
 @router.get(
-    "/{id}/", response_class=UJSONResponse, response_model=MaintenanceRecordSchema
+    "/{id}/", response_class=ORJSONResponse, response_model=MaintenanceRecordSchema
 )
 async def read_maintenance_record_by_id(id: int, conn: Database = Depends(get_db)):
     """

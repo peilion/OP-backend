@@ -2,7 +2,7 @@ import psutil
 from databases import Database
 from fastapi import APIRouter
 from sqlalchemy import text
-from starlette.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 
 from db.conn_engine import INFO_URL
 from model.others import ServerInfoSchema
@@ -10,7 +10,7 @@ from model.others import ServerInfoSchema
 router = APIRouter()
 
 
-@router.get("/", response_class=UJSONResponse, response_model=ServerInfoSchema)
+@router.get("/", response_class=ORJSONResponse, response_model=ServerInfoSchema)
 async def read_equip_level_mapper():
     conn = Database(INFO_URL)
     s = text("select sum(data_length) as volume " "from tables")

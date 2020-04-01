@@ -57,7 +57,7 @@ sim = np.zeros((feature_matrix.shape[0], 1))
 thres = np.zeros((feature_matrix.shape[0], 1))
 Kest = np.zeros((feature_matrix.shape[0], feature_matrix.shape[1]))
 
-N = 1  # cycle number
+N = 2  # cycle number
 
 for i in range(int(feature_matrix.shape[0] / N)):
     Kest[i * N:(i + 1) * N] = MSET(memorymat=memory_mat, Kobs=feature_matrix[i * N:(i + 1) * N], Temp=temp_memory_mat)

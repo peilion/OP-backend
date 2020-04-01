@@ -3,7 +3,7 @@ from typing import List, Optional
 from databases import Database
 from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.exc import IntegrityError
-from starlette.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
 from crud.assets import (
@@ -35,7 +35,7 @@ from services.query_processors.asset import tree_list_format
 router = APIRouter()
 
 
-@router.get("/", response_class=UJSONResponse)
+@router.get("/", response_class=ORJSONResponse)
 async def read_assets(
     skip: int = None,
     limit: int = None,
@@ -67,7 +67,7 @@ async def read_assets(
 
 @router.get(
     "/cards/",
-    response_class=UJSONResponse,
+    response_class=ORJSONResponse,
     response_model=Optional[List[Optional[AssetCardSchema]]],
 )
 async def read_assets_card(
@@ -84,7 +84,7 @@ async def read_assets_card(
     # return NestAssetListSchema(asset=res)
 
 
-@router.get("/{id}/", response_class=UJSONResponse, response_model=FlattenAssetSchema)
+@router.get("/{id}/", response_class=ORJSONResponse, response_model=FlattenAssetSchema)
 async def read_by_id(id: int, conn: Database = Depends(get_db)):
     """
     Get Asset by ID.
@@ -97,7 +97,7 @@ async def read_by_id(id: int, conn: Database = Depends(get_db)):
 
 @router.get(
     "/{id}/card/",
-    response_class=UJSONResponse,
+    response_class=ORJSONResponse,
     response_model=Optional[AssetCardSchema],
 )
 async def read_assets_card(id: int, conn: Database = Depends(get_db)):
@@ -109,7 +109,7 @@ async def read_assets_card(id: int, conn: Database = Depends(get_db)):
     return items[0]
 
 
-@router.get("/{id}/detail/", response_class=UJSONResponse)
+@router.get("/{id}/detail/", response_class=ORJSONResponse)
 async def read_pump_detail_by_id(id: int, conn: Database = Depends(get_db)):
     """
     Support pump unit only.
@@ -122,7 +122,7 @@ async def read_pump_detail_by_id(id: int, conn: Database = Depends(get_db)):
     return res
 
 
-@router.get("/{id}/info/", response_class=UJSONResponse)
+@router.get("/{id}/info/", response_class=ORJSONResponse)
 async def read_asset_info(id: int, conn: Database = Depends(get_db)):
     """
     Get Asset Info by ID.
@@ -137,7 +137,7 @@ async def read_asset_info(id: int, conn: Database = Depends(get_db)):
     return dict(info)
 
 
-@router.get("/{id}/avghi/", response_class=UJSONResponse)
+@router.get("/{id}/avghi/", response_class=ORJSONResponse)
 async def read_asset_avghi(
     id: int,
     time_before: str = Query(None, description="e.x. 2016-07-01 00:00:00"),
@@ -180,7 +180,7 @@ async def read_asset_avghi(
         return res
 
 
-@router.post("/", response_class=UJSONResponse)
+@router.post("/", response_class=ORJSONResponse)
 async def create_asset(asset: AssetPostSchema, conn: Database = Depends(get_db)):
     try:
         res = await create(conn=conn, data=asset)

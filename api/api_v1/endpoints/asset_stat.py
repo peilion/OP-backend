@@ -3,7 +3,7 @@ from typing import List
 
 from databases import Database
 from fastapi import APIRouter, HTTPException, Query, Depends
-from starlette.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
 from crud.assets_stat import crud_meth_mapper
@@ -25,7 +25,7 @@ class GroupRule(str, Enum):
     avghi = "avghi"
 
 
-@router.get("/stat/", response_class=UJSONResponse)
+@router.get("/stat/", response_class=ORJSONResponse)
 async def read_assets_statistic(
     group_by: List[GroupRule] = Query(None), conn: Database = Depends(get_db)
 ):

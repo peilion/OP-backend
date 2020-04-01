@@ -3,7 +3,7 @@ from typing import List
 
 from databases import Database
 from fastapi import APIRouter, HTTPException, Query, Depends
-from starlette.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
 from crud.feature import get_latest, get_multi, get
@@ -40,7 +40,7 @@ FEATURE_FIELDS = [
 ]
 
 
-@router.get("/mp/{mp_id}/elec_feature/latest/", response_class=UJSONResponse)
+@router.get("/mp/{mp_id}/elec_feature/latest/", response_class=ORJSONResponse)
 async def read_the_latest_elec_feature(
     mp_id: int,
     features: List[str] = Query(
@@ -59,7 +59,7 @@ async def read_the_latest_elec_feature(
     return dict(res)
 
 
-@router.get("/mp/{mp_id}/elec_feature/list/", response_class=UJSONResponse)
+@router.get("/mp/{mp_id}/elec_feature/list/", response_class=ORJSONResponse)
 async def read_elec_features(
     mp_id: int,
     features: List[str] = Query(
@@ -87,7 +87,7 @@ async def read_elec_features(
     return res
 
 
-@router.get("/mp/{mp_id}/elec_feature/{data_id}/", response_class=UJSONResponse)
+@router.get("/mp/{mp_id}/elec_feature/{data_id}/", response_class=ORJSONResponse)
 async def read_elec_feature_by_id(
     mp_id: int,
     data_id: int,

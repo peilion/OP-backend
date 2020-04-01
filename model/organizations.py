@@ -11,6 +11,12 @@ class StationSchema(BaseModel):
     longitude: float
 
 
+class StationWeatherSchema(BaseModel):
+    id: int
+    name: str
+    weather: str
+
+
 class BranchSchema(BaseModel):
     id: int
     name: str

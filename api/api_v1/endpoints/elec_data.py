@@ -4,7 +4,7 @@ from typing import List
 
 from databases import Database
 from fastapi import APIRouter, Depends, HTTPException, Query
-from starlette.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
 from crud.data import get_latest, get_by_id, get_multi, get_data_join_feature_by_id
@@ -36,7 +36,7 @@ class AnalyzeRule(str, Enum):
 
 @router.get(
     "/mp/{mp_id}/elec/latest/",
-    response_class=UJSONResponse,
+    response_class=ORJSONResponse,
     response_model=ElecSignalSchema,
 )
 async def read_the_latest_electric_signal(mp_id: int, conn: Database = Depends(get_db)):
@@ -51,7 +51,7 @@ async def read_the_latest_electric_signal(mp_id: int, conn: Database = Depends(g
 
 @router.get(
     "/mp/{mp_id}/elec/all/",
-    response_class=UJSONResponse,
+    response_class=ORJSONResponse,
     response_model=List[ElecSignalListSchema],
 )
 async def read_all_electric_signal_info(
@@ -81,7 +81,7 @@ async def read_all_electric_signal_info(
 
 @router.get(
     "/mp/{mp_id}/elec/{data_id}/",
-    response_class=UJSONResponse,
+    response_class=ORJSONResponse,
     response_model=ElecSignalSchema,
 )
 async def read_electric_signal_by_id(
@@ -96,7 +96,7 @@ async def read_electric_signal_by_id(
     return {**processed, **{"id": res["id"], "time": res["time"]}}
 
 
-@router.get("/mp/{mp_id}/elec/{data_id}/analysis/", response_class=UJSONResponse)
+@router.get("/mp/{mp_id}/elec/{data_id}/analysis/", response_class=ORJSONResponse)
 async def analyze_electric_signal(
     mp_id: int,
     data_id: int,

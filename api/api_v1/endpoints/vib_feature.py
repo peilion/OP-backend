@@ -3,7 +3,7 @@ from typing import List
 
 from databases import Database
 from fastapi import APIRouter, Depends, HTTPException, Query
-from starlette.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
 from crud.feature import get_latest, get_multi, get
@@ -12,7 +12,7 @@ from db_model import VibFeature
 router = APIRouter()
 
 
-@router.get("/mp/{mp_id}/vib_feature/latest/", response_class=UJSONResponse)
+@router.get("/mp/{mp_id}/vib_feature/latest/", response_class=ORJSONResponse)
 async def read_the_latest_vibration_feature(
     mp_id: int,
     features: List[str] = Query(
@@ -32,7 +32,7 @@ async def read_the_latest_vibration_feature(
     return dict(res)
 
 
-@router.get("/mp/{mp_id}/vib_feature/list/", response_class=UJSONResponse)
+@router.get("/mp/{mp_id}/vib_feature/list/", response_class=ORJSONResponse)
 async def read_vibration_features(
     mp_id: int,
     time_before: datetime = Query(None, description="e.x. 2016-07-01 00:00:00"),
@@ -63,7 +63,7 @@ async def read_vibration_features(
     return res
 
 
-@router.get("/mp/{mp_id}/vib_feature/{data_id}/", response_class=UJSONResponse)
+@router.get("/mp/{mp_id}/vib_feature/{data_id}/", response_class=ORJSONResponse)
 async def read_vibration_feature_by_id(
     mp_id: int,
     data_id: int,

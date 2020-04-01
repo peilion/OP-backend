@@ -4,7 +4,7 @@ from typing import List, Optional
 from databases import Database
 from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.exc import IntegrityError
-from starlette.responses import UJSONResponse
+from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
 from crud.measuer_points import get_multi, get, get_stat, create
@@ -20,7 +20,7 @@ class GroupRule(str, Enum):
 
 
 @router.get(
-    "/", response_class=UJSONResponse, response_model=List[Optional[MeasurePointSchema]]
+    "/", response_class=ORJSONResponse, response_model=List[Optional[MeasurePointSchema]]
 )
 async def read_measure_points(
     skip: int = None,
@@ -53,7 +53,7 @@ async def read_measure_points(
     return item
 
 
-@router.get("/stat/", response_class=UJSONResponse)
+@router.get("/stat/", response_class=ORJSONResponse)
 async def read_measure_point_statistic_report(
     rule: GroupRule = Query(
         default=None, description="Rule to generate statistic report."
@@ -65,7 +65,7 @@ async def read_measure_point_statistic_report(
 
 
 @router.get(
-    "/{id}/", response_class=UJSONResponse, response_model=Optional[MeasurePointSchema]
+    "/{id}/", response_class=ORJSONResponse, response_model=Optional[MeasurePointSchema]
 )
 async def read_measure_point_by_id(id: int, conn: Database = Depends(get_db)):
     item = await get(conn=conn, id=id)
@@ -74,7 +74,7 @@ async def read_measure_point_by_id(id: int, conn: Database = Depends(get_db)):
     return item
 
 
-@router.post("/", response_class=UJSONResponse)
+@router.post("/", response_class=ORJSONResponse)
 async def create_measure_point(mp: MeasurePointInputSchema):
     try:
         await create(mp)
