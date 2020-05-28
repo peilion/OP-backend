@@ -122,6 +122,19 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
         self.sub_harmonics = np.array(harmonics)
         self.sub_harmonics_index = np.array(harmonics_index)
 
+    def compute_half_harmonic(self, fr, tolerance=0.025):
+        spec = self.spec
+        freq = self.freq
+        df = freq[1] - freq[0]
+
+        half_fr_indexes = fr / 2
+
+        upper_search = np.rint((half_fr_indexes + tolerance * (half_fr_indexes / fr)) / df).astype(np.int)
+        lower_search = np.rint((half_fr_indexes - tolerance * (half_fr_indexes / fr)) / df).astype(np.int)
+
+        self.half_fr_indexes = lower_search + np.argmax(spec[lower_search:upper_search+1])
+        self.half_fr_amp = spec[self.half_fr_indexes]
+
     def compute_spectrum(self, compute_axis: bool = True):
         spec = np.fft.fft(self.data)[0 : int(self.N / 2)] / self.N
         spec[1:] = 2 * spec[1:]
@@ -130,7 +143,7 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
             self.freq = np.fft.fftfreq(self.N, 1.0 / self.sampling_rate)[
                 0 : int(self.N / 2)
             ]
-            self.df = self.freq[1] - self.freq[1]
+            self.df = self.freq[1] - self.freq[0]
 
     def compute_bearing_frequency(
         self, bpfi, bpfo, bsf, ftf, fr, upper=3, tolerance=None

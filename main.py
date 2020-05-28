@@ -1,8 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
 from starlette.websockets import WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.api_v1.api import api_router
 from core import config

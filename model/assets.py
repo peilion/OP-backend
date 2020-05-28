@@ -116,3 +116,10 @@ class TypeStationSchema(BaseModel):
 
     res: Optional[List[Optional["item"]]]
     update_time: Optional[datetime] = None
+
+
+class MSETSimilaritySchema(BaseModel):
+    id: list
+    time: list
+    similarity: list
+    threshold: list

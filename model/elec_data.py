@@ -63,9 +63,6 @@ class ElecSymSchema(BaseModel):
 class ElecHarmonicSchema(BaseModel):
     id: int
     time: datetime
-    ufft: SignalArray
-    vfft: SignalArray
-    wfft: SignalArray
     uharmonics: BinaryArray
     vharmonics: BinaryArray
     wharmonics: BinaryArray

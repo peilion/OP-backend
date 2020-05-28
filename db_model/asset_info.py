@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, SmallInteger, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, Float, SmallInteger, ForeignKey, Boolean, String
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm import relationship
 
@@ -18,6 +18,7 @@ class Bearing(Base):
     roller_number = Column(SmallInteger, nullable=True)
     contact_angle = Column(Float, nullable=True)
     model = Column(Float, nullable=True)
+    is_driven_end = Column(SmallInteger, nullable=False)
 
     bpfi = Column(Float, nullable=True)
     bpfo = Column(Float, nullable=True)
@@ -70,6 +71,7 @@ class PumpUnit(Base):
     asset_id = Column(Integer, ForeignKey("asset.id"))
     pipeline_id = Column(Integer, ForeignKey("pipeline.id"))
     asset = relationship("Asset", uselist=False)
+    mset_model_path = Column(String(255))
 
 
 class Rotor(Base):

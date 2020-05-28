@@ -7,5 +7,5 @@ from db_model.raw_data import ElecData, VibData
 from .asset import Asset
 from .measure_point import MeasurePoint
 from .organization import Station, BranchCompany, RegionCompany, Pipeline
-
+from .diag_threshold import Threshold
 __all__ = [s for s in dir() if not s.startswith("_")]

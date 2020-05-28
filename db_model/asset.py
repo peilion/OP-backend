@@ -7,6 +7,7 @@ from sqlalchemy import (
     DateTime,
     func,
     BigInteger,
+    JSON
 )
 from sqlalchemy import String, Text
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -28,7 +29,7 @@ class Asset(Base):
     }  # should have the same name as the models been defined in .asset_info.py
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(64))
+    name = Column(String(64))  # 轴承命名规则 以N（非驱动端） 或D（驱动端） 开头
     sn = Column(String(128), unique=True)
     lr_time = Column(DateTime, nullable=True)
     cr_time = Column(DateTime, nullable=True, default=func.now())
@@ -77,6 +78,10 @@ class AssetHI(object):
                     id=Column(BigInteger, primary_key=True),
                     time=Column(DateTime, index=True),
                     health_indicator=Column(Float, default=85, nullable=True),
+                    similarity=Column(Float, nullable=True),
+                    threshold=Column(Float, nullable=True),
+                    est=Column(JSON),
+                    data_id=Column(Integer, index=True),
                     __table_args__=table_args,
                 ),
             )

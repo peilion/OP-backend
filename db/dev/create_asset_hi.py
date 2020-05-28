@@ -17,7 +17,7 @@ for row in x:
 
 from sqlalchemy import create_engine
 
-META_URL = "mysql://git:Fpl8315814.@123.56.7.137/op_meta?charset=utf8"
+META_URL = "mysql://git:Fpl8315814.@123.56.7.137/op_meta_merged?charset=utf8"
 engine = create_engine(META_URL, encoding="utf-8", pool_pre_ping=True)
 base.metadata.create_all(engine)
 

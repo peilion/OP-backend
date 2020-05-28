@@ -57,7 +57,7 @@ async def get_multi(
         time_before: str,
         time_after: str,
         limit: int,
-        with_estimated: bool,
+        with_estimated: bool = False,
         session: Session = session_make(engine=None),
 ):
     model = get_shard_model(orm_model, mp_id=mp_id, require_mp_type=require_mp_type)

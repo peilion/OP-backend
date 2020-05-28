@@ -17,6 +17,7 @@ from api.api_v1.endpoints import (
     pipeline,
     union,
     organizations,
+    assets_mset
 )
 
 api_router = APIRouter()
@@ -44,3 +45,4 @@ api_router.include_router(measure_points.router, prefix="/mp", tags=["Measure Po
 api_router.include_router(
     maintenance_record.router, prefix="/maintre", tags=["Maintenance Record"]
 )
+api_router.include_router(assets_mset.router, tags=['MSET'], prefix="/asset")

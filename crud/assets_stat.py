@@ -10,7 +10,7 @@ from services.query_processors.general import (
 
 
 async def get_count_by_statu(conn: Database):
-    query = "SELECT statu, COUNT(*) as cnt " "FROM `asset` " "GROUP BY statu"
+    query = "SELECT statu, COUNT(*) as cnt FROM `asset` where asset_level = 0 GROUP BY statu"
     res = await conn.fetch_all(query)
     res_dic = format_single_grouped_result(res=res, group_names=Asset.STATUS)
     return StatuStatisticSchema(**res_dic)
@@ -135,6 +135,7 @@ async def get_statu_count_by_station(conn: Database):
         "SELECT station.NAME, statu, COUNT( * ),station.longitude, station.latitude AS cnt "
         "FROM `asset` "
         "JOIN station ON asset.station_id = station.id  "
+        "WHERE asset.asset_level = 0 "
         "GROUP BY statu, station_id  "
         "ORDER BY statu"
     )

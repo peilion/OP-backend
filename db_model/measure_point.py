@@ -1,8 +1,21 @@
-from sqlalchemy import Column, Integer, SmallInteger, ForeignKey, DateTime, func, Float
+from sqlalchemy import Column, Integer, SmallInteger, ForeignKey, DateTime, func, Float, Enum
 from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import relationship
-
+import enum
 from db import Base, table_args
+
+
+class DirectionEnum(enum.Enum):
+    horizontal = 1
+    vertical = 2
+    axial = 3
+
+
+class PositionEnum(enum.Enum):
+    motor_driven = 1
+    motor_non_driven = 2
+    pump_driven = 3
+    pump_non_driven = 4
 
 
 class MeasurePoint(Base):
@@ -28,6 +41,8 @@ class MeasurePoint(Base):
     asset_id = Column(Integer, ForeignKey("asset.id"))
     station_id = Column(Integer, ForeignKey("station.id"))
     inner_station_id = Column(Integer)
+    last_diag_id = Column(Integer)
+    direction = Column(Enum(DirectionEnum), nullable=True)
+    position = Column(Enum(PositionEnum), nullable=True)
     asset = relationship("Asset", back_populates="measure_points")
     station = relationship("Station", back_populates="measure_points")
-    model_name = Column(String(255)) # used to record MSET model file path
