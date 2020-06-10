@@ -1,3 +1,5 @@
+import MySQLdb
+
 from .base import MeasurePoint
 from .mixin import UnbalanceMixin, MisalignmentMixin, RollBearingMixin, ALooseMixin, BLooseMixin, SurgeMixin, \
     RubbingMixin
@@ -108,7 +110,7 @@ class PumpDriven(MeasurePoint, UnbalanceMixin, MisalignmentMixin, RollBearingMix
             upper=3,
         )
         self.roll_bearing_diagnosis(diag_obj=self.x_env)
-        self.surge_diagnosis(diag_obj=self.x, pressure_vector=self.pressure)
+        self.surge_diagnosis(diag_obj=self.x)
 
         self.compute_fault_num()
 
@@ -126,6 +128,7 @@ class PumpNonDriven(MeasurePoint, UnbalanceMixin, RollBearingMixin, ALooseMixin,
 
         self.unbalance_diagnosis(blade_num=0, diag_obj=self.x_vel)
         self.atype_loose_diagnosis(diag_obj=self.x_vel)
+        self.surge_diagnosis(diag_obj=self.x)
 
         self.x_vel.compute_half_harmonic(fr=self.fr)
         self.btype_loose_diagnosis(blade_num=0, diag_obj=self.x_vel)
@@ -146,7 +149,7 @@ class PumpNonDriven(MeasurePoint, UnbalanceMixin, RollBearingMixin, ALooseMixin,
 
 
 def motor_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
-    data = np.fromstring(data)
+    data = np.fromstring(data,dtype=np.float32)
     x = VibrationSignal(data=data, fs=fs, type=2)
     mp_instance = MotorDriven(x=x, y=x, r=R, bearing_ratio=bearing_ratio,
                               ib_threshold=th['Unbalance'],
@@ -161,11 +164,19 @@ def motor_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
                               harmonic_threshold=th['harmonic_threshold'],
                               subharmonic_threshold=th['subharmonic_threshold'])
     mp_instance.diagnosis()
-    return mp_instance.fault_diag_result
+    return mp_instance.fault_diag_result, {'ib_indicator': float(mp_instance.ib_indicator),
+                                           'ma_indicator': float(mp_instance.ma_indicator),
+                                           'bw_indicator': MySQLdb.Binary(mp_instance.x_env.bearing_amp.astype(np.float32)),
+                                           'al_indicator': float(mp_instance.al_indicator),
+                                           'bl_indicator': float(mp_instance.bl_indicator),
+                                           'rb_indicator': float(mp_instance.rb_indicator),
+                                           'env_kurtosis': float(mp_instance.x_env.kurtosis),
+                                           'vel_thd': float(mp_instance.x_vel.thd)
+                                           }
 
 
 def motor_non_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
-    data = np.fromstring(data)
+    data = np.fromstring(data,dtype=np.float32)
     x = VibrationSignal(data=data, fs=fs, type=2)
     mp_instance = MotorNonDriven(x=x, y=x, r=R, bearing_ratio=bearing_ratio,
                                  ib_threshold=th['Unbalance'],
@@ -177,41 +188,63 @@ def motor_non_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
                                  kurtosis_threshold=th['kurtosis'],
                                  harmonic_threshold=th['harmonic_threshold'])
     mp_instance.diagnosis()
-    return mp_instance.fault_diag_result
+    return mp_instance.fault_diag_result, {'ib_indicator': float(mp_instance.ib_indicator),
+                                           'bw_indicator': MySQLdb.Binary(mp_instance.x_env.bearing_amp.astype(np.float32)),
+                                           'al_indicator': float(mp_instance.al_indicator),
+                                           'bl_indicator': float(mp_instance.bl_indicator),
+                                           'env_kurtosis': float(mp_instance.x_env.kurtosis),
+                                           'vel_thd': float(mp_instance.x_vel.thd)
+                                           }
 
 
 def pump_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
-    data = np.fromstring(data)
+    data = np.fromstring(data,dtype=np.float32)
     x = VibrationSignal(data=data, fs=fs, type=2)
-    mp_instance = MotorDriven(x=x, y=x, r=R, bearing_ratio=bearing_ratio,
-                              ib_threshold=th['Unbalance'],
-                              ma_threshold=th['Misalignment'],
-                              bw_threshold=th['RollBearing'],
-                              al_threshold=th['ALoose'],
-                              bl_threshold=th['BLoose'],
-                              sg_threshold=th['Surge'],
-                              rb_threshold=th['Rubbing'],
-                              thd_threshold=th['thd'],
-                              pd_threshold=0,
-                              kurtosis_threshold=th['kurtosis'],
-                              harmonic_threshold=th['harmonic_threshold'],
-                              subharmonic_threshold=th['subharmonic_threshold'])
+    mp_instance = PumpDriven(x=x, y=x, r=R, bearing_ratio=bearing_ratio,
+                             ib_threshold=th['Unbalance'],
+                             ma_threshold=th['Misalignment'],
+                             bw_threshold=th['RollBearing'],
+                             al_threshold=th['ALoose'],
+                             bl_threshold=th['BLoose'],
+                             sg_threshold=th['Surge'],
+                             rb_threshold=th['Rubbing'],
+                             thd_threshold=th['thd'],
+                             pd_threshold=0,
+                             kurtosis_threshold=th['kurtosis'],
+                             harmonic_threshold=th['harmonic_threshold'],
+                             subharmonic_threshold=th['subharmonic_threshold'])
     mp_instance.diagnosis()
-    return mp_instance.fault_diag_result
+    return mp_instance.fault_diag_result, {'ib_indicator': float(mp_instance.ib_indicator),
+                                           'ma_indicator': float(mp_instance.ma_indicator),
+                                           'bw_indicator': MySQLdb.Binary(mp_instance.x_env.bearing_amp.astype(np.float32)),
+                                           'al_indicator': float(mp_instance.al_indicator),
+                                           'bl_indicator': float(mp_instance.bl_indicator),
+                                           'sg_indicator': float(mp_instance.sg_indicator),
+                                           'rb_indicator': float(mp_instance.rb_indicator),
+                                           'env_kurtosis': float(mp_instance.x_env.kurtosis),
+                                           'vel_thd': float(mp_instance.x_vel.thd)
+                                           }
 
 
 def pump_non_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
-    data = np.fromstring(data)
+    data = np.fromstring(data,dtype=np.float32)
     x = VibrationSignal(data=data, fs=fs, type=2)
-    mp_instance = MotorNonDriven(x=x, y=x, r=R, bearing_ratio=bearing_ratio,
-                                 ib_threshold=th['Unbalance'],
-                                 bw_threshold=th['RollBearing'],
-                                 al_threshold=th['ALoose'],
-                                 bl_threshold=th['BLoose'],
-                                 sg_threshold=th['Surge'],
-                                 thd_threshold=th['thd'],
-                                 pd_threshold=0,
-                                 kurtosis_threshold=th['kurtosis'],
-                                 harmonic_threshold=th['harmonic_threshold'])
+    mp_instance = PumpNonDriven(x=x, y=x, r=R, bearing_ratio=bearing_ratio,
+                                ib_threshold=th['Unbalance'],
+                                bw_threshold=th['RollBearing'],
+                                al_threshold=th['ALoose'],
+                                bl_threshold=th['BLoose'],
+                                sg_threshold=th['Surge'],
+                                thd_threshold=th['thd'],
+                                pd_threshold=0,
+                                kurtosis_threshold=th['kurtosis'],
+                                harmonic_threshold=th['harmonic_threshold'])
     mp_instance.diagnosis()
-    return mp_instance.fault_diag_result
+    return mp_instance.fault_diag_result, {'ib_indicator': float(mp_instance.ib_indicator),
+                                           'bw_indicator': MySQLdb.Binary(mp_instance.x_env.bearing_amp.astype(np.float32)),
+                                           'al_indicator': float(mp_instance.al_indicator),
+                                           'bl_indicator': float(mp_instance.bl_indicator),
+                                           'sg_indicator': float(mp_instance.sg_indicator),
+                                           'env_kurtosis': float(mp_instance.x_env.kurtosis),
+                                           'vel_thd': float(mp_instance.x_vel.thd)
+                                           }

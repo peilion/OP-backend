@@ -76,6 +76,7 @@ async def get_avg_hi_limit_latest(conn: Database, assets: list, limit: int) -> l
             "limit {1}".format(asset["id"], limit)
         )
         res = await conn.fetch_all(query)
+        res.reverse()
         assets[index]["health_indicator_history"] = [
             row["health_indicator"] for row in res
         ]
@@ -103,6 +104,7 @@ async def get_similarity_threshold_recently(conn: Database, asset_id: int, limit
         .order_by(hi_model.time.desc()) \
         .limit(limit)
     res = await conn.fetch_all(query2sql(query))
+    res.reverse()
     dic = multi_result_to_array(res)
     return dic
 
@@ -112,7 +114,7 @@ async def get_estimated_value_by_id(conn: Database, asset_id: int, data_id: int,
     hi_model = AssetHI.model(point_id=asset_id)
     query = session.query(hi_model.id, hi_model.est).filter(hi_model.id == data_id)
     res = await conn.fetch_one(query2sql(query))
-    dic = {'id': res['id'], 'est': json.loads(json.loads(res['est']))}
+    dic = {'id': res['id'], 'est': json.loads(res['est'])}
     return dic
 
 
@@ -128,7 +130,7 @@ async def get_estimated_value_multi(conn: Database, asset_id: int, time_before: 
         dic.setdefault('id', []).append(row['id'])
         dic.setdefault('time', []).append(str(row['time']))
 
-        serialized = json.loads(json.loads(row['est']))
+        serialized = json.loads(row['est'])
         for index, fileds in enumerate(serialized['label']):
             dic.setdefault(fileds + '—原始值', []).append(serialized['raw'][index])
             dic.setdefault(fileds + '-估计值', []).append(serialized['est'][index])

@@ -11,7 +11,7 @@ manufactures = session.query(Manufacturer).all()
 
 for asset in assets:
     Motor = Asset(
-        name='Motor#{0}'.format(random.randint(100, 999)),
+        name='驱动电机#{0}'.format(random.randint(100, 999)),
         sn="".join(random.sample("zyxwvutsrqponmlkjihgfedcba", 8)),
         asset_level=1,
         asset_type=2,
@@ -26,7 +26,7 @@ for asset in assets:
     )
 
     Bearing1 = Asset(
-        name="DrivenEndBearing#{0}".format(random.randint(100, 999)),
+        name="驱动端轴承#{0}".format(random.randint(100, 999)),
         sn="".join(random.sample("zyxwvutsrqponmlkjihgfedcba", 8)),
         asset_level=2,
         asset_type=5,
@@ -40,7 +40,7 @@ for asset in assets:
     )
 
     Bearing2 = Asset(
-        name="NonDrivenBearing#{0}".format(random.randint(100, 999)),
+        name="非驱动端轴承#{0}".format(random.randint(100, 999)),
         sn="".join(random.sample("zyxwvutsrqponmlkjihgfedcba", 8)),
         asset_level=2,
         asset_type=5,
@@ -54,7 +54,7 @@ for asset in assets:
     )
 
     Pump = Asset(
-        name='Pump#{0}'.format(random.randint(100, 999)),
+        name='泵体#{0}'.format(random.randint(100, 999)),
         sn="".join(random.sample("zyxwvutsrqponmlkjihgfedcba", 8)),
         asset_level=1,
         asset_type=1,
@@ -69,7 +69,7 @@ for asset in assets:
     )
 
     Bearing3 = Asset(
-        name="DrivenEndBearing#{0}".format(random.randint(100, 999)),
+        name="驱动端轴承#{0}".format(random.randint(100, 999)),
         sn="".join(random.sample("zyxwvutsrqponmlkjihgfedcba", 8)),
         asset_level=2,
         asset_type=5,
@@ -83,7 +83,7 @@ for asset in assets:
     )
 
     Bearing4 = Asset(
-        name="NonDrivenBearing#{0}".format(random.randint(100, 999)),
+        name="非驱动端轴承#{0}".format(random.randint(100, 999)),
         sn="".join(random.sample("zyxwvutsrqponmlkjihgfedcba", 8)),
         asset_level=2,
         asset_type=5,

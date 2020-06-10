@@ -16,6 +16,7 @@ class PositionEnum(enum.Enum):
     motor_non_driven = 2
     pump_driven = 3
     pump_non_driven = 4
+    pipeline = 5
 
 
 class MeasurePoint(Base):
@@ -37,7 +38,7 @@ class MeasurePoint(Base):
     type = Column(SmallInteger, nullable=False)  # 键含义参照 TYPES
     sample_interval = Column(Integer)  # 单位为 s
     sample_freq = Column(Integer)  # 单位为 Hz
-    statu = Column(SmallInteger, default=4)  # 值含义见 STATUS
+    statu = Column(SmallInteger, default=0)  # 值含义见 STATUS
     asset_id = Column(Integer, ForeignKey("asset.id"))
     station_id = Column(Integer, ForeignKey("station.id"))
     inner_station_id = Column(Integer)

@@ -100,7 +100,7 @@ class RollBearingMixin(FaultPattenMixin):
 
     def roll_bearing_diagnosis(self, diag_obj: VibrationSignal):
         level_list = []
-        obj = diag_obj  # type : VibrationSignal
+        obj : VibrationSignal = diag_obj
         bw_amps = obj.bearing_amp[:4]
         for item in bw_amps:
             level_list.append(np.searchsorted(self.bw_threshold, item))

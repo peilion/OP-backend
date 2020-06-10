@@ -11,7 +11,7 @@ bearings = session.query(Asset).filter(Asset.asset_type == 5)
 
 for bearing in bearings:
     bearing_info = Bearing(
-        is_driven_end=0 if re.search('NonDriven', bearing.name) else 1,
+        is_driven_end=0 if re.search('非驱动端', bearing.name) else 1,
         bpfi=random.choice([4.19, 3.71]),
         bpfo=random.choice([5.81, 5.29]),
         bsf=random.choice([2.99, 2.75]),

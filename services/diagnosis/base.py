@@ -56,7 +56,7 @@ class MeasurePoint(metaclass=abc.ABCMeta):
 
         for item in type(self).__bases__:
             if item.__bases__[0] is FaultPattenMixin:
-                self.fault_diag_result[item.fault_name] = getattr(self, item.fault_num_name)
+                self.fault_diag_result[item.fault_name] = int(getattr(self, item.fault_num_name))
 
     def calibrate_fr(self, cali_base: tuple, tolerance: float):
 

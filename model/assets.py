@@ -40,7 +40,7 @@ class FlattenAssetSchema(BaseModel):
     station_name: Optional[str] = None
     parent_id: Optional[int] = None
     repairs: Optional[int]
-
+    mp_configuration: Optional[int]
 
 class FlattenAssetListSchema(BaseModel):
     asset: Optional[List[Optional["FlattenAssetSchema"]]]
@@ -50,7 +50,7 @@ class AssetCardSchema(FlattenAssetSchema):
     is_domestic: bool
     oil_type: int
     design_output: float
-    health_indicator_history: Optional[List]
+    # health_indicator_history: Optional[List]
 
 
 class NestAssetSchema(BaseModel):

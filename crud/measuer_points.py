@@ -51,7 +51,7 @@ async def get_multi(
             Asset.name.label("asset_name"),
         )
     query = (
-        query.order_by(MeasurePoint.type)
+        query.order_by(MeasurePoint.id.asc())
         .offset(skip)
         .limit(limit)
         .join(Station, MeasurePoint.station_id == Station.id)

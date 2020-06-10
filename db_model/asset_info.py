@@ -10,16 +10,7 @@ class Bearing(Base):
     __table_args__ = table_args
 
     id = Column(Integer, primary_key=True)
-    inner_race_diameter = Column(Float, nullable=True)
-    inner_race_width = Column(Float, nullable=True)
-    outter_race_diameter = Column(Float, nullable=True)
-    outter_race_width = Column(Float, nullable=True)
-    roller_diameter = Column(Float, nullable=True)
-    roller_number = Column(SmallInteger, nullable=True)
-    contact_angle = Column(Float, nullable=True)
-    model = Column(Float, nullable=True)
     is_driven_end = Column(SmallInteger, nullable=False)
-
     bpfi = Column(Float, nullable=True)
     bpfo = Column(Float, nullable=True)
     bsf = Column(Float, nullable=True)

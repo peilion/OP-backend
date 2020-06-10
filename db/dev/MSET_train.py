@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 from databases import Database
 from crud.base import query2sql
@@ -9,7 +11,7 @@ import asyncio
 import time
 from services.MSET.core import memory_mat_train, Temp_MemMat
 
-asset_id = 1
+asset_id = 7
 
 
 async def get_data(query):
@@ -28,9 +30,11 @@ async def get_time_relate_data(mps_info, base_data_list):
         feature_row = [base_data['rms']]
         for mp in mps_info[1:]:  # 某设备所拥有的测点inner_station_id的排序必须一致
             query = "select rms from vib_data_{0}_{1} order by abs(datediff(time,'{2}')) limit 1".format(
-                mp['station_id'], mp['inner_station_id'], base_data['time'])
+                mp['station_id'], mp['inner_station_id'], str(base_data['time']))
             res = await db.fetch_all(query)
-            feature_row.append(res[0]['rms'])
+            # feature_row.append(res[0]['rms'])
+            feature_row.append(res[0]['rms'] + random.random())
+
         feature_matrix.append(feature_row)
     await db.disconnect()
     return feature_matrix
@@ -54,7 +58,7 @@ feature_matrix = np.array(feature_matrix)
 feature_matrix_max = np.max(feature_matrix, axis=0)
 feature_matrix_min = np.min(feature_matrix, axis=0)
 
-feature_matrix = (feature_matrix - feature_matrix_min) / (feature_matrix_max - feature_matrix_min)
+feature_matrix = (feature_matrix - (feature_matrix_min)) / (feature_matrix_max - feature_matrix_min)
 
 memory_mat = memory_mat_train(feature_matrix)  # 训练得到记忆矩阵
 np.save('./services/MSET/models/asset{0}_{1}.npy'.format(asset_id, time.strftime("%Y%m%d%H%M%S", time.localtime()),

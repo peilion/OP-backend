@@ -19,6 +19,7 @@ from db import Base, table_args
 class Asset(Base):
     LEVELS = {0: "Unit", 1: "Equip", 2: "Component"}
     STATUS = {0: "Excellent", 1: "Good", 2: "Moderate", 3: "Poor", 4: "Offline"}
+    MPCONFIGURATION = {1: '4振动', 2: '10振动加电流电压', 3:'8振动加电流电压'}
     TYPES = {
         0: "PumpUnit",
         1: "Pump",
@@ -41,6 +42,7 @@ class Asset(Base):
     memo = Column(Text, nullable=True)
     health_indicator = Column(Float, default=85, nullable=True)
     statu = Column(SmallInteger, default=4)  # 值含义见 STATUS
+    mp_configuration = Column(SmallInteger, nullable=True)
 
     parent_id = Column(Integer, ForeignKey("asset.id"), nullable=True)
     manufacturer_id = Column(Integer, ForeignKey("manufacturer.id"))

@@ -77,9 +77,9 @@ async def read_assets_card(
     Get Asset List.
     """
     items = await get_cards(conn=conn, skip=skip, limit=limit)
-    items = await get_avg_hi_limit_latest(
-        conn=conn, assets=[dict(item) for item in items], limit=20
-    )
+    # items = await get_avg_hi_limit_latest(
+    #     conn=conn, assets=[dict(item) for item in items], limit=20
+    # )
     return items
     # return NestAssetListSchema(asset=res)
 
