@@ -53,7 +53,7 @@ async def read_vibration_features(
         time_before=str(time_before),
         time_after=str(time_after),
         limit=limit,
-        with_estimated = with_estimated,
+        with_estimated=with_estimated,
         orm_model=VibFeature,
     )
     if not res:

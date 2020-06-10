@@ -3,6 +3,7 @@ from typing import Optional
 from .base import JsonString
 from pydantic import BaseModel
 
+
 class ThresholdSchema(BaseModel):
     id: int
     mp_pattern: str

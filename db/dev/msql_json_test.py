@@ -36,8 +36,8 @@ META_URL = "mysql://root:8315814@127.0.0.1:3306/demo?charset=utf8"
 meta_engine = create_engine(META_URL, encoding="utf-8", pool_pre_ping=True)
 
 json_data = {
-    '泵驱动端': {
-        '水平方向': {
+    "泵驱动端": {
+        "水平方向": {
             # '前期_01': {
             #     '频域': {
             #         'αFmax_1000': [],
@@ -104,26 +104,26 @@ json_data = {
             #         '解调HF_1-10k_Fmax_1000': [],
             #     },
             # },
-            '中期': {
-                '频域': {
-                    'αFmax_1000': [],
-                    'αFmax_5000': [],
-                    'αFmax_400': [],
-                    'vFmax_1600': [],
-                    'vHF_10k_Fmax_1000': [],
-                    'αHF_10k_Fmax_1000': [],
-                    '解调HF_10k_Fmax_1000': [],
-                    '解调HF_1-10k_Fmax_1000': [],
+            "中期": {
+                "频域": {
+                    "αFmax_1000": [],
+                    "αFmax_5000": [],
+                    "αFmax_400": [],
+                    "vFmax_1600": [],
+                    "vHF_10k_Fmax_1000": [],
+                    "αHF_10k_Fmax_1000": [],
+                    "解调HF_10k_Fmax_1000": [],
+                    "解调HF_1-10k_Fmax_1000": [],
                 },
-                '时域': {
-                    'αFmax_1000': [],
-                    'αFmax_5000': [],
-                    'αFmax_400': [],
-                    'vFmax_1600': [],
-                    'vHF_10k_Fmax_1000': [],
-                    'αHF_10k_Fmax_1000': [],
-                    '解调HF_10k_Fmax_1000': [],
-                    '解调HF_1-10k_Fmax_1000': [],
+                "时域": {
+                    "αFmax_1000": [],
+                    "αFmax_5000": [],
+                    "αFmax_400": [],
+                    "vFmax_1600": [],
+                    "vHF_10k_Fmax_1000": [],
+                    "αHF_10k_Fmax_1000": [],
+                    "解调HF_10k_Fmax_1000": [],
+                    "解调HF_1-10k_Fmax_1000": [],
                 },
             },
             # '后期': {
@@ -1174,10 +1174,7 @@ for key in json_data.keys():
 start = time.time()
 serializer_data = orjson.dumps(json_data)
 with meta_engine.begin() as connection:
-    s = text(
-        "INSERT INTO json_test (data) "
-        "values (:data);"
-    )
+    s = text("INSERT INTO json_test (data) " "values (:data);")
     result = connection.execute(s, data=serializer_data)
 end = time.time()
 print((end - start))  # 5s
@@ -1185,10 +1182,11 @@ print((end - start))  # 5s
 start = time.time()
 with meta_engine.begin() as connection:
     s = text(
-        'SELECT json_extract( DATA, \'$."泵非驱动端"."水平方向"."前期_01"."频域"."vFmax_1600"\') as data FROM json_test where id = 3 ')
+        'SELECT json_extract( DATA, \'$."泵非驱动端"."水平方向"."前期_01"."频域"."vFmax_1600"\') as data FROM json_test where id = 3 '
+    )
     result = connection.execute(s)
     result = result.fetchone()
-    result = orjson.loads(result['data'])
+    result = orjson.loads(result["data"])
 end = time.time()
 print((end - start))
 

@@ -20,7 +20,9 @@ class GroupRule(str, Enum):
 
 
 @router.get(
-    "/", response_class=ORJSONResponse, response_model=List[Optional[MeasurePointSchema]]
+    "/",
+    response_class=ORJSONResponse,
+    response_model=List[Optional[MeasurePointSchema]],
 )
 async def read_measure_points(
     skip: int = None,

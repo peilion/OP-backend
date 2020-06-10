@@ -56,10 +56,10 @@ async def read_the_latest_electric_signal(mp_id: int, conn: Database = Depends(g
     response_model=List[ElecSignalListSchema],
 )
 async def read_all_electric_signal_info(
-        mp_id: int,
-        time_before: datetime = Query(default="2016-01-01 00:00:00"),
-        time_after: datetime = Query(default="2016-07-10 00:00:00"),
-        conn: Database = Depends(get_db),
+    mp_id: int,
+    time_before: datetime = Query(default="2016-01-01 00:00:00"),
+    time_after: datetime = Query(default="2016-07-10 00:00:00"),
+    conn: Database = Depends(get_db),
 ):
     """
     Diagnosis info will be joined to the response in the future.
@@ -86,7 +86,7 @@ async def read_all_electric_signal_info(
     response_model=ElecSignalSchema,
 )
 async def read_electric_signal_by_id(
-        mp_id: int, data_id: int, conn: Database = Depends(get_db)
+    mp_id: int, data_id: int, conn: Database = Depends(get_db)
 ):
     res = await get_by_id(
         conn=conn, mp_id=mp_id, require_mp_type=1, data_id=data_id, orm_model=ElecData,
@@ -99,14 +99,20 @@ async def read_electric_signal_by_id(
 
 @router.get("/mp/{mp_id}/elec/{data_id}/analysis/", response_class=ORJSONResponse)
 async def analyze_electric_signal(
-        mp_id: int,
-        data_id: int,
-        method: AnalyzeRule = Query(None),
-        conn: Database = Depends(get_db),
+    mp_id: int,
+    data_id: int,
+    method: AnalyzeRule = Query(None),
+    conn: Database = Depends(get_db),
 ):
     if method == AnalyzeRule.harmonic:
-        res = await get(conn=conn, mp_id=mp_id, require_mp_type=1, data_id=data_id, orm_model=ElecFeature,
-                        fileds=['uharmonics', 'vharmonics', 'wharmonics'])
+        res = await get(
+            conn=conn,
+            mp_id=mp_id,
+            require_mp_type=1,
+            data_id=data_id,
+            orm_model=ElecFeature,
+            fileds=["uharmonics", "vharmonics", "wharmonics"],
+        )
 
         return ElecHarmonicSchema(
             **{
@@ -118,10 +124,13 @@ async def analyze_electric_signal(
             }
         )
 
-
     elif method == AnalyzeRule.hilbert:
         res = await get_by_id(
-            conn=conn, mp_id=mp_id, require_mp_type=1, data_id=data_id, orm_model=ElecData,
+            conn=conn,
+            mp_id=mp_id,
+            require_mp_type=1,
+            data_id=data_id,
+            orm_model=ElecData,
         )
         processed_res = three_phase_hilbert_transform(
             u=res["ucur"], v=res["vcur"], w=res["wcur"]
@@ -132,15 +141,33 @@ async def analyze_electric_signal(
 
     elif method == AnalyzeRule.dq:
         res = await get_by_id(
-            conn=conn, mp_id=mp_id, require_mp_type=1, data_id=data_id, orm_model=ElecData,
+            conn=conn,
+            mp_id=mp_id,
+            require_mp_type=1,
+            data_id=data_id,
+            orm_model=ElecData,
         )
         processed_res = dq_transform(u=res["ucur"], v=res["vcur"], w=res["wcur"])
         return ElecDQSchema(**processed_res, **{"id": res["id"], "time": res["time"]})
 
     elif method == AnalyzeRule.symetry:
-        res = await get(conn=conn, mp_id=mp_id, require_mp_type=1, data_id=data_id, orm_model=ElecFeature,
-                        fileds=['uamplitude', 'vamplitude', 'wamplitude',
-                                'ufrequency', 'wfrequency', 'vfrequency',
-                                'uinitial_phase', 'vinitial_phase', 'winitial_phase'])
+        res = await get(
+            conn=conn,
+            mp_id=mp_id,
+            require_mp_type=1,
+            data_id=data_id,
+            orm_model=ElecFeature,
+            fileds=[
+                "uamplitude",
+                "vamplitude",
+                "wamplitude",
+                "ufrequency",
+                "wfrequency",
+                "vfrequency",
+                "uinitial_phase",
+                "vinitial_phase",
+                "winitial_phase",
+            ],
+        )
         processed_res = sym_analyze(res=res)
         return ElecSymSchema(**processed_res, **{"id": res["id"], "time": res["time"]})

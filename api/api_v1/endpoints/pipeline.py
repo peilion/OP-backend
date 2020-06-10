@@ -11,7 +11,9 @@ from model.organizations import PipelineSchema
 router = APIRouter()
 
 
-@router.get("/", response_model=List[Optional[PipelineSchema]],response_class=ORJSONResponse)
+@router.get(
+    "/", response_model=List[Optional[PipelineSchema]], response_class=ORJSONResponse
+)
 async def read_pipelines(
     skip: int = 0, limit: int = None, conn: Database = Depends(get_db)
 ):

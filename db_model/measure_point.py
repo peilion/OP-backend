@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, SmallInteger, ForeignKey, DateTime, func, Float, Enum
+from sqlalchemy import (
+    Column,
+    Integer,
+    SmallInteger,
+    ForeignKey,
+    DateTime,
+    func,
+    Float,
+    Enum,
+)
 from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import relationship
 import enum

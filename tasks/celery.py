@@ -32,25 +32,23 @@ app.conf.beat_schedule = {
     "make_diagnosis-in-60-seconds": {
         "task": "tasks.celery.make_diagnosis",
         "schedule": 60.0,
-    }
+    },
 }
 
 
 @app.task(ignore_result=True)
 def make_feature_calculation():
     res = cal_vib_feature()
-    print('{0} feature extraction finished.'.format(res))
+    print("{0} feature extraction finished.".format(res))
 
 
 @app.task(ignore_result=True)
 def make_mset_estimate():
     res = mset_evaluate(3)
-    print('{0} estimate finished.'.format(res))
+    print("{0} estimate finished.".format(res))
 
 
 @app.task(ignore_result=True)
 def make_diagnosis():
-    res =  expert_system_diagnosis()
-    print('{0} diagnosis finished.'.format(res))
-
-
+    res = expert_system_diagnosis()
+    print("{0} diagnosis finished.".format(res))

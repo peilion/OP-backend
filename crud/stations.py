@@ -14,11 +14,13 @@ async def get_multi(
     query = session.query(Station).order_by(Station.id).offset(skip).limit(limit)
     return await conn.fetch_all(query2sql(query))
 
-async def get_weathers(
-    conn: Database, session: Session = session_make(engine=None)
-):
-    query = session.query(Station.id, Station.name, Station.weather).order_by(Station.id)
+
+async def get_weathers(conn: Database, session: Session = session_make(engine=None)):
+    query = session.query(Station.id, Station.name, Station.weather).order_by(
+        Station.id
+    )
     return await conn.fetch_all(query2sql(query))
+
 
 async def get(conn: Database, id: int, session: Session = session_make(engine=None)):
     query = session.query(Station).filter(Station.id == id)

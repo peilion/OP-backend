@@ -100,7 +100,7 @@ def feature_calculator(u, v, w):
         phase_fft_axis = np.linspace(0, RATE / 2, len(phase) / 2 + 1)
 
         # Power supply frequency
-        PSF = phase_fft_axis[np.argmax(phase_fft[:int(60 / FREQ_INTERVAL)])]
+        PSF = phase_fft_axis[np.argmax(phase_fft[: int(60 / FREQ_INTERVAL)])]
 
         harmonics_index = [i * PSF / FREQ_INTERVAL for i in range(2, 20)]
         total = 0
@@ -115,7 +115,7 @@ def feature_calculator(u, v, w):
         THD = np.sqrt(total)
         # Hilbert transform
         Shiftted = np.abs(signal.hilbert(phase))
-        phase_envelope = signal.detrend(Shiftted[1024: 1024 + 4096])
+        phase_envelope = signal.detrend(Shiftted[1024 : 1024 + 4096])
         # Hilebert spectrum
         phase_envelope_fft = fftransform(phase_envelope)
         brb_list.append(phase_envelope_fft[:10])

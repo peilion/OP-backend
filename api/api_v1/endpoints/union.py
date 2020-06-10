@@ -5,10 +5,11 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
-from crud.union import get_recent_asset_event,get_recent_warning
+from crud.union import get_recent_asset_event, get_recent_warning
 from model.log import WarningAndMainteSchema
 
 router = APIRouter()
+
 
 @router.get(
     "/warning/",
@@ -28,5 +29,3 @@ async def read_warning_and_mset_warning(conn: Database = Depends(get_db)):
 async def read_recent_asset_event(id: int, conn: Database = Depends(get_db)):
     res = await get_recent_asset_event(conn=conn, asset_id=id)
     return res
-
-

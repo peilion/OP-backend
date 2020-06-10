@@ -6,7 +6,7 @@ import numpy as np
 from sqlalchemy.ext.declarative import declarative_base
 from db.conn_engine import META_URL
 from db import session_make, meta_engine
-from db_model import VibData, VibFeature, MeasurePoint,ElecFeature,ElecData
+from db_model import VibData, VibFeature, MeasurePoint, ElecFeature, ElecData
 from utils.elec_feature_tool import feature_calculator
 from utils.simulators import unbalance, misalignment, a_loose, b_loose, rubbing
 from sqlalchemy import create_engine
@@ -14,31 +14,43 @@ from sqlalchemy import create_engine
 session = session_make(meta_engine)
 base = declarative_base()
 engine = create_engine(META_URL, encoding="utf-8", pool_pre_ping=True)
-x = session.query(MeasurePoint).filter(MeasurePoint.station_id == 7, MeasurePoint.type == 0)
+x = session.query(MeasurePoint).filter(
+    MeasurePoint.station_id == 7, MeasurePoint.type == 0
+)
 
 for row in x:
     model = VibData.model(
         station_id=row.station_id, inner_id=row.inner_station_id, base=base
     )  # registe to metadata for all pump_unit
-    fea_model = VibFeature.model(station_id=row.station_id, inner_id=row.inner_station_id, base=base
-                                 )
+    fea_model = VibFeature.model(
+        station_id=row.station_id, inner_id=row.inner_station_id, base=base
+    )
 
 base.metadata.create_all(engine)
 
 
-x = session.query(MeasurePoint).filter(MeasurePoint.station_id == 7, MeasurePoint.type == 1)
+x = session.query(MeasurePoint).filter(
+    MeasurePoint.station_id == 7, MeasurePoint.type == 1
+)
 base = declarative_base()
 for row in x:
     model = ElecData.model(
         station_id=row.station_id, inner_id=row.inner_station_id, base=base
     )  # registe to metadata for all pump_unit
-    fea_model = ElecFeature.model(station_id=row.station_id, inner_id=row.inner_station_id, base=base
-                                 )
+    fea_model = ElecFeature.model(
+        station_id=row.station_id, inner_id=row.inner_station_id, base=base
+    )
 base.metadata.create_all(engine)
 
 
-x = session.query(MeasurePoint).filter(MeasurePoint.station_id != 7, MeasurePoint.type == 1).all()
-model = VibData.model(station_id=7, inner_id=0, base=base)  # registe to metadata for all pump_unit
+x = (
+    session.query(MeasurePoint)
+    .filter(MeasurePoint.station_id != 7, MeasurePoint.type == 1)
+    .all()
+)
+model = VibData.model(
+    station_id=7, inner_id=0, base=base
+)  # registe to metadata for all pump_unit
 data = session.query(model).all()
 for row in x:
     model = ElecData.model(
@@ -62,8 +74,12 @@ for row in x:
 
 x = session.query(MeasurePoint).filter(MeasurePoint.type == 1).all()
 for mp in x:
-    fea_model = ElecFeature.model(station_id=mp.station_id, inner_id=mp.inner_station_id, base=base)  # registe to metadata for all pump_unit
-    data_model = ElecData.model(station_id=mp.station_id, inner_id=mp.inner_station_id, base=base)
+    fea_model = ElecFeature.model(
+        station_id=mp.station_id, inner_id=mp.inner_station_id, base=base
+    )  # registe to metadata for all pump_unit
+    data_model = ElecData.model(
+        station_id=mp.station_id, inner_id=mp.inner_station_id, base=base
+    )
     data = session.query(data_model).all()
     tmp = []
     for item in data:
@@ -84,7 +100,7 @@ for mp in x:
         ) = feature_calculator(u, v, w)
         r = fea_model(
             data_id=item.id,
-            time = item.time,
+            time=item.time,
             urms=rms_list[0],
             uthd=THD_list[0],
             uharmonics=harmonics_list[0].astype(np.float32).tostring(),

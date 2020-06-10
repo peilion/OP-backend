@@ -42,6 +42,7 @@ class FlattenAssetSchema(BaseModel):
     repairs: Optional[int]
     mp_configuration: Optional[int]
 
+
 class FlattenAssetListSchema(BaseModel):
     asset: Optional[List[Optional["FlattenAssetSchema"]]]
 

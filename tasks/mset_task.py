@@ -1,7 +1,7 @@
-'''
+"""
 该任务涉及插入表： MsetWarningLog，AssetHI
 涉及更新表：Asset
-'''
+"""
 import datetime
 
 import numpy as np
@@ -18,34 +18,42 @@ from services.MSET.core import (
 
 
 def fetch_pumps(session):
-    pumps = session.query(PumpUnit.asset_id, PumpUnit.mset_model_path, Asset.name.label('name')). \
-        filter(PumpUnit.mset_model_path != None). \
-        join(Asset, Asset.id == PumpUnit.asset_id).all()
+    pumps = (
+        session.query(
+            PumpUnit.asset_id, PumpUnit.mset_model_path, Asset.name.label("name")
+        )
+        .filter(PumpUnit.mset_model_path != None)
+        .join(Asset, Asset.id == PumpUnit.asset_id)
+        .all()
+    )
 
     return pumps
 
 
 def fetch_mps(session, asset_id):
-    mps = session. \
-        query(
-        MeasurePoint.name,
-        MeasurePoint.station_id,
-        MeasurePoint.inner_station_id). \
-        filter(MeasurePoint.asset_id == asset_id, MeasurePoint.type == 0). \
-        order_by(MeasurePoint.inner_station_id).all()
+    mps = (
+        session.query(
+            MeasurePoint.name, MeasurePoint.station_id, MeasurePoint.inner_station_id
+        )
+        .filter(MeasurePoint.asset_id == asset_id, MeasurePoint.type == 0)
+        .order_by(MeasurePoint.inner_station_id)
+        .all()
+    )
 
     return mps
 
 
 def fetch_base_data(session, cycle_number, base_mp, asset_id):
-    data = session.execute("SELECT d.id as id, d.time as time, d.rms as rms "
-                           "from vib_data_{0}_{1} as d "
-                           "LEFT JOIN asset_hi_{2} as h on d.id = h.data_id "
-                           "where h.data_id is null "
-                           "order by d.id "
-                           "limit {3};".format(
-        base_mp.station_id, base_mp.inner_station_id, asset_id, cycle_number
-    ))
+    data = session.execute(
+        "SELECT d.id as id, d.time as time, d.rms as rms "
+        "from vib_data_{0}_{1} as d "
+        "LEFT JOIN asset_hi_{2} as h on d.id = h.data_id "
+        "where h.data_id is null "
+        "order by d.id "
+        "limit {3};".format(
+            base_mp.station_id, base_mp.inner_station_id, asset_id, cycle_number
+        )
+    )
 
     return data.fetchall()
 
@@ -73,7 +81,7 @@ def evaluate(path, feature_matrix):
     memory_mat = memory_mat[:-2, :]
     temp_memory_mat = Temp_MemMat(memory_mat)
     feature_matrix = (feature_matrix - feature_matrix_min) / (
-            feature_matrix_max - feature_matrix_min
+        feature_matrix_max - feature_matrix_min
     )
     Kest = mset_estimate(
         memorymat=memory_mat, Kobs=feature_matrix, Temp=temp_memory_mat
@@ -128,12 +136,14 @@ def mset_evaluate(cycle_number):
                             health_indicator=float(sim[i][0] * 100),
                             similarity=float(sim[i][0]),
                             threshold=float(thres[i][0]),
-                            time=base_data_list[i]['time'],
-                            data_id=base_data_list[i]['id'],
-                            est={'label': [mp.name for mp in mps],
-                                 'raw': feature_matrix[i].tolist(),
-                                 'est': Kest[i].tolist()})
-
+                            time=base_data_list[i]["time"],
+                            data_id=base_data_list[i]["id"],
+                            est={
+                                "label": [mp.name for mp in mps],
+                                "raw": feature_matrix[i].tolist(),
+                                "est": Kest[i].tolist(),
+                            },
+                        )
                     )
                 try:
                     for index, row in enumerate(evaluate_res_insert_value):
@@ -141,18 +151,30 @@ def mset_evaluate(cycle_number):
                         session.add(row)
                         session.commit()
                         if len(warning_index) != 0:
-                            if (index in warning_index):
-                                session.add(MsetWarningLog(
-                                    cr_time=base_data_list[index]["time"],
-                                    description=mps[np.argmax(feature_matrix[index] - Kest[index])].name + '异常。',
-                                    asset_id=pump.asset_id,
-                                    reporter_id=row.id
-                                ))
+                            if index in warning_index:
+                                session.add(
+                                    MsetWarningLog(
+                                        cr_time=base_data_list[index]["time"],
+                                        description=mps[
+                                            np.argmax(
+                                                feature_matrix[index] - Kest[index]
+                                            )
+                                        ].name
+                                        + "异常。",
+                                        asset_id=pump.asset_id,
+                                        reporter_id=row.id,
+                                    )
+                                )
                             session.commit()
                     session.query(Asset).filter(Asset.id == pump.asset_id).update(
-                        {"statu": determine_statu(feature_matrix=feature_matrix),
-                         "health_indicator": evaluate_res_insert_value[-1].health_indicator,
-                         "md_time": datetime.datetime.now(), })
+                        {
+                            "statu": determine_statu(feature_matrix=feature_matrix),
+                            "health_indicator": evaluate_res_insert_value[
+                                -1
+                            ].health_indicator,
+                            "md_time": datetime.datetime.now(),
+                        }
+                    )
                     session.commit()
                     estimate_count += len(evaluate_res_insert_value)
                 except Exception as e:
@@ -163,6 +185,7 @@ def mset_evaluate(cycle_number):
 
     return estimate_count
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     for i in range(15):
         estimate_count = mset_evaluate(3)

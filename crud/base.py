@@ -1,6 +1,7 @@
 from sqlalchemy.dialects import mysql
 from sqlalchemy.orm.query import Query
 
+
 def con_warpper(func):
     async def make_decorater(*args, **kwargs):
         await kwargs["conn"].connect()

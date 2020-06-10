@@ -17,7 +17,7 @@ async def get_avg_hi_pre(conn: Database, session: Session = session_make(engine=
 
 
 async def get_avg_hi_during_time(
-        conn: Database, asset_id: int, time_before: str, time_after: str, interval: int
+    conn: Database, asset_id: int, time_before: str, time_after: str, interval: int
 ):
     query = text(
         "SELECT datediff( time, '{0}' ) DIV {3} AS diff, AVG( health_indicator ) as avg FROM asset_hi_{2} "
@@ -33,7 +33,7 @@ async def get_avg_hi_during_time(
 
 
 async def get_avg_hi_before_limit(
-        conn: Database, asset_id: int, interval: int, limit: int
+    conn: Database, asset_id: int, interval: int, limit: int
 ):
     import datetime
 
@@ -84,54 +84,76 @@ async def get_avg_hi_limit_latest(conn: Database, assets: list, limit: int) -> l
     return assets
 
 
-async def get_similarity_threshold_during_time(conn: Database, asset_id: int, time_before: str, time_after: str,
-                                               session: Session = session_make(engine=None),
-                                               ):
+async def get_similarity_threshold_during_time(
+    conn: Database,
+    asset_id: int,
+    time_before: str,
+    time_after: str,
+    session: Session = session_make(engine=None),
+):
     hi_model = AssetHI.model(point_id=asset_id)
-    query = session.query(hi_model.id, hi_model.time, hi_model.similarity, hi_model.threshold). \
-        filter(hi_model.time.between(str(time_after), str(time_before)))
+    query = session.query(
+        hi_model.id, hi_model.time, hi_model.similarity, hi_model.threshold
+    ).filter(hi_model.time.between(str(time_after), str(time_before)))
 
     res = await conn.fetch_all(query2sql(query))
     dic = multi_result_to_array(res)
     return dic
 
 
-async def get_similarity_threshold_recently(conn: Database, asset_id: int, limit: int,
-                                            session: Session = session_make(engine=None),
-                                            ):
+async def get_similarity_threshold_recently(
+    conn: Database,
+    asset_id: int,
+    limit: int,
+    session: Session = session_make(engine=None),
+):
     hi_model = AssetHI.model(point_id=asset_id)
-    query = session.query(hi_model.id, hi_model.time, hi_model.similarity, hi_model.threshold) \
-        .order_by(hi_model.time.desc()) \
+    query = (
+        session.query(
+            hi_model.id, hi_model.time, hi_model.similarity, hi_model.threshold
+        )
+        .order_by(hi_model.time.desc())
         .limit(limit)
+    )
     res = await conn.fetch_all(query2sql(query))
     res.reverse()
     dic = multi_result_to_array(res)
     return dic
 
 
-async def get_estimated_value_by_id(conn: Database, asset_id: int, data_id: int,
-                                    session: Session = session_make(engine=None)):
+async def get_estimated_value_by_id(
+    conn: Database,
+    asset_id: int,
+    data_id: int,
+    session: Session = session_make(engine=None),
+):
     hi_model = AssetHI.model(point_id=asset_id)
     query = session.query(hi_model.id, hi_model.est).filter(hi_model.id == data_id)
     res = await conn.fetch_one(query2sql(query))
-    dic = {'id': res['id'], 'est': json.loads(res['est'])}
+    dic = {"id": res["id"], "est": json.loads(res["est"])}
     return dic
 
 
-async def get_estimated_value_multi(conn: Database, asset_id: int, time_before: str, time_after: str,
-                                    session: Session = session_make(engine=None)):
+async def get_estimated_value_multi(
+    conn: Database,
+    asset_id: int,
+    time_before: str,
+    time_after: str,
+    session: Session = session_make(engine=None),
+):
     hi_model = AssetHI.model(point_id=asset_id)
     query = session.query(hi_model.id, hi_model.time, hi_model.est).filter(
-        hi_model.time.between(str(time_after), str(time_before)))
+        hi_model.time.between(str(time_after), str(time_before))
+    )
     res = await conn.fetch_all(query2sql(query))
 
     dic = {}
     for row in res:
-        dic.setdefault('id', []).append(row['id'])
-        dic.setdefault('time', []).append(str(row['time']))
+        dic.setdefault("id", []).append(row["id"])
+        dic.setdefault("time", []).append(str(row["time"]))
 
-        serialized = json.loads(row['est'])
-        for index, fileds in enumerate(serialized['label']):
-            dic.setdefault(fileds + '—原始值', []).append(serialized['raw'][index])
-            dic.setdefault(fileds + '-估计值', []).append(serialized['est'][index])
+        serialized = json.loads(row["est"])
+        for index, fileds in enumerate(serialized["label"]):
+            dic.setdefault(fileds + "—原始值", []).append(serialized["raw"][index])
+            dic.setdefault(fileds + "-估计值", []).append(serialized["est"][index])
     return dic

@@ -11,7 +11,11 @@ from model.organizations import BranchSchema, RegionSchema
 router = APIRouter()
 
 
-@router.get("/branch_companies", response_model=List[Optional[BranchSchema]], response_class=ORJSONResponse)
+@router.get(
+    "/branch_companies",
+    response_model=List[Optional[BranchSchema]],
+    response_class=ORJSONResponse,
+)
 async def read_branch_companies(
     skip: int = 0, limit: int = None, conn: Database = Depends(get_db)
 ):
@@ -23,7 +27,11 @@ async def read_branch_companies(
     return items
 
 
-@router.get("/region_companies", response_model=List[Optional[RegionSchema]], response_class=ORJSONResponse)
+@router.get(
+    "/region_companies",
+    response_model=List[Optional[RegionSchema]],
+    response_class=ORJSONResponse,
+)
 async def read_region_companies(
     skip: int = 0, limit: int = None, conn: Database = Depends(get_db)
 ):

@@ -5,6 +5,7 @@ step = 2
 delta = 0.001
 z = 4
 
+
 @jit(nopython=True)
 def memory_mat_train(np_D):
     memory_mat = np.zeros((1, np_D.shape[1]))
@@ -12,11 +13,13 @@ def memory_mat_train(np_D):
         for k in range(step):
             for j in range(np_D.shape[0]):
                 if np.abs(np_D[j, i] - k * (1 / step)) < delta:
-                    memory_mat = np.vstack((memory_mat, np.expand_dims(np_D[j], 0)))  # 添加向量至记忆矩阵
+                    memory_mat = np.vstack(
+                        (memory_mat, np.expand_dims(np_D[j], 0))
+                    )  # 添加向量至记忆矩阵
                     break
     memory_mat = memory_mat[1:, :]
     # memory_mat = np.delete(memory_mat, 0, axis=0)
-    print('memory_mat:', memory_mat.shape)
+    print("memory_mat:", memory_mat.shape)
     # np.save(memorymat_name, memory_mat)
     return memory_mat
 
@@ -51,10 +54,11 @@ def calculate_similarity(Kobs, Kest):
     dist_cos = np.zeros((Kobs.shape[0], 1))
     for i in range(Kobs.shape[0]):
         dist_norm[i] = np.linalg.norm(Kobs[i, :] - Kest[i, :])  # 欧式距离
-        dist_cos[i] = np.dot(Kobs[i, :], Kest[i, :]) / \
-                      (np.linalg.norm(Kobs[i, :]) * np.linalg.norm(Kest[i, :]))  # dot向量内积，norm向量二范数
+        dist_cos[i] = np.dot(Kobs[i, :], Kest[i, :]) / (
+            np.linalg.norm(Kobs[i, :]) * np.linalg.norm(Kest[i, :])
+        )  # dot向量内积，norm向量二范数
     dist_cos = dist_cos * 0.5 + 0.5  # 余弦距离平移至[0,1]
-    sim = (1 / (1 + dist_norm / dist_cos))  # 相似度公式
+    sim = 1 / (1 + dist_norm / dist_cos)  # 相似度公式
     return sim
 
 
@@ -70,10 +74,14 @@ def threshold_caculate(sim):
             # 相似度大于动态阈值且大于0.8，更新动态阈值
             if sim[i - 1] >= (mu[i - 1] - z * sigma[i - 1]) and sim[i - 1] >= 0.8:
                 mu[i] = 1 / (i + 1) * sim[i] + i / (i + 1) * sim[i - 1]
-                sigma[i] = np.sqrt((i - 1) / i * (sigma[i - 1] ** 2) + ((sim[i] - mu[i - 1]) ** 2 / (i + 1)))
+                sigma[i] = np.sqrt(
+                    (i - 1) / i * (sigma[i - 1] ** 2)
+                    + ((sim[i] - mu[i - 1]) ** 2 / (i + 1))
+                )
             # 相似度小于动态阈值或相似度大于动态阈值且小于0.8，不更新
-            elif sim[i - 1] < (mu[i - 1] - z * sigma[i - 1]) or \
-                    (sim[i - 1] >= (mu[i - 1] - z * sigma[i - 1]) and sim[i - 1] < 0.8):
+            elif sim[i - 1] < (mu[i - 1] - z * sigma[i - 1]) or (
+                sim[i - 1] >= (mu[i - 1] - z * sigma[i - 1]) and sim[i - 1] < 0.8
+            ):
                 mu[i] = mu[i - 1]
                 sigma[i] = sigma[i - 1]
                 index = np.append(index, i)

@@ -26,15 +26,17 @@ class MeasurePoint(metaclass=abc.ABCMeta):
             if grand_class is FaultPattenMixin:
                 check_list = parent_class.check_list
                 for check_item in check_list:
-                    if (not hasattr(self, check_item)) | (getattr(self, check_item) is None):
-                        raise Exception(check_item + ' undefined!')
+                    if (not hasattr(self, check_item)) | (
+                        getattr(self, check_item) is None
+                    ):
+                        raise Exception(check_item + " undefined!")
 
     @property
     def phase_diff(self):
         if self._phase_diff is None:
             trimed_x = self.x.data[
-                       : int(self.x.sampling_rate / 4)
-                       ]  # 只取前 0.25秒! 的 加速度! 数据进行互相关计算,考虑计算量以及积分后的相位移动
+                : int(self.x.sampling_rate / 4)
+            ]  # 只取前 0.25秒! 的 加速度! 数据进行互相关计算,考虑计算量以及积分后的相位移动
             trimed_y = self.y.data[: int(self.x.sampling_rate / 4)]
             t = np.linspace(
                 0.0, ((len(trimed_x) - 1) / self.x.sampling_rate), len(trimed_x)
@@ -43,8 +45,8 @@ class MeasurePoint(metaclass=abc.ABCMeta):
             dt = np.linspace(-t[-1], t[-1], (2 * len(trimed_x)) - 1)
             time_shift = dt[cross_correlate.argmax()]
             self._phase_diff = (
-                                       (2.0 * np.pi) * ((time_shift / (1.0 / self.fr)) % 1.0)
-                               ) - np.pi
+                (2.0 * np.pi) * ((time_shift / (1.0 / self.fr)) % 1.0)
+            ) - np.pi
         return self._phase_diff
 
     @abc.abstractmethod
@@ -56,7 +58,9 @@ class MeasurePoint(metaclass=abc.ABCMeta):
 
         for item in type(self).__bases__:
             if item.__bases__[0] is FaultPattenMixin:
-                self.fault_diag_result[item.fault_name] = int(getattr(self, item.fault_num_name))
+                self.fault_diag_result[item.fault_name] = int(
+                    getattr(self, item.fault_num_name)
+                )
 
     def calibrate_fr(self, cali_base: tuple, tolerance: float):
 
@@ -67,5 +71,7 @@ class MeasurePoint(metaclass=abc.ABCMeta):
         upper_search = np.rint((self.fr + tolerance) / df).astype(np.int)
         lower_search = np.rint((self.fr - tolerance) / df).astype(np.int)
 
-        cali_fr_index = (lower_search + np.argmax(spec[lower_search:upper_search + 1])) * df
+        cali_fr_index = (
+            lower_search + np.argmax(spec[lower_search : upper_search + 1])
+        ) * df
         self.fr = cali_fr_index

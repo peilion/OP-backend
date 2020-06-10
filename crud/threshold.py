@@ -1,4 +1,3 @@
-
 from databases import Database
 from sqlalchemy.orm import Session
 
@@ -8,8 +7,7 @@ from db_model import Threshold
 
 
 async def get_multi(
-        conn: Database,
-        session: Session = session_make(engine=None),
+    conn: Database, session: Session = session_make(engine=None),
 ):
     query = session.query(Threshold)
 

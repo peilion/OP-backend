@@ -11,7 +11,7 @@ manufactures = session.query(Manufacturer).all()
 
 for asset in assets:
     Motor = Asset(
-        name='驱动电机#{0}'.format(random.randint(100, 999)),
+        name="驱动电机#{0}".format(random.randint(100, 999)),
         sn="".join(random.sample("zyxwvutsrqponmlkjihgfedcba", 8)),
         asset_level=1,
         asset_type=2,
@@ -22,7 +22,7 @@ for asset in assets:
         repairs=random.randint(0, 5),
         health_indicator=85,
         parent_id=asset.id,
-        manufacturer=random.choice(manufactures)
+        manufacturer=random.choice(manufactures),
     )
 
     Bearing1 = Asset(
@@ -36,7 +36,7 @@ for asset in assets:
         admin=asset.admin,
         repairs=random.randint(0, 5),
         health_indicator=85,
-        manufacturer=random.choice(manufactures)
+        manufacturer=random.choice(manufactures),
     )
 
     Bearing2 = Asset(
@@ -50,11 +50,11 @@ for asset in assets:
         admin=asset.admin,
         repairs=random.randint(0, 5),
         health_indicator=85,
-        manufacturer=random.choice(manufactures)
+        manufacturer=random.choice(manufactures),
     )
 
     Pump = Asset(
-        name='泵体#{0}'.format(random.randint(100, 999)),
+        name="泵体#{0}".format(random.randint(100, 999)),
         sn="".join(random.sample("zyxwvutsrqponmlkjihgfedcba", 8)),
         asset_level=1,
         asset_type=1,
@@ -65,7 +65,7 @@ for asset in assets:
         repairs=random.randint(0, 5),
         health_indicator=85,
         parent_id=asset.id,
-        manufacturer=random.choice(manufactures)
+        manufacturer=random.choice(manufactures),
     )
 
     Bearing3 = Asset(
@@ -79,7 +79,7 @@ for asset in assets:
         admin=asset.admin,
         repairs=random.randint(0, 5),
         health_indicator=85,
-        manufacturer=random.choice(manufactures)
+        manufacturer=random.choice(manufactures),
     )
 
     Bearing4 = Asset(
@@ -93,7 +93,7 @@ for asset in assets:
         admin=asset.admin,
         repairs=random.randint(0, 5),
         health_indicator=85,
-        manufacturer=random.choice(manufactures)
+        manufacturer=random.choice(manufactures),
     )
 
     Motor.children = [Bearing1, Bearing2]

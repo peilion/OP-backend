@@ -14,18 +14,24 @@ from services.signal.vibration.vibration_class import VibrationSignal
 
 
 def fetch_mps(session):
-    mps = (session.query(MeasurePoint.station_id, MeasurePoint.inner_station_id).
-           filter(MeasurePoint.type == 0).
-           all())
+    mps = (
+        session.query(MeasurePoint.station_id, MeasurePoint.inner_station_id)
+        .filter(MeasurePoint.type == 0)
+        .all()
+    )
     return mps
 
 
 def fetch_data(session, station_id, inner_station_id):
     data_model = VibData.model(station_id=station_id, inner_id=inner_station_id)
     feature_model = VibFeature.model(station_id=station_id, inner_id=inner_station_id)
-    data = (session.query(data_model.id, data_model.time, data_model.ima).
-            join(feature_model, feature_model.data_id == data_model.id, isouter=True).
-            filter(feature_model.data_id == None).limit(10).all())
+    data = (
+        session.query(data_model.id, data_model.time, data_model.ima)
+        .join(feature_model, feature_model.data_id == data_model.id, isouter=True)
+        .filter(feature_model.data_id == None)
+        .limit(10)
+        .all()
+    )
     # ("SELECT d.id,d.time as time, d.ima as vib "
     #  "from vib_data_{0}_{1} as d "
     #  "LEFT JOIN vib_feature_{0}_{1} as f on d.id = f.data_id "
@@ -66,12 +72,23 @@ def cal_vib_feature():
     session = session_make(engine=meta_engine)
     mps: List[MeasurePoint] = fetch_mps(session=session)
     for mp in mps:  # Each measure points
-        data = fetch_data(session=session, station_id=mp.station_id, inner_station_id=mp.inner_station_id)
+        data = fetch_data(
+            session=session,
+            station_id=mp.station_id,
+            inner_station_id=mp.inner_station_id,
+        )
         if len(data) > 0:
             feature_insert_value = []
             for row in data:  # each row
                 feature_insert_value.append(
-                    calculate_feature_row(row=row, station_id=mp.station_id, inner_station_id=mp.inner_station_id))
-            processed_rows += insert_feature(session=session, to_save=feature_insert_value)
+                    calculate_feature_row(
+                        row=row,
+                        station_id=mp.station_id,
+                        inner_station_id=mp.inner_station_id,
+                    )
+                )
+            processed_rows += insert_feature(
+                session=session, to_save=feature_insert_value
+            )
     session.close()
     return processed_rows

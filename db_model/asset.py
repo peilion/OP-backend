@@ -7,7 +7,7 @@ from sqlalchemy import (
     DateTime,
     func,
     BigInteger,
-    JSON
+    JSON,
 )
 from sqlalchemy import String, Text
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -19,7 +19,7 @@ from db import Base, table_args
 class Asset(Base):
     LEVELS = {0: "Unit", 1: "Equip", 2: "Component"}
     STATUS = {0: "Excellent", 1: "Good", 2: "Moderate", 3: "Poor", 4: "Offline"}
-    MPCONFIGURATION = {1: '4振动', 2: '10振动加电流电压', 3:'8振动加电流电压'}
+    MPCONFIGURATION = {1: "4振动", 2: "10振动加电流电压", 3: "8振动加电流电压"}
     TYPES = {
         0: "PumpUnit",
         1: "Pump",

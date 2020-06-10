@@ -129,10 +129,16 @@ class DigitalSignal:  # Base class for vibration signal and electric signal
 
         half_fr_indexes = fr / 2
 
-        upper_search = np.rint((half_fr_indexes + tolerance * (half_fr_indexes / fr)) / df).astype(np.int)
-        lower_search = np.rint((half_fr_indexes - tolerance * (half_fr_indexes / fr)) / df).astype(np.int)
+        upper_search = np.rint(
+            (half_fr_indexes + tolerance * (half_fr_indexes / fr)) / df
+        ).astype(np.int)
+        lower_search = np.rint(
+            (half_fr_indexes - tolerance * (half_fr_indexes / fr)) / df
+        ).astype(np.int)
 
-        self.half_fr_indexes = lower_search + np.argmax(spec[lower_search:upper_search+1])
+        self.half_fr_indexes = lower_search + np.argmax(
+            spec[lower_search : upper_search + 1]
+        )
         self.half_fr_amp = spec[self.half_fr_indexes]
 
     def compute_spectrum(self, compute_axis: bool = True):
