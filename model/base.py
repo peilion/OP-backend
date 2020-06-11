@@ -32,6 +32,17 @@ class BinaryArray(list):
         return [round(float(item), TIME_DOMAIN_DECIMAL) for item in raw]
 
 
+class BinaryArrayMax(list):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        raw = np.fromstring(v, dtype=np.float32)
+        return float(raw.max())
+
+
 class SubSampledArray(list):
     @classmethod
     def __get_validators__(cls):
@@ -55,7 +66,6 @@ class SignalArray(list):
 
     @classmethod
     def validate(cls, v: ndarray):
-
         return [round(float(item), TIME_DOMAIN_DECIMAL) for item in v]
 
 
@@ -66,5 +76,4 @@ class JsonString(list):
 
     @classmethod
     def validate(cls, v: str):
-
         return orjson.loads(v)

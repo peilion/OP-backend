@@ -46,6 +46,7 @@ class MeasurePoint(Base):
     health_indicator = Column(Float, default=85, nullable=True)
     type = Column(SmallInteger, nullable=False)  # 键含义参照 TYPES
     sample_interval = Column(Integer)  # 单位为 s
+    sample_sensitive = Column(Float)  # 单位为 mv/g
     sample_freq = Column(Integer)  # 单位为 Hz
     statu = Column(SmallInteger, default=0)  # 值含义见 STATUS
     asset_id = Column(Integer, ForeignKey("asset.id"))

@@ -7,7 +7,7 @@ from fastapi.responses import ORJSONResponse
 
 from core.dependencies import get_db
 from crud.warning import *
-from model.log import WarningLogSchema
+from model.log import WarningLogSchema, WarningDetailSchema
 
 router = APIRouter()
 
@@ -26,11 +26,11 @@ class GroupRule(str, Enum):
     "/", response_class=ORJSONResponse, response_model=List[Optional[WarningLogSchema]]
 )
 async def read_warning_logs(
-    skip: int = None,
-    limit: int = None,
-    asset_id: int = None,
-    isread: bool = None,
-    conn: Database = Depends(get_db),
+        skip: int = None,
+        limit: int = None,
+        asset_id: int = None,
+        isread: bool = None,
+        conn: Database = Depends(get_db),
 ):
     """
     Get Warning List.
@@ -43,7 +43,7 @@ async def read_warning_logs(
 
 @router.get("/stat/", response_class=ORJSONResponse)
 async def read_warning_logs_statistic(
-    group_by: GroupRule, conn: Database = Depends(get_db)
+        group_by: GroupRule, conn: Database = Depends(get_db)
 ):
     """
     Response Schema:
@@ -80,7 +80,7 @@ async def read_warning_logs_statistic(
         raise HTTPException(status_code=400, detail="Bad query parameters")
 
 
-@router.get("/{id}/", response_class=ORJSONResponse, response_model=WarningLogSchema)
+@router.get("/{id}/", response_class=ORJSONResponse, response_model=WarningDetailSchema)
 async def read_warning_logs_by_id(id: int, conn: Database = Depends(get_db)):
     """
     Get warning log by ID.

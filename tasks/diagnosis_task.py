@@ -19,10 +19,7 @@ import orjson
 from typing import Dict, List
 
 position_type_mapper = {
-    "motor_non_driven": (
-        2,
-        "非",
-        motor_non_driven_end_diagnosis,
+    "motor_non_driven": (2,"非",motor_non_driven_end_diagnosis,
     ),  # asset_type, bearing position , and diagnosis method
     "motor_driven": (2, "驱", motor_driven_end_diagnosis),
     "pump_non_driven": (1, "非", pump_non_driven_end_diagnosis),
@@ -121,7 +118,7 @@ def expert_system_diagnosis():
 
                 if (bearing_id is not None) & (len(bearing_info) != 0):
                     th = (
-                        session.query(Threshold.diag_threshold)
+                        session.query(Threshold.id,Threshold.diag_threshold)
                         .filter(Threshold.mp_pattern == mp["position"].name)
                         .one()
                     )
@@ -142,6 +139,7 @@ def expert_system_diagnosis():
                                 diag_res_insert_value.append(
                                     WarningLog(
                                         description=diag_res,
+                                        threshold_id=th.id,
                                         severity=int(diag_res_sum - 1)
                                         if diag_res_sum < 3
                                         else 2,
@@ -155,9 +153,10 @@ def expert_system_diagnosis():
                                 )
                                 session.add_all(diag_res_insert_value)
                             if index == len(signal_list) - 1:
-                                session.query(MeasurePoint).filter(
-                                    MeasurePoint.id == mp["id"]
-                                ).update(
+                                session.\
+                                    query(MeasurePoint).\
+                                    filter(MeasurePoint.id == mp["id"]).\
+                                    update(
                                     {
                                         "id": mp["id"],
                                         "statu": int(diag_res_sum)

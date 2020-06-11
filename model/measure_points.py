@@ -11,6 +11,7 @@ class MeasurePointSchema(BaseModel):
     md_time: Optional[datetime] = None
     sample_freq: Optional[int]
     sample_interval: Optional[int]
+    sample_sensitive: Optional[float]
     statu: Optional[int]
     health_indicator: Optional[int]
     station_id: Optional[int]

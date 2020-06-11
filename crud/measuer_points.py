@@ -77,6 +77,7 @@ async def get(conn: Database, id: int, session: Session = session_make(engine=No
             MeasurePoint.type,
             MeasurePoint.md_time,
             MeasurePoint.statu,
+            MeasurePoint.sample_sensitive,
             MeasurePoint.sample_freq,
             MeasurePoint.asset_id,
             Station.id.label("staion_id"),

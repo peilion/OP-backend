@@ -1,3 +1,5 @@
+import enum
+
 from sqlalchemy import (
     Column,
     Integer,
@@ -11,10 +13,20 @@ from sqlalchemy import (
     Boolean,
     JSON,
     UniqueConstraint,
-)
+    Enum)
 from sqlalchemy.orm import relationship
 
 from db import Base, table_args
+
+
+class FaultPatternEnum(enum.Enum):
+    不平衡故障 = 1
+    不对中故障 = 2
+    A类松动 = 3
+    B类松动 = 4
+    滚动轴承故障 = 5
+    喘振故障 = 6
+    碰磨故障 = 7
 
 
 class MaintenanceRecord(Base):
@@ -45,6 +57,7 @@ class WarningLog(Base):
     id = Column(Integer, primary_key=True)
     cr_time = Column(DateTime, nullable=True, default=func.now(), index=True)
     description = Column(JSON, nullable=False)
+    threshold_id = Column(Integer, ForeignKey("threshold.id"), index=True)
     severity = Column(SmallInteger, nullable=False)
     is_read = Column(Boolean, nullable=False, default=False)
     asset_id = Column(Integer, ForeignKey("asset.id"))
@@ -76,3 +89,13 @@ class MsetWarningLog(Base):
     reporter_id = Column(Integer, index=True)
 
     # asset = relationship("Asset", back_populates="MsetWarningLogs")
+
+
+class MaintenanceSuggestion(Base):
+    __tablename__ = "maintenance_suggestion"
+    __table_args__ = table_args
+
+    id = Column(Integer, primary_key=True)
+    fault_pattern = Column(Enum(FaultPatternEnum), nullable=False)
+    severity = Column(SmallInteger, nullable=False)
+    suggestion = Column(Text, nullable=False)
