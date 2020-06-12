@@ -1,12 +1,11 @@
 import datetime
+from typing import Dict
 
 import numpy as np
-from databases import Database
-import asyncio
-from crud.base import query2sql
+
 from custom_lib.treelib import Tree
 from db import session_make
-from db.conn_engine import META_URL, meta_engine
+from db.conn_engine import meta_engine
 from db_model import Asset, MeasurePoint, Bearing, Threshold, WarningLog, VibData
 from services.diagnosis.processors import (
     motor_non_driven_end_diagnosis,
@@ -14,13 +13,10 @@ from services.diagnosis.processors import (
     pump_non_driven_end_diagnosis,
     pump_driven_end_diagnosis,
 )
-import json
-import orjson
-from typing import Dict, List
 
 position_type_mapper = {
-    "motor_non_driven": (2,"非",motor_non_driven_end_diagnosis,
-    ),  # asset_type, bearing position , and diagnosis method
+    "motor_non_driven": (2, "非", motor_non_driven_end_diagnosis,
+                         ),  # asset_type, bearing position , and diagnosis method
     "motor_driven": (2, "驱", motor_driven_end_diagnosis),
     "pump_non_driven": (1, "非", pump_non_driven_end_diagnosis),
     "pump_driven": (1, "驱", pump_driven_end_diagnosis),
@@ -57,8 +53,8 @@ def fetch_mps(session):
             MeasurePoint.position,
             MeasurePoint.direction,
         )
-        .filter(MeasurePoint.type == 0, MeasurePoint.position != "pipeline")
-        .all()
+            .filter(MeasurePoint.type == 0, MeasurePoint.position != "pipeline")
+            .all()
     )
     return mps
 
@@ -70,9 +66,9 @@ def fetch_data(session, mp: Dict):
     last_diag_id = mp["last_diag_id"] if mp["last_diag_id"] is not None else 0
     signals = (
         session.query(data_model.id, data_model.time, data_model.ima.label("vib"))
-        .filter(data_model.id > last_diag_id)
-        .limit(10)
-        .all()
+            .filter(data_model.id > last_diag_id)
+            .limit(10)
+            .all()
     )
     return signals
 
@@ -83,15 +79,15 @@ def fetch_bearing_info(session, asset: Dict, mp: Dict):
         if equip["asset_type"] == position_type_mapper[mp["position"].name][0]:
             for bearing in equip["children"]:
                 if bearing["name"].startswith(
-                    position_type_mapper[mp["position"].name][1]
+                        position_type_mapper[mp["position"].name][1]
                 ):
                     bearing_id = bearing["id"]
 
     bearing_info = (
         session.query(Bearing.bpfi, Bearing.bpfo, Bearing.bsf, Bearing.ftf)
-        .filter(Bearing.asset_id == bearing_id)
-        .limit(1)
-        .one()
+            .filter(Bearing.asset_id == bearing_id)
+            .limit(1)
+            .one()
     )
     return bearing_id, bearing_info
 
@@ -118,15 +114,16 @@ def expert_system_diagnosis():
 
                 if (bearing_id is not None) & (len(bearing_info) != 0):
                     th = (
-                        session.query(Threshold.id,Threshold.diag_threshold)
-                        .filter(Threshold.mp_pattern == mp["position"].name)
-                        .one()
+                        session.query(Threshold.id, Threshold.diag_threshold)
+                            .filter(Threshold.mp_pattern == mp["position"].name)
+                            .order_by(Threshold.id.desc())
+                            .one()
                     )
 
                     diag_res_insert_value = []
                     for index, signal in enumerate(signal_list):
                         diag_method = position_type_mapper[mp["position"].name][2]
-                        diag_res, indicators = diag_method(
+                        diag_res, marks, indicators = diag_method(
                             data=signal.vib,
                             fs=10000,
                             R=2800,
@@ -139,6 +136,7 @@ def expert_system_diagnosis():
                                 diag_res_insert_value.append(
                                     WarningLog(
                                         description=diag_res,
+                                        marks=marks,
                                         threshold_id=th.id,
                                         severity=int(diag_res_sum - 1)
                                         if diag_res_sum < 3
@@ -151,11 +149,10 @@ def expert_system_diagnosis():
                                         **indicators
                                     )
                                 )
-                                session.add_all(diag_res_insert_value)
                             if index == len(signal_list) - 1:
-                                session.\
-                                    query(MeasurePoint).\
-                                    filter(MeasurePoint.id == mp["id"]).\
+                                session. \
+                                    query(MeasurePoint). \
+                                    filter(MeasurePoint.id == mp["id"]). \
                                     update(
                                     {
                                         "id": mp["id"],
@@ -166,6 +163,7 @@ def expert_system_diagnosis():
                                         "last_diag_id": signal.id,
                                     }
                                 )
+                                session.add_all(diag_res_insert_value)
                             session.commit()
                             processed_row += 1
                         except Exception as e:

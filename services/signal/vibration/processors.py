@@ -1,3 +1,6 @@
+import numpy as np
+
+from services.diagnosis.base import MeasurePoint
 from services.signal.vibration.vibration_class import VibrationSignal
 from utils.serializer import binary_deserializer
 

@@ -36,19 +36,19 @@ app.conf.beat_schedule = {
 }
 
 
-@app.task(ignore_result=True)
+@app.task(ignore_result=True, expires=10)
 def make_feature_calculation():
     res = cal_vib_feature()
     print("{0} feature extraction finished.".format(res))
 
 
-@app.task(ignore_result=True)
+@app.task(ignore_result=True, expires=10)
 def make_mset_estimate():
     res = mset_evaluate(3)
     print("{0} estimate finished.".format(res))
 
 
-@app.task(ignore_result=True)
+@app.task(ignore_result=True, expires=10)
 def make_diagnosis():
     res = expert_system_diagnosis()
     print("{0} diagnosis finished.".format(res))

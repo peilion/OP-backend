@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List
-from .base import BinaryArray, JsonString, BinaryArrayMax
+from .base import SignalArray, JsonString, BinaryArrayMax, SignalArrayWithoutRound
 from pydantic import BaseModel
 
 
@@ -30,6 +30,7 @@ class WarningDetailSchema(BaseModel):
     id: int
     cr_time: datetime
     description: JsonString
+    marks: JsonString
     severity: int
     data_id: int
     ib_indicator: Optional[float]
@@ -43,6 +44,11 @@ class WarningDetailSchema(BaseModel):
     vel_thd: Optional[float]
     thres: JsonString
     suggestions: List[str]
+
+
+class WarningData(BaseModel):
+    spec: SignalArrayWithoutRound
+    freq: SignalArrayWithoutRound
 
 
 class WarningAndMainteSchema(BaseModel):

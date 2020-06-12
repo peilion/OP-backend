@@ -57,6 +57,7 @@ class WarningLog(Base):
     id = Column(Integer, primary_key=True)
     cr_time = Column(DateTime, nullable=True, default=func.now(), index=True)
     description = Column(JSON, nullable=False)
+    marks = Column(JSON, nullable=False)
     threshold_id = Column(Integer, ForeignKey("threshold.id"), index=True)
     severity = Column(SmallInteger, nullable=False)
     is_read = Column(Boolean, nullable=False, default=False)

@@ -208,6 +208,15 @@ def motor_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
     return (
         mp_instance.fault_diag_result,
         {
+            "ib_mark": int(mp_instance.x_vel.harmonics_index[1]),
+            "ma_mark": int(mp_instance.x_vel.harmonics_index[2]),
+            "al_mark": int(mp_instance.x_vel.harmonics_index[1]),
+            "bl_mark": [int(item) for item in mp_instance.x_vel.harmonics_index],
+            "rb_mark": [int(item) for item in mp_instance.x_vel.harmonics_index[:5]] + [int(item) for item in
+                                                                                        mp_instance.x_vel.sub_harmonics_index],
+            "bw_mark": [int(item) for item in mp_instance.x_env.bearing_index]
+        },
+        {
             "ib_indicator": float(mp_instance.ib_indicator),
             "ma_indicator": float(mp_instance.ma_indicator),
             "bw_indicator": MySQLdb.Binary(
@@ -242,6 +251,12 @@ def motor_non_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
     mp_instance.diagnosis()
     return (
         mp_instance.fault_diag_result,
+        {
+            "ib_mark": int(mp_instance.x_vel.harmonics_index[1]),
+            "al_mark": int(mp_instance.x_vel.harmonics_index[1]),
+            "bl_mark": [int(item) for item in mp_instance.x_vel.harmonics_index],
+            "bw_mark": [int(item) for item in mp_instance.x_env.bearing_index]
+        },
         {
             "ib_indicator": float(mp_instance.ib_indicator),
             "bw_indicator": MySQLdb.Binary(
@@ -280,6 +295,16 @@ def pump_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
     return (
         mp_instance.fault_diag_result,
         {
+            "ib_mark": int(mp_instance.x_vel.harmonics_index[1]),
+            "ma_mark": int(mp_instance.x_vel.harmonics_index[2]),
+            "al_mark": int(mp_instance.x_vel.harmonics_index[1]),
+            "bl_mark": [int(item) for item in mp_instance.x_vel.harmonics_index],
+            "rb_mark": [int(item) for item in mp_instance.x_vel.harmonics_index[:5]] + [int(item) for item in
+                                                                                        mp_instance.x_vel.sub_harmonics_index],
+            "bw_mark": [int(item) for item in mp_instance.x_env.bearing_index],
+            "sg_mark": [int(item) for item in mp_instance.sg_index]
+        },
+        {
             "ib_indicator": float(mp_instance.ib_indicator),
             "ma_indicator": float(mp_instance.ma_indicator),
             "bw_indicator": MySQLdb.Binary(
@@ -316,6 +341,13 @@ def pump_non_driven_end_diagnosis(data, fs, R, bearing_ratio: dict, th: dict):
     mp_instance.diagnosis()
     return (
         mp_instance.fault_diag_result,
+        {
+            "ib_mark": int(mp_instance.x_vel.harmonics_index[1]),
+            "al_mark": int(mp_instance.x_vel.harmonics_index[1]),
+            "bl_mark": [int(item) for item in mp_instance.x_vel.harmonics_index],
+            "bw_mark": [int(item) for item in mp_instance.x_env.bearing_index],
+            "sg_mark": [int(item) for item in mp_instance.sg_index]
+        },
         {
             "ib_indicator": float(mp_instance.ib_indicator),
             "bw_indicator": MySQLdb.Binary(
