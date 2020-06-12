@@ -13,7 +13,8 @@ from sqlalchemy import (
     Boolean,
     JSON,
     UniqueConstraint,
-    Enum)
+    Enum,
+)
 from sqlalchemy.orm import relationship
 
 from db import Base, table_args

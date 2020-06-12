@@ -15,12 +15,12 @@ from services.query_processors.warning import warning_description_formatter
 
 
 async def get_multi(
-        conn: Database,
-        skip: int,
-        limit: int,
-        asset_id: int,
-        isread: bool,
-        session: Session = session_make(engine=None),
+    conn: Database,
+    skip: int,
+    limit: int,
+    asset_id: int,
+    isread: bool,
+    session: Session = session_make(engine=None),
 ):
     query = (
         session.query(
@@ -35,9 +35,9 @@ async def get_multi(
             Asset.name.label("asset_name"),
             WarningLog.asset_id,
         )
-            .join(Asset, Asset.id == WarningLog.asset_id)
-            .join(MeasurePoint, MeasurePoint.id == WarningLog.mp_id)
-            .order_by(WarningLog.cr_time.desc())
+        .join(Asset, Asset.id == WarningLog.asset_id)
+        .join(MeasurePoint, MeasurePoint.id == WarningLog.mp_id)
+        .order_by(WarningLog.cr_time.desc())
     )
     if asset_id:
         query = query.filter(Asset.id == asset_id)
@@ -49,26 +49,28 @@ async def get_multi(
 
 
 async def get(
-        conn: Database, id: int, session: Session = session_make(engine=meta_engine)
+    conn: Database, id: int, session: Session = session_make(engine=meta_engine)
 ):
     query = (
-        session.query(WarningLog, Threshold.diag_threshold.label('thres'))
-            .filter(WarningLog.id == id)
-            .join(Threshold, Threshold.id == WarningLog.threshold_id)
+        session.query(WarningLog, Threshold.diag_threshold.label("thres"))
+        .filter(WarningLog.id == id)
+        .join(Threshold, Threshold.id == WarningLog.threshold_id)
     )
     res = await conn.fetch_one(query2sql(query))
-    diag_res = orjson.loads(res['description'])
+    diag_res = orjson.loads(res["description"])
     suggestions = []
     for fault_pattern, severity in diag_res.items():
         if severity != 0:
-            query = session.query(MaintenanceSuggestion.suggestion).filter(MaintenanceSuggestion.fault_pattern == fault_pattern,
-                                                                           MaintenanceSuggestion.severity==severity)
+            query = session.query(MaintenanceSuggestion.suggestion).filter(
+                MaintenanceSuggestion.fault_pattern == fault_pattern,
+                MaintenanceSuggestion.severity == severity,
+            )
             suggestion = await conn.fetch_one(query2sql(query))
-            suggestions.append(suggestion['suggestion'])
+            suggestions.append(suggestion["suggestion"])
     if not res.is_read:
         update_query = "Update warning_log set is_read=:isread where id = :id"
-        await conn.execute(update_query, {'isread': True, 'id': id})
-    return {'suggestions': suggestions, **dict(res)}
+        await conn.execute(update_query, {"isread": True, "id": id})
+    return {"suggestions": suggestions, **dict(res)}
 
 
 async def get_warning_calendar(conn: Database):
@@ -84,16 +86,16 @@ async def get_warning_calendar(conn: Database):
 
 
 async def get_warning_stat_by_station(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = (
         session.query(
             Asset.station_id, Station.name, func.count(WarningLog.asset_id).label("cnt")
         )
-            .select_from(WarningLog)
-            .join(Asset)
-            .join(Station, Asset.station_id == Station.id)
-            .group_by(Asset.station_id)
+        .select_from(WarningLog)
+        .join(Asset)
+        .join(Station, Asset.station_id == Station.id)
+        .group_by(Asset.station_id)
     )
 
     res = await conn.fetch_all(query2sql(query))
@@ -106,15 +108,15 @@ async def get_warning_stat_by_station(
 
 
 async def get_warning_stat_by_branch_company(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = (
         session.query(BranchCompany.name, func.count(WarningLog.asset_id).label("cnt"))
-            .select_from(WarningLog)
-            .join(Asset)
-            .join(Station, Asset.station_id == Station.id)
-            .join(BranchCompany, Station.bc_id == BranchCompany.id)
-            .group_by(Asset.station_id)
+        .select_from(WarningLog)
+        .join(Asset)
+        .join(Station, Asset.station_id == Station.id)
+        .join(BranchCompany, Station.bc_id == BranchCompany.id)
+        .group_by(Asset.station_id)
     )
 
     res = await conn.fetch_all(query2sql(query))
@@ -127,15 +129,15 @@ async def get_warning_stat_by_branch_company(
 
 
 async def get_warning_stat_by_region_company(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = (
         session.query(RegionCompany.name, func.count(WarningLog.asset_id).label("cnt"))
-            .select_from(WarningLog)
-            .join(Asset)
-            .join(Station, Asset.station_id == Station.id)
-            .join(RegionCompany, Station.rc_id == RegionCompany.id)
-            .group_by(Asset.station_id)
+        .select_from(WarningLog)
+        .join(Asset)
+        .join(Station, Asset.station_id == Station.id)
+        .join(RegionCompany, Station.rc_id == RegionCompany.id)
+        .group_by(Asset.station_id)
     )
 
     res = await conn.fetch_all(query2sql(query))
@@ -148,7 +150,7 @@ async def get_warning_stat_by_region_company(
 
 
 async def get_warning_stat_by_asset(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = session.query(WarningLog.asset_id, func.count("*").label("cnt")).group_by(
         WarningLog.asset_id
@@ -158,7 +160,7 @@ async def get_warning_stat_by_asset(
 
 
 async def get_warning_stat_by_isreadable(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     query = session.query(WarningLog.is_read, func.count("*").label("cnt")).group_by(
         WarningLog.is_read
@@ -171,7 +173,7 @@ async def get_warning_stat_by_isreadable(
 
 
 async def get_warning_stat_by_period(
-        conn: Database, session: Session = session_make(engine=None)
+    conn: Database, session: Session = session_make(engine=None)
 ):
     now = datetime.datetime.now()
     last_day = now - datetime.timedelta(days=1)
@@ -182,13 +184,13 @@ async def get_warning_stat_by_period(
     for start_date in [last_day, last_week, last_month, last_year]:
         query1 = (
             session.query(func.count("*").label("cnt"))
-                .select_from(WarningLog)
-                .filter(WarningLog.cr_time.between(str(start_date), str(now)))
+            .select_from(WarningLog)
+            .filter(WarningLog.cr_time.between(str(start_date), str(now)))
         )
         query2 = (
             session.query(func.count("*").label("cnt"))
-                .select_from(MsetWarningLog)
-                .filter(MsetWarningLog.cr_time.between(str(start_date), str(now)))
+            .select_from(MsetWarningLog)
+            .filter(MsetWarningLog.cr_time.between(str(start_date), str(now)))
         )
         res1 = await conn.fetch_one(query2sql(query1))
         res2 = await conn.fetch_one(query2sql(query2))

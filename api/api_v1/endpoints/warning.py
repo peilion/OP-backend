@@ -41,11 +41,11 @@ class FaultRule(str, Enum):
     "/", response_class=ORJSONResponse, response_model=List[Optional[WarningLogSchema]]
 )
 async def read_warning_logs(
-        skip: int = None,
-        limit: int = None,
-        asset_id: int = None,
-        isread: bool = None,
-        conn: Database = Depends(get_db),
+    skip: int = None,
+    limit: int = None,
+    asset_id: int = None,
+    isread: bool = None,
+    conn: Database = Depends(get_db),
 ):
     """
     Get Warning List.
@@ -58,7 +58,7 @@ async def read_warning_logs(
 
 @router.get("/stat/", response_class=ORJSONResponse)
 async def read_warning_logs_statistic(
-        group_by: GroupRule, conn: Database = Depends(get_db)
+    group_by: GroupRule, conn: Database = Depends(get_db)
 ):
     """
     Response Schema:
@@ -94,9 +94,11 @@ async def read_warning_logs_statistic(
     else:
         raise HTTPException(status_code=400, detail="Bad query parameters")
 
+
 @router.get("/data/", response_class=ORJSONResponse, response_model=WarningData)
-async def read_warning_log_data_by_id(data_id: int, mp_id: int, fault_mode: FaultRule,
-                                      conn: Database = Depends(get_db)):
+async def read_warning_log_data_by_id(
+    data_id: int, mp_id: int, fault_mode: FaultRule, conn: Database = Depends(get_db)
+):
     """
     Get warning log data by ID and fault pattern.
     """
@@ -105,21 +107,30 @@ async def read_warning_log_data_by_id(data_id: int, mp_id: int, fault_mode: Faul
     )
     if not data:
         raise HTTPException(status_code=400, detail="Item not found")
-    signal = VibrationSignal(data=np.fromstring(data['ima'], dtype=np.float32), fs=10000, type=2)
+    signal = VibrationSignal(
+        data=np.fromstring(data["ima"], dtype=np.float32), fs=10000, type=2
+    )
 
-    if fault_mode == FaultRule.ub or fault_mode == FaultRule.ma or fault_mode == FaultRule.al or fault_mode == FaultRule.bl or fault_mode == FaultRule.rb:
+    if (
+        fault_mode == FaultRule.ub
+        or fault_mode == FaultRule.ma
+        or fault_mode == FaultRule.al
+        or fault_mode == FaultRule.bl
+        or fault_mode == FaultRule.rb
+    ):
         signal = signal.to_velocity(detrend_type="poly")
         signal.compute_spectrum()
-        return {'spec': signal.spec, 'freq': signal.freq}
+        return {"spec": signal.spec, "freq": signal.freq}
     if fault_mode == FaultRule.bw:
         signal = signal.to_filted_signal(
             filter_type="highpass", co_frequency=2 * 1000 / 10000
         ).to_envelope()
         signal.compute_spectrum()
-        return {'spec': signal.spec, 'freq': signal.freq}
+        return {"spec": signal.spec, "freq": signal.freq}
     if fault_mode == FaultRule.sg:
         signal.compute_spectrum()
-        return {'spec': signal.spec, 'freq': signal.freq}
+        return {"spec": signal.spec, "freq": signal.freq}
+
 
 @router.get("/{id}/", response_class=ORJSONResponse, response_model=WarningDetailSchema)
 async def read_warning_logs_by_id(id: int, conn: Database = Depends(get_db)):

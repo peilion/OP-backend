@@ -68,6 +68,7 @@ class SignalArray(list):
     def validate(cls, v: ndarray):
         return [round(float(item), TIME_DOMAIN_DECIMAL) for item in v]
 
+
 class SignalArrayWithoutRound(list):
     @classmethod
     def __get_validators__(cls):
@@ -76,7 +77,6 @@ class SignalArrayWithoutRound(list):
     @classmethod
     def validate(cls, v: ndarray):
         return [float(item) for item in v]
-
 
 
 class JsonString(list):

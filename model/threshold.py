@@ -23,50 +23,50 @@ class MotorDrivenEndPostSchema(BaseModel):
     harmonic_threshold: List[float]
     subharmonic_threshold: List[float]
 
-    @validator('ALoose')
+    @validator("ALoose")
     def ALoose_must_have_a_size_of_three(cls, v):
         if len(v) != 3:
-            raise ValueError('must have a size of 3')
+            raise ValueError("must have a size of 3")
         return v
 
-    @validator('BLoose')
+    @validator("BLoose")
     def BLoose_must_have_a_size_of_three(cls, v):
         if len(v) != 3:
-            raise ValueError('must have a size of 3')
+            raise ValueError("must have a size of 3")
         return v
 
-    @validator('Rubbing')
+    @validator("Rubbing")
     def Rubbing_must_have_a_size_of_three(cls, v):
         if len(v) != 3:
-            raise ValueError('must have a size of 3')
+            raise ValueError("must have a size of 3")
         return v
 
-    @validator('Unbalance')
+    @validator("Unbalance")
     def Unbalance_must_have_a_size_of_three(cls, v):
         if len(v) != 3:
-            raise ValueError('must have a size of 3')
+            raise ValueError("must have a size of 3")
         return v
 
-    @validator('RollBearing')
+    @validator("RollBearing")
     def RollBearing_must_have_a_size_of_three(cls, v):
         if len(v) != 3:
-            raise ValueError('must have a size of 3')
+            raise ValueError("must have a size of 3")
         return v
 
-    @validator('Misalignment')
+    @validator("Misalignment")
     def Misalignment_must_have_a_size_of_three(cls, v):
         if len(v) != 3:
-            raise ValueError('must have a size of 3')
+            raise ValueError("must have a size of 3")
         return v
 
-    @validator('harmonic_threshold')
+    @validator("harmonic_threshold")
     def harmonic_threshold_must_have_a_size_of_11(cls, v):
         if len(v) != 11:
-            raise ValueError('must have a size of 11')
+            raise ValueError("must have a size of 11")
         return v
 
-    @validator('subharmonic_threshold')
+    @validator("subharmonic_threshold")
     def sub_harmonic_threshold_must_have_a_size_of_5(cls, v):
         if len(v) != 5:
-            raise ValueError('must have a size of 5')
+            raise ValueError("must have a size of 5")
         return v
