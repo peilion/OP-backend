@@ -174,7 +174,7 @@ def feature_calculator(u, v, w):
         phaseB_neg,
         phaseC_neg,
         phaseZero,
-    ) = cal_symm(complex_list[1], complex_list[0], complex_list[2])
+    ) = cal_symm(complex_list[0], complex_list[1], complex_list[2])
 
     return (
         rms_list,

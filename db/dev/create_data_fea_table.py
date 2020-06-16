@@ -12,6 +12,7 @@ from utils.simulators import unbalance, misalignment, a_loose, b_loose, rubbing
 from sqlalchemy import create_engine
 
 session = session_make(meta_engine)
+
 base = declarative_base()
 engine = create_engine(META_URL, encoding="utf-8", pool_pre_ping=True)
 x = session.query(MeasurePoint).filter(
@@ -28,7 +29,6 @@ for row in x:
 
 base.metadata.create_all(engine)
 
-
 x = session.query(MeasurePoint).filter(
     MeasurePoint.station_id == 7, MeasurePoint.type == 1
 )
@@ -42,11 +42,10 @@ for row in x:
     )
 base.metadata.create_all(engine)
 
-
 x = (
     session.query(MeasurePoint)
-    .filter(MeasurePoint.station_id != 7, MeasurePoint.type == 1)
-    .all()
+        .filter(MeasurePoint.station_id != 7, MeasurePoint.type == 1)
+        .all()
 )
 model = VibData.model(
     station_id=7, inner_id=0, base=base
@@ -71,16 +70,21 @@ for row in x:
     session.add_all(tmp)
     session.commit()
 
-
 x = session.query(MeasurePoint).filter(MeasurePoint.type == 1).all()
 for mp in x:
     fea_model = ElecFeature.model(
-        station_id=mp.station_id, inner_id=mp.inner_station_id, base=base
+        station_id=mp.station_id, inner_id=mp.inner_station_id
     )  # registe to metadata for all pump_unit
     data_model = ElecData.model(
-        station_id=mp.station_id, inner_id=mp.inner_station_id, base=base
+        station_id=mp.station_id, inner_id=mp.inner_station_id
     )
-    data = session.query(data_model).all()
+    data = (
+        session.query(data_model.id, data_model.ucur, data_model.vcur, data_model.wcur, data_model.time)
+            .join(fea_model, fea_model.data_id == data_model.id, isouter=True)
+            .filter(fea_model.data_id == None)
+            .limit(10)
+            .all()
+    )
     tmp = []
     for item in data:
         u = np.fromstring(item.ucur, dtype=np.float32)
@@ -122,7 +126,7 @@ for mp in x:
             n_rms=n_rms,
             p_rms=p_rms,
             z_rms=z_rms,
-            imbalance=n_rms / p_rms,
+            imbalance=(n_rms / p_rms * 100) if p_rms > 0.1 else 0,
             uamplitude=params[0][0],
             ufrequency=params[0][1],
             uinitial_phase=params[0][2],

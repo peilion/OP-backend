@@ -11,7 +11,7 @@ def three_phase_fast_fournier_transform(
     res = {}
     for phase, phase_name in zip([u, v, w], ["u", "v", "w"]):
         x = ElectricSignal(
-            data=binary_deserializer(phase), fs=20480, compute_axis=False, type=0
+            data=binary_deserializer(phase), fs=10000, compute_axis=False, type=0
         )
         x.compute_spectrum(compute_axis=False)
         if if_return_raw:
@@ -24,7 +24,7 @@ def three_phase_hilbert_transform(u: str, v: str, w: str) -> dict:
     res = {}
     for phase, phase_name in zip([u, v, w], ["u", "v", "w"]):
         x = ElectricSignal(
-            data=binary_deserializer(phase), fs=20480, compute_axis=False, type=0
+            data=binary_deserializer(phase), fs=10000, compute_axis=False, type=0
         )
 
         env = x.to_envelope()
@@ -38,13 +38,13 @@ def three_phase_hilbert_transform(u: str, v: str, w: str) -> dict:
 def dq_transform(u: str, v: str, w: str) -> dict:
     three_phase = ThreePhaseElectric(
         u=ElectricSignal(
-            data=binary_deserializer(u), fs=20480, compute_axis=False, type=0
+            data=binary_deserializer(u), fs=10000, compute_axis=False, type=0
         ),
         v=ElectricSignal(
-            data=binary_deserializer(v), fs=20480, compute_axis=False, type=0
+            data=binary_deserializer(v), fs=10000, compute_axis=False, type=0
         ),
         w=ElectricSignal(
-            data=binary_deserializer(w), fs=20480, compute_axis=False, type=0
+            data=binary_deserializer(w), fs=10000, compute_axis=False, type=0
         ),
     )
     d, q = three_phase.dq0_transform()
@@ -59,7 +59,7 @@ def sym_analyze(res):
             2 * np.pi * res[item + "frequency"],
             res[item + "initial_phase"],
             samples=1024,
-            end_time=1024 / 20480,
+            end_time=1024 / 10000,
         )
         # Append to the list
         complex_list.append(complex_phase)
@@ -72,7 +72,7 @@ def sym_analyze(res):
         phaseB_neg,
         phaseC_neg,
         phaseZero,
-    ) = cal_symm(complex_list[1], complex_list[0], complex_list[2])
+    ) = cal_symm(complex_list[0], complex_list[1], complex_list[2])
     return {
         "A_pos_real": phaseA_pos.real,
         "B_pos_real": phaseB_pos.real,
