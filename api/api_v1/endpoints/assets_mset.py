@@ -10,7 +10,7 @@ from crud.assets_hi import (
     get_estimated_value_multi,
     get_estimated_value_by_id,
     get_similarity_threshold_recently,
-)
+    get_similarity_threshold_near_by)
 from db import session_make
 from db.conn_engine import meta_engine
 from model.assets import MSETSimilaritySchema
@@ -28,6 +28,7 @@ async def read_asset_similarities_and_threshold(
     time_before: str = Query(None, description="e.x. 2016-07-01 00:00:00"),
     time_after: str = Query(None, description="e.x. 2016-01-10 00:00:00"),
     limit: int = Query(None),
+    near_by: int = Query(None),
     conn: Database = Depends(get_db),
 ):
     """
@@ -36,6 +37,10 @@ async def read_asset_similarities_and_threshold(
     if limit:
         items = await get_similarity_threshold_recently(
             conn=conn, asset_id=asset_id, limit=limit
+        )
+    elif near_by:
+        items = await get_similarity_threshold_near_by(
+            conn=conn, asset_id=asset_id, data_id=near_by
         )
     else:
         items = await get_similarity_threshold_during_time(

@@ -100,6 +100,22 @@ async def get_similarity_threshold_during_time(
     dic = multi_result_to_array(res)
     return dic
 
+async def get_similarity_threshold_near_by(
+    conn: Database,
+    asset_id: int,
+    data_id: int,
+    session: Session = session_make(engine=None),
+):
+    hi_model = AssetHI.model(point_id=asset_id)
+    query = session.query(
+        hi_model.id, hi_model.time, hi_model.similarity, hi_model.threshold
+    ).filter(hi_model.id<=data_id).order_by(hi_model.id.desc()).limit(10)
+
+    res = await conn.fetch_all(query2sql(query))
+    res.reverse()
+    dic = multi_result_to_array(res)
+    return dic
+
 
 async def get_similarity_threshold_recently(
     conn: Database,

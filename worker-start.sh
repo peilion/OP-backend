@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-celery -A core beat --loglevel=info --pidfile=
+celery -A tasks beat --loglevel=info --pidfile=
 
 # Create periodic tasks consumer(worker)
-celery -A core worker --loglevel=info
+celery -A tasks worker --loglevel=info

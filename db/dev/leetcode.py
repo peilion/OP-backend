@@ -251,29 +251,477 @@ class Solution9:
                 min_index = [index + 1]
                 min = len(item)
             elif len(item) == min:
-                min_index.append(index + 1 )
+                min_index.append(index + 1)
 
         return min_index
+
     def longestCommonPrefix(self, strs: List[str]) -> str:
         if len(strs) == 0:
             return ''
         res = ''
         min_index = self.find_min(strs)[0]
         min_str = strs[min_index]
-        for char_index,char in enumerate(min_str):
+        for char_index, char in enumerate(min_str):
             for item in strs:
                 if item[char_index] != char:
                     return res
             res = res + char
         return res
 
-if __name__ == "__main__":
-    nums = [-1, 0, 1, 2, -1, -4]
-    nums = [1, 2, -2, -1]
-    nums = [-1, 0, 1, 2, -1, -4]
-    nums = [3, 0, -2, -1, 1, 2]
-    nums = [-4, -2, 1, -5, -4, -4, 4, -2, 0, 4, 0, -2, 3, 1, -5, 0]
-    from db.dev.leetcode import Solution9
 
-    x = Solution9().longestCommonPrefix(["dog","racecar","car"])
-    print(x)
+class Solution10:
+    def maxScoreSightseeingPair(self, A: List[int]) -> int:
+        left = A[0]
+        res = 0
+        for lindex, litem in enumerate(A[1:]):
+            lindex += 1
+            res = max(res, left + A[lindex] - lindex)
+            left = max(left, A[lindex] + lindex)
+        return res
+
+
+class Solution11:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        dic = {}
+        for item in nums:
+            dic.setdefault(item, 0)
+            dic[item] += 1
+        for num in dic.keys():
+            require_num = target - num
+            dic[num] = dic[num] - 1
+            if require_num in dic.keys():
+                if dic[require_num] > 0:
+                    break
+            dic[num] = dic[num] + 1
+        first = nums.index(num)
+        del nums[first]
+        second = nums.index(require_num) + 1
+        return [first, second]
+
+
+class Solution12:
+    def calPoints(self, ops: List[str]) -> int:
+        values = []
+        res = 0
+        for round in ops:
+            if round == 'C':
+                res -= values[-1]
+                values.pop()
+            elif round == 'D':
+                res += 2 * values[-1]
+                values.append(2 * values[-1])
+            elif round == '+':
+                res = res + values[-1] + values[-2]
+                values.append(values[-1] + values[-2])
+            else:
+                res += int(round)
+                values.append(int(round))
+        return res
+
+
+class Solution13:
+    def compressString(self, S: str) -> str:
+        res = ''
+        for i in range(len(S)):
+            if i == 0:
+                res = ''
+                counter = 0
+            elif S[i] != S[i - 1]:
+                counter += 1
+                res = res + S[i - 1] + str(counter)
+                counter = 0
+            else:
+                counter += 1
+
+            if i == len(S) - 1:
+                counter += 1
+                res = res + S[i] + str(counter)
+        return res if len(res) < len(S) else S
+
+
+import base64
+
+
+class Codec:
+    def __init__(self):
+        self.encode_book = {}
+
+    def encode(self, longUrl: str) -> str:
+        s = base64.b64encode(longUrl.encode('utf8')).decode('utf8')
+        key = ''
+        for i in range(10):
+            if s[i:i + 5] not in self.encode_book.keys():
+                key = s[i:i + 5]
+                self.encode_book[s[i:i + 5]] = longUrl
+                break
+        return 'http://tinyurl.com/' + key
+
+    def decode(self, shortUrl: str) -> str:
+        """Decodes a shortened URL to its original URL.
+        """
+        s = shortUrl.split('.com/')[1]
+        url = self.encode_book[s]
+        return url
+
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, x, d):
+        self.val = x
+        self.left = None
+        self.right = None
+        self.depth = d
+
+
+class Solution14:
+
+    def recoverFromPreorder(self, S: str) -> TreeNode:
+        def add_node(pnode, cnode):
+            if pnode.left is None:
+                pnode.left = cnode
+            elif (pnode.left is not None) and (pnode.right is None):
+                pnode.right = cnode
+            else:
+                raise ('Node occupied!')
+
+        if '-' not in S:
+            return TreeNode(int(S), 0)
+        res_list = []
+        item = ''
+        depth = 0
+        max_depth = 0
+        for i in range(len(S)):
+            if i == 0:
+                item = item + S[i]
+            elif i == len(S) - 1:
+                res_list.append((item + S[i], depth))
+                max_depth = max(max_depth, depth)
+
+            else:
+                if (S[i] == '-') and (S[i - 1] != '-'):
+                    res_list.append((item, depth))
+                    max_depth = max(max_depth, depth)
+                    item = ''
+                    depth = 1
+                elif (S[i] != '-') and (S[i - 1] != '-'):
+                    item += S[i]
+                elif (S[i] == '-') and (S[i - 1] == '-'):
+                    depth += 1
+                elif (S[i] != '-') and (S[i - 1] == '-'):
+                    item += S[i]
+
+        root_node = TreeNode(res_list[0][0], 0)
+        res_list[0] = (res_list[0][0], res_list[0][1], root_node)
+        pre_node = None
+        parent_node = None
+        for i in range(1, len(res_list)):
+            node = res_list[i]
+            cur_node = TreeNode(node[0], node[1])
+            if (i == 1):
+                add_node(root_node, cur_node)
+                pre_node = cur_node
+                parent_node = root_node
+
+            elif node[1] == pre_node.depth:
+                add_node(parent_node, cur_node)
+                pre_node = cur_node
+
+            elif node[1] > pre_node.depth:
+                parent_node = pre_node
+                add_node(pre_node, cur_node)
+                pre_node = cur_node
+
+            elif node[1] < pre_node.depth:
+                for j in range(len(res_list[:i]) - 1, -1, -1):
+                    if res_list[j][1] == node[1] - 1:
+                        parent_node = res_list[j][2]
+                        break
+                add_node(parent_node, cur_node)
+                pre_node = cur_node
+
+            res_list[i] = (res_list[i][0], res_list[i][1], cur_node)
+
+        def assign_null_node(node):
+            if node.depth < max_depth:
+                if node.left is None:
+                    node.left = TreeNode(None, node.depth + 1)
+                else:
+                    assign_null_node(node.left)
+                if node.right is None:
+                    node.right = TreeNode(None, node.depth + 1)
+                else:
+                    assign_null_node(node.right)
+
+        # assign_null_node(root_node)
+        return root_node, res_list
+
+
+class Solution15:
+    def countCharacters(self, words: List[str], chars: str) -> int:
+        import collections
+        char_dic = collections.Counter(chars)
+        res = 0
+        for word in words:
+            learnable = True
+            word_dic = collections.Counter(word)
+            for key in word_dic.keys():
+                if key in char_dic:
+                    if char_dic[key] >= word_dic[key]:
+                        continue
+                    else:
+                        learnable = False
+                        break
+                else:
+                    learnable = False
+                    break
+            if learnable:
+                res += len(word)
+        return res
+
+
+class Solution16:
+    def convertToBase7(self, num: int) -> str:
+        if num == 0:
+            return 0
+        unfinished = True
+        count = abs(num)
+        res = ''
+        while unfinished:
+            rest = count % 7
+            res += str(rest)
+            count = int(count / 7)
+            if count < 7:
+                if count != 0:
+                    res += str(count)
+                unfinished = False
+        res = "".join(list(res)[::-1])
+        if num < 0:
+            res = '-' + res
+        return res
+
+
+class Solution16:
+    def maximalRectangle(self, matrix: List[List[str]]) -> int:
+        maxmal = 0
+        for rindex in range(len(matrix)):
+            row = matrix[rindex]
+            link_group = []
+            start_cindex = None
+            length = 0
+            for cindex, item in enumerate(row):
+                if (item == '1') and (start_cindex is None):
+                    start_cindex = cindex
+                    length += 1
+                elif (item == '1') and (start_cindex is not None):
+                    length += 1
+                elif (item == '0') and (start_cindex is not None):
+                    link_group.append((start_cindex, length))
+                    start_cindex = None
+                    length = 0
+            if start_cindex is not None:
+                link_group.append((start_cindex, length))
+            for link in link_group:
+                for item in range(0, link[1]):
+                    start_cindex = link[0] + item
+                    length = link[1] - item
+                    width = 1
+                    for row in matrix[rindex + 1:]:
+                        if row[start_cindex:start_cindex + length] == ['1' for i in range(length)]:
+                            width += 1
+                        else:
+                            break
+                    for row in range(rindex - 1, 0 - 1, -1):
+                        row = matrix[row]
+                        if row[start_cindex:start_cindex + length] == ['1' for i in range(length)]:
+                            width += 1
+                        else:
+                            break
+                    maxmal = max(maxmal, length * width)
+        return maxmal
+
+
+class Solution17:
+    def isMatch(self, s: str, p: str) -> bool:
+        pl = p.split('*')
+        x = []
+        for item in pl:
+            if item == '.':
+                x.append('.')
+            elif '.' in item:
+                ls = ''
+                for i in item:
+                    if i != '.':
+                        ls += i
+                    else:
+                        x.append(ls)
+                        x.append('.')
+                        ls = ''
+
+            else:
+                x.append(item)
+        pll = []
+        for index, item in enumerate(x):
+            if index == len(pl) - 1:
+                pll.append(item)
+            elif len(item) == 1:
+                pll.append(item + '*')
+            else:
+                pll.append(item[:-1])
+                pll.append(item[-1] + '*')
+
+        if p.endswith('*'):
+            pll.pop()
+
+        count = 0
+        for item in pll:
+            if '*' not in item:
+                count += len(item)
+        if count > len(s):
+            return False
+
+        def match_item(s: str, sp: str):
+            if sp == '.*':
+                return True, len(s)
+            elif sp == '.':
+                return True, 1
+            elif '*' in sp:
+                if not s.startswith(sp[0]):
+                    return True, 0
+                n = 1
+                while True:
+                    if s.startswith(n * sp[0]):
+                        n += 1
+                    else:
+                        return True, n - 1
+            elif '.' in sp:
+                for i in range(len(sp)):
+                    if (s[i] != sp[i]) and (sp[i] != '.'):
+                        return False, 0
+                return True, len(sp)
+            else:
+                if s[:len(sp)] == sp:
+                    return True, len(sp)
+                else:
+                    return False, 0
+
+        def match(s, pll):
+            increase = 0
+            pll_index = 0
+            first_matched = False
+            while increase != len(s):
+                if (pll_index > len(pll) - 1) and not first_matched:
+                    return False
+                elif (pll_index > len(pll) - 1) and first_matched:
+                    return True
+                prefix = pll[pll_index]
+                matched, inc = match_item(s[increase:], prefix)
+                increase = increase + inc
+                if not matched:
+                    return False
+                if (increase == len(s)) and (pll_index < len(pll) - 1):
+                    if (pll_index + 1 == len(pll) - 1) and ('*' in pll[pll_index + 1]):
+                        return True
+                    first_matched = True
+                    sc_matched = False
+                    for i in range(inc, 0, -1):
+                        eincrease = increase - i
+                        res = match(s[eincrease:], pll[pll_index + 1:])
+                        if res:
+                            sc_matched = True
+                    if not sc_matched:
+                        return False
+                pll_index += 1
+            return True
+
+        return match(s, pll)
+
+
+class Solution20:
+    def patternMatching(self, pattern: str, value: str) -> bool:
+        if pattern == '':
+            return True
+        pattern = list(pattern)
+        len_s = len(value)
+        import collections
+        pdic = collections.Counter(pattern)
+        a_num, b_num = pdic['a'], pdic['b']
+
+        # a,b 为空字符串情形
+        if a_num!=0:
+            if len_s % a_num == 0:
+                len_word = int(len_s / a_num)
+                base = value[:len_word]
+                matched = True
+                for i in range(a_num):
+                    if value[i * len_word:(i + 1) * len_word] != base:
+                        matched = False
+                        break
+                if matched:
+                    return True
+        elif a_num == 0 :
+            if len_s % b_num != 0:
+                return False
+            else:
+                s=''
+                for i in range(b_num):
+                   s += value[:int(len_s / b_num)]
+                if value != s:
+                    return False
+                else: return True
+
+        if b_num != 0 :
+            if len_s % b_num == 0:
+                len_word = int(len_s / b_num)
+                base = value[:len_word]
+                matched = True
+                for i in range(b_num):
+                    if value[i * len_word:(i + 1) * len_word] != base:
+                        matched = False
+                        break
+                if matched:
+                    return True
+        elif b_num == 0 :
+            if len_s % a_num != 0:
+                return False
+            else:
+                s=''
+                for i in range(a_num):
+                   s += value[:int(len_s / a_num)]
+                if value != s:
+                    return False
+                else: return True
+        # 一般情形
+        max_a_len = int((len_s - b_num * 1) / a_num)
+        for a_len in range(max_a_len, 0, -1):
+            if (len_s - (a_len * a_num)) % b_num != 0:
+                continue
+            b_len = int((len_s - (a_len * a_num)) / b_num)
+            a_word = ''
+            b_word = ''
+            cursor = 0
+            matched = True
+            for p in pattern:
+                if p == 'a':
+                    a_word = value[cursor:cursor+a_len] if a_word == '' else a_word
+                    if value[cursor:cursor+a_len] != a_word:
+                        matched = False
+                        break
+                    cursor += a_len
+                elif p == 'b':
+                    b_word = value[cursor:cursor+b_len] if b_word == '' else b_word
+                    if value[cursor:cursor+b_len] != b_word:
+                        matched = False
+                        break
+                    cursor += b_len
+            if matched:
+                return True
+        return False
+
+if __name__ == "__main__":
+    from db.dev.leetcode import Solution20
+    import itertools
+
+    pattern = "abba"
+    value = "dogdogdogdog"
+    res = Solution20().patternMatching(pattern, value)
+    print(res)

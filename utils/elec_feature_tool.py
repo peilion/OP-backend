@@ -187,4 +187,5 @@ def feature_calculator(u, v, w):
         np.sqrt(np.dot(phaseA_neg.real, phaseA_neg.real) / phase.size),
         np.sqrt(np.dot(phaseA_pos.real, phaseA_pos.real) / phase.size),
         np.sqrt(np.dot(phaseZero.real, phaseZero.real) / phase.size),
+        fundamental,
     )

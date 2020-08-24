@@ -60,3 +60,18 @@ class WarningAndMainteSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class WarningTableSchema(BaseModel):
+    description: str
+    id: int
+    asset_id: int
+    mp_id: Optional[int]
+    cr_time: datetime
+    severity: int
+    is_read: bool
+    mp_name: Optional[str]
+    data_id: int
+    asset_name: Optional[str]
+    t_name: str
+    mp_configuration: int

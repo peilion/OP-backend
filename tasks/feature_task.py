@@ -3,11 +3,7 @@ from __future__ import absolute_import, unicode_literals
 from typing import List
 
 import numpy as np
-from sqlalchemy import text
-from databases import Database
-
-from crud.base import query2sql
-from db.conn_engine import META_URL, meta_engine
+from db.conn_engine import meta_engine
 from db.db_config import session_make
 from db_model import MeasurePoint, VibFeature, VibData
 from services.signal.vibration.vibration_class import VibrationSignal

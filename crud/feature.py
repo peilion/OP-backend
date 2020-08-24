@@ -76,12 +76,12 @@ async def get_multi(
 
     if time_before != "None":
         query = query.filter(model.time.between(str(time_after), str(time_before)))
-    query = query.order_by(model.time)
+        query = query.order_by(model.time.desc())
 
     if limit:
-        query = query.limit(limit)
+        query = query.order_by(model.time.desc()).limit(limit)
     res = await conn.fetch_all(query2sql(query))
-
+    res.reverse()
     if len(res) == 0:
         raise HTTPException(
             status_code=400, detail="No signal collected between the time range"

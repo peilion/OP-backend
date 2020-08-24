@@ -2,6 +2,7 @@ aiocontextvars==0.2.2
 aiomysql==0.0.20
 amqp==2.5.1
 appdirs==1.4.3
+asgiref==3.2.7
 asn1crypto==0.24.0
 attrs==19.1.0
 autopep8==1.4.4
@@ -40,6 +41,7 @@ numpy==1.17.2
 orjson==2.6.2
 pathspec==0.7.0
 psutil==5.6.6
+pyarmor==6.2.8
 pycodestyle==2.5.0
 pycparser==2.19
 pydantic==1.2
@@ -56,11 +58,10 @@ SQLAlchemy==1.3.8
 starlette==0.13.2
 toml==0.10.0
 tornado==5.1.1
-treelib==1.5.5
 typed-ast==1.4.0
 ujson==1.35
 urllib3==1.25.7
-uvicorn==0.11.3
+uvicorn==0.11.5
 vine==1.3.0
 websockets==8.1
 zipp==0.6.0

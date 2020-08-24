@@ -30,7 +30,8 @@ class Motor(Base):
     turn_number = Column(SmallInteger, nullable=True, default=50)
     rated_voltage = Column(Float, nullable=True, default=220)
     rated_speed = Column(Float, nullable=True, default=5000)
-
+    health_indicator = Column(Float, default=0)
+    statu = Column(SmallInteger, default=0)
     asset_id = Column(Integer, ForeignKey("asset.id"))
     asset = relationship("Asset", uselist=False)
 

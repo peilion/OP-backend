@@ -1,12 +1,10 @@
 import numpy as np
-from numba import jit
 
 step = 2
 delta = 0.001
 z = 4
 
 
-@jit(nopython=True)
 def memory_mat_train(np_D):
     memory_mat = np.zeros((1, np_D.shape[1]))
     for i in range(np_D.shape[1]):
@@ -24,7 +22,6 @@ def memory_mat_train(np_D):
     return memory_mat
 
 
-@jit(nopython=True)
 def Temp_MemMat(memorymat):
     memorymat_row = memorymat.shape[0]
     Temp = np.zeros((memorymat_row, memorymat_row))
@@ -35,7 +32,6 @@ def Temp_MemMat(memorymat):
     # np.save(Temp_name, Temp)
 
 
-@jit(nopython=True)
 def mset_estimate(memorymat, Kobs, Temp):  # Temp为临时计算的矩阵
     memorymat_row = memorymat.shape[0]
     Kobs_row = Kobs.shape[0]
@@ -48,7 +44,6 @@ def mset_estimate(memorymat, Kobs, Temp):  # Temp为临时计算的矩阵
     return Kest
 
 
-@jit(nopython=True)
 def calculate_similarity(Kobs, Kest):
     dist_norm = np.zeros((Kobs.shape[0], 1))
     dist_cos = np.zeros((Kobs.shape[0], 1))

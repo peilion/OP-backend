@@ -8,6 +8,6 @@ from .asset import Asset
 from .measure_point import MeasurePoint
 from .organization import Station, BranchCompany, RegionCompany, Pipeline
 from .diag_threshold import Threshold
-from .log import MsetWarningLog
+from .log import MsetWarningLog,logs
 
 __all__ = [s for s in dir() if not s.startswith("_")]
