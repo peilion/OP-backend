@@ -61,7 +61,7 @@ tornado==5.1.1
 typed-ast==1.4.0
 ujson==1.35
 urllib3==1.25.7
-uvicorn==0.11.5
+uvicorn==0.11.7
 vine==1.3.0
 websockets==8.1
 zipp==0.6.0
