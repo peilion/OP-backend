@@ -15,7 +15,7 @@ cffi==1.12.3
 chardet==3.0.4
 Click==7.0
 contextvars==2.4
-cryptography==2.7
+cryptography==3.2
 cycler==0.10.0
 databases==0.2.5
 dataclasses==0.6
