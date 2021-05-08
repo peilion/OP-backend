@@ -21,7 +21,7 @@ databases==0.2.5
 dataclasses==0.6
 dnspython==1.16.0
 email-validator==1.0.5
-eventlet==0.25.1
+eventlet==0.31.0
 fastapi==0.53.2
 flower==0.9.3
 greenlet==0.4.15
