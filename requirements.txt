@@ -23,7 +23,7 @@ dnspython==1.16.0
 email-validator==1.0.5
 eventlet==0.25.1
 fastapi==0.53.2
-flower==0.9.3
+flower==1.2.0
 greenlet==0.4.15
 h11==0.8.1
 idna==2.8
